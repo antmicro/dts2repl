@@ -1,0 +1,4 @@
+// generic_leon3 overlay
+timer0:
+    timersNumber: 2
+    frequency: 50000000

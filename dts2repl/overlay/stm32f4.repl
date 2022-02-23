@@ -1,0 +1,4 @@
+// stm32f4 overlay
+sysbus:
+    init:
+        ApplySVD @https://dl.antmicro.com/projects/renode/svd/STM32F40x.svd.gz

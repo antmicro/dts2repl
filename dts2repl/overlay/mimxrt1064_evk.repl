@@ -1,0 +1,22 @@
+// mimxrt1064_evk overlay
+analog01: Python.PythonPeripheral @ sysbus 0x400D8000
+    size: 0x30
+    initable: true
+    filename: "scripts/pydev/flipflop.py"
+
+dcdc: Python.PythonPeripheral @ sysbus 0x40080000
+    size: 0x4000
+    initable: true
+    filename: "scripts/pydev/flipflop.py"
+
+sysbus:
+    init:
+        Tag <0x400FC014, 0x400FC017> "CCM_CBCDR" 0x000A8200
+        Tag <0x400FC024, 0x400FC027> "CCM(CSCDR1)" 0x40
+        Tag <0x400D8030, 0x400D8033> "analog02" 0x80002001
+
+sdram0: Memory.MappedMemory @ sysbus 0x80000000
+    size: 0x2000000
+
+flash_mem: Memory.MappedMemory @ sysbus 0x70000000
+    size: 0x400000

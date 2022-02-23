@@ -1,0 +1,93 @@
+{
+    "arm,cortex-m0": "CPU.CortexM",
+    "arm,cortex-m0+": "CPU.CortexM",
+    "arm,cortex-m3": "CPU.CortexM",
+    "arm,cortex-m33": "CPU.CortexM",
+    "arm,cortex-m33f": "CPU.CortexM",
+    "arm,cortex-m4": "CPU.CortexM",
+    "arm,cortex-m4f": "CPU.CortexM",
+    "arm,cortex-m7": "CPU.CortexM",
+    "arm,pl011": "UART.PL011",
+    "arm,v6m-nvic": "IRQControllers.NVIC",
+    "arm,v7m-nvic": "IRQControllers.NVIC",
+    "arm,v8m-nvic": "IRQControllers.NVIC",
+
+    "atmel,sam-usart": "UART.SAM_USART",
+
+    "gaisler,apbuart": "UART.GaislerUART",
+    "gaisler,gptimer": "Timers.GaislerGPTimer",
+    "gaisler,irqmp": "IRQControllers.GaislerMIC",
+    "gaisler,leon3": "CPU.Sparc",
+
+    "litex,timer0": "Timers.LiteX_Timer",
+    "litex,uart0": "UART.LiteX_UART",
+
+    "memory": "Memory.MappedMemory",
+    "mmio-sram": "Memory.MappedMemory",
+
+    "microsemi,miv": "CPU.RiscV32",
+    "microsemi,coreuart": "UART.MiV_CoreUART",
+
+    "nordic,nrf-clock": "Miscellaneous.NRF52840_CLOCK",
+    "nordic,nrf-ecb": "Miscellaneous.NRF52840_ECB",
+    "nordic,nrf-rng": "Miscellaneous.NRF52840_RNG",
+    "nordic,nrf-rtc": "Timers.NRF52840_RTC",
+    "nordic,nrf-spi": "SPI.NRF52840_SPI",
+    "nordic,nrf-timer": "Timers.NRF52840_Timer",
+    "nordic,nrf-twi": "I2C.NRF52840_I2C",
+    "nordic,nrf-uart": "UART.NRF52840_UART",
+    "nordic,nrf-uarte": "UART.NRF52840_UART",
+    "nordic,nrf-watchdog": "Timers.NRF52840_Watchdog",
+
+    "ns16550": "UART.NS16550",
+
+    "nxp,flexpwm": "Timers.IMXRT_PWM",
+    "nxp,imx-code-bus": "Memory.MappedMemory",
+    "nxp,imx-dtcm": "Memory.MappedMemory",
+    "nxp,imx-flexspi": "SPI.IMXRT_FlexSPI",
+    "nxp,imx-gpio": "GPIOPort.IMXRT_GPIO",
+    "nxp,imx-itcm": "Memory.MappedMemory",
+    "nxp,imx-lpspi": "SPI.IMXRT_LPSPI",
+    "nxp,imx-sys-bus": "Memory.MappedMemory",
+    "nxp,imx-uart": "UART.ImxUart",
+    "nxp,imx-iuart": "UART.ImxUart",
+    "nxp,kinetis-lpuart": "UART.LowPower_UART",
+    "nxp,kinetis-mcg": "Miscellaneous.K6xF_MCG",
+    "nxp,kinetis-rnga": "Miscellaneous.K6xF_RNG",
+    "nxp,kinetis-sim": "Miscellaneous.K6xF_SIM",
+    "nxp,kinetis-trng": "Miscellaneous.IMX_TRNG",
+    "nxp,kinetis-uart": "UART.K6xF_UART",
+    "nxp,mcux-12b1msps-sar": "Analog.IMXRT_ADC",
+
+    "riscv": "CPU.VexRiscv",
+    "riscv,clint0": "IRQControllers.CoreLevelInterruptor",
+
+    "sifive,dtim0": "Memory.MappedMemory",
+    "sifive,maskrom0": "Memory.MappedMemory",
+    "sifive,otp0": "Memory.MappedMemory",
+    "sifive,plic-1.0.0": "IRQControllers.PlatformLevelInterruptController",
+    "sifive,rocket0": "CPU.RiscV32",
+    "sifive,uart0": "UART.SiFive_UART",
+
+    "silabs,gecko-leuart": "UART.LEUART",
+    "silabs,gecko-uart": "UART.EFM32_UART",
+    "silabs,gecko-usart": "UART.EFR32_USART",
+
+    "soc-nv-flash": "Memory.MappedMemory",
+
+    "st,stm32-gpio": "GPIOPort.STM32_GPIOPort",
+    "st,stm32-lpuart": "UART.STM32F7_USART",
+    "st,stm32-nv-flash": "Memory.MappedMemory",
+    "st,stm32-rcc": "Miscellaneous.STM32F4_RCC",
+    "st,stm32-rng": "Miscellaneous.STM32F4_RNG",
+    "st,stm32-rtc": "Timers.STM32F4_RTC",
+    "st,stm32-timers": "Timers.STM32_Timer",
+    "st,stm32-uart": "UART.STM32_UART",
+    "st,stm32-usart": "UART.STM32_UART",
+    "st,stm32-watchdog": "Timers.STM32F4_IndependentWatchdog",
+    "st,stm32f0-rcc": "Miscellaneous.STM32F4_RCC",
+    "st,stm32wl-rcc": "Miscellaneous.STM32F4_RCC",
+
+    "starfive,itim0": "Memory.MappedMemory",
+    "starfive,rocket0": "CPU.RiscV64"
+}

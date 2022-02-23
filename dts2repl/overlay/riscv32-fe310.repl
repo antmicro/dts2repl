@@ -1,0 +1,14 @@
+// riscv32-fe310 overlay
+clint:
+    frequency: 62000000
+
+plic:
+    numberOfSources: 52
+    numberOfContexts: 1
+
+qspi0Xip: Memory.MappedMemory @ sysbus 0x20000000
+    size: 0x20000000
+
+sysbus:
+    init:
+        ApplySVD @https://dl.antmicro.com/projects/renode/svd/FE310.svd.gz

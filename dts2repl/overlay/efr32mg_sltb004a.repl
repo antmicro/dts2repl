@@ -1,0 +1,8 @@
+// efr32mg_sltb004a overlay
+bitband_peripherals: Miscellaneous.BitBanding @ sysbus <0x42000000, +0x2000000>
+    peripheralBase: 0x40000000
+
+ff0: Python.PythonPeripheral @ sysbus 0x400e4090
+    size: 0x4
+    initable: true
+    filename: "scripts/pydev/flipflop.py"

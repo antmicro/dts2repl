@@ -1,0 +1,17 @@
+// microsemi-miv overlay
+clint: IRQControllers.CoreLevelInterruptor @ sysbus 0x44000000
+    frequency: 66000000
+    [0, 1] -> cpu0@[3, 7]
+
+plic:
+    numberOfSources: 31
+    numberOfContexts: 1
+    prioritiesEnabled: false
+
+timer0: Timers.MiV_CoreTimer @ sysbus 0x70003000
+    -> plic@30
+    clockFrequency: 66000000
+
+timer1: Timers.MiV_CoreTimer @ sysbus 0x70004000
+    -> plic@31
+    clockFrequency: 66000000
