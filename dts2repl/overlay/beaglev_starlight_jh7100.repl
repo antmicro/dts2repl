@@ -3,6 +3,8 @@ dtim: Memory.MappedMemory @sysbus 0x0100000
     size: 0x2000
 
 clint:
+    [0,1] -> cpu0@[3,7]
+    [2,3] -> cpu1@[3,7]
     frequency: 6250000
     numberOfTargets: 2
 
@@ -10,6 +12,8 @@ L2LIM: Memory.MappedMemory @sysbus 0x08000000
     size: 0x200000
 
 plic:
+    [0,1] -> cpu0@[11,9]
+    [2,3] -> cpu1@[11,9]
     numberOfSources: 127
     numberOfContexts: 4
     prioritiesEnabled: true

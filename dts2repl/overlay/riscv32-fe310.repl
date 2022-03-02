@@ -1,8 +1,10 @@
 // riscv32-fe310 overlay
 clint:
+    [0,1] -> cpu0@[3,7]
     frequency: 62000000
 
 plic:
+    [0] -> cpu0@[11]
     numberOfSources: 52
     numberOfContexts: 1
 

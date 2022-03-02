@@ -4,54 +4,65 @@ Renode dts2repl
 
 Copyright (c) 2022 `Antmicro <https://www.antmicro.com>`_
 
-``dts2repl`` is a tool for converting device tree sources from
-`Zephyr RTOS <https://www.zephyrproject.org>`_ into
+``dts2repl`` is a tool for converting device tree sources into
 `Renode's <https://renode.io>`_ ``.repl`` files.
 
 Installation
 ------------
 
-Use pip to install this package::
+This tool uses the ``devicetree`` library from Zephyr RTOS. You can either
+install it directly with ``pip``::
+
+    pip install devicetree
+
+or by setting up the Zephyr development environment by following the
+`Getting Started Guide <https://docs.zephyrproject.org/latest/getting_started/index.html>`_
+from the Zephyr documentation and then installing it manually::
+
+    pushd ~/zephyrproject/zephyr/scripts/dts/python-devicetree/
+    python3 setup.py install
+    popd
+
+Note that if you plan to use Zephyr RTOS build system, you need to use the
+``devicetree`` library version provided by its repository.
+
+Next, use pip to install this package::
 
    pip install git+https://github.com/antmicro/dts2repl.git
-
-Required setup and data
------------------------
-
-Make sure you have set up the Zephyr development environment. If you're not
-sure how to prepare it, follow the `Getting Started Guide
-<https://docs.zephyrproject.org/latest/getting_started/index.html>`_ from
-the Zephyr documentation.
-
-For this tool to work, you need to have access to the following files:
-
-* flattened device tree, provided by Zephyr build tools when building a sample in ``zephyrproject/zephyr/build/zephyr/zephyr.dts``,
-* top-level device tree source from the ``board`` directory, e.g. ``zephyrproject/zephyr/boards/arm/96b_aerocore2/96b_aerocore2.dts``.
-
-Note that providing the top-level device tree source file is optional if you
-pass the comma-separated CPU dependency chain instead. It consists of
-device tree includes, starting from the top-level file from the ``board``
-directory. For example, the CPU dependency chain for ``96b_aerocore2`` would
-be::
-
-   st/f4/stm32f427vi,st/f4/stm32f427vX,st/f4/stm32f427,st/f4/stm32f407,st/f4/stm32f405,st/f4/stm32f401,st/f4/stm32f4,arm/armv7-m
 
 Usage
 -----
 
 You can use this tool either directly from the commandline, i.e.::
 
-   # using the top-level dts
-   dts2repl --arch riscv --board litex_vexriscv --base-dts board/riscv/litex_vexriscv/litex_vexriscv.dts path/to/flattened_devicetree.dts 
-
-   # providing CPU dependency chain manually
-   dts2repl --arch riscv --board litex_vexriscv --cpu-dep-chain riscv32-litex-vexriscv path/to/flattened_devicetree.dts
+   dts2repl --overlays riscv32-fe310 path/to/flattened_devicetree.dts
 
 or by importing and using it in your Python script::
 
    from dts2repl import dts2repl
    from argparse import Namespace
 
-   print(dts2repl.generate(Namespace(arch="riscv", board="litex_vexriscv",
-                                     cpu_dep_chain="riscv32-litex-vexriscv",
+   print(dts2repl.generate(Namespace(overlays="riscv32-fe310",
                                      filename="path/to/flattened_devicetree.dts")))
+
+Required data
+-------------
+
+For this tool to work, you need to have access to the flattened device tree
+file. You can obtain it by manually preprocessing your device tree sources with
+GCC, for example::
+
+   gcc -H -E -P -x assembler-with-cpp -I include/ -I dts/riscv -I dts/common boards/riscv/litex_vexriscv/litex_vexriscv.dts 1>flat.dts 2>includes.txt
+
+Some boards need additional overlays located under ``dts2repl/overlay`` to be
+used to generate a proper repl file. Check the ``includes.txt`` output file
+from the command mentioned above to see if any files overlap listed there
+correspond to overlay files provided by this tool. For the previous command,
+the ``include.txt`` file has the following content::
+
+   . dts/riscv/riscv32-fe310.dtsi
+   .. include/dt-bindings/gpio/gpio.h
+   Multiple include guards may be useful for:
+   dts/riscv/riscv32-fe310.dtsi
+
+This suggests that you should use the ``riscv32-fe310`` overlay by passing it through the ``--overlay`` option.
