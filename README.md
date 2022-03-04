@@ -41,7 +41,7 @@ file. You can obtain it by manually preprocessing your device tree sources with
 GCC, for example:
 
 ```
-gcc -H -E -P -x assembler-with-cpp -I include/ -I dts/riscv -I dts/common boards/riscv/litex_vexriscv/litex_vexriscv.dts 1>flat.dts 2>includes.txt
+gcc -H -E -P -x assembler-with-cpp -I include/ -I dts/riscv -I dts/common boards/riscv/hifive1/hifive1.dts 1>flat.dts 2>includes.txt
 ```
 
 Some boards need additional overlays located under ``dts2repl/overlay`` to be
