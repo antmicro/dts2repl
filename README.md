@@ -34,23 +34,7 @@ pip install git+https://github.com/antmicro/dts2repl.git
 
 ## Usage
 
-You can use this tool either directly from the commandline, i.e.:
-
-```
-dts2repl --overlays riscv32-fe310 path/to/flattened_devicetree.dts
-```
-
-or by importing and using it in your Python script:
-
-```
-from dts2repl import dts2repl
-from argparse import Namespace
-
-print(dts2repl.generate(Namespace(overlays="riscv32-fe310",
-                         filename="path/to/flattened_devicetree.dts")))
-```
-
-## Required data
+### Generating the device tree
 
 For this tool to work, you need to have access to the flattened device tree
 file. You can obtain it by manually preprocessing your device tree sources with
@@ -74,3 +58,21 @@ dts/riscv/riscv32-fe310.dtsi
 ```
 
 This suggests that you should use the `riscv32-fe310` overlay by passing it through the `--overlay` option.
+
+### Generating the repl file
+
+You can use this tool either directly from the commandline, i.e.:
+
+```
+dts2repl --overlays riscv32-fe310 path/to/flattened_devicetree.dts
+```
+
+or by importing and using it in your Python script:
+
+```
+from dts2repl import dts2repl
+from argparse import Namespace
+
+print(dts2repl.generate(Namespace(overlays="riscv32-fe310",
+                         filename="path/to/flattened_devicetree.dts")))
+```
