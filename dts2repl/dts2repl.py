@@ -25,6 +25,12 @@ def parse_args():
     parser.add_argument('--output',
                         default='output.repl',
                         help='Output filename')
+    parser.add_argument('--include',
+                        default='',
+                        help='Comma-separated dtsi include directories')
+    parser.add_argument('--automatch',
+                        action='store_true',
+                        help='Match overlays automatically. Only available when dtsi include dirs are provided')
 
     args = parser.parse_args()
 
@@ -292,6 +298,35 @@ def generate(args):
 
 def main():
     args = parse_args()
+
+    dirs = []
+    for top in args.include.split(','):
+        for root, _, _ in os.walk(top):
+            dirs.append(f'-I {root}')
+
+    incl_dirs = ' '.join(dirs)
+
+    if args.automatch:
+        board_name = os.path.splitext(os.path.basename(args.filename))[0]
+        cmd = f'gcc -H -E -P -x assembler-with-cpp {incl_dirs} {args.filename}'.split()
+        ret = subprocess.run(cmd, capture_output=True)
+
+        # save flattened device tree
+        flat_dts = f'{os.path.splitext(args.output)[0]}.flat.dts'
+        with open(flat_dts, 'w') as f:
+            f.write(ret.stdout.decode('utf-8'))
+        args.filename = flat_dts
+
+        # try to automatch overlays
+        includes = ret.stderr.decode('utf-8').split('\n')
+        includes = filter(lambda x: '.dtsi' in x, includes)
+        includes = map(lambda x: x.lstrip('. '), includes)
+        includes = map(lambda x: os.path.basename(x), includes)
+        includes = map(lambda x: os.path.splitext(x)[0], includes)
+        includes = set(includes)
+        includes.add(board_name)
+        args.overlays = ','.join(includes)
+
     with open(args.output, 'w') as f:
         f.write(generate(args))
 
