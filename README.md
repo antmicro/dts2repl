@@ -9,7 +9,7 @@ The `dts2repl` project is a tool for converting device tree sources into [Renode
 Use pip to install this package:
 
 ```
-pip install git+https://github.com/antmicro/dts2repl.git
+pip3 install git+https://github.com/antmicro/dts2repl.git
 ```
 
 ## Usage
