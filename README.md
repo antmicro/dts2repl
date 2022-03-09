@@ -2,7 +2,7 @@
 
 Copyright (c) 2022 [Antmicro](https://www.antmicro.com)
 
-`dts2repl` is a tool for converting device tree sources into [Renode's](https://renode.io) `.repl` files.
+The `dts2repl` project is a tool for converting device tree sources into [Renode's](https://renode.io) `.repl` files.
 
 ## Installation
 
