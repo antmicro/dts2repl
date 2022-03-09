@@ -9,7 +9,7 @@ import subprocess
 import sys
 import json
 import tempfile
-from devicetree import dtlib
+from dts2repl import dtlib
 
 
 def parse_args():

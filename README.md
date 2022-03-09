@@ -6,27 +6,7 @@ The `dts2repl` project is a tool for converting device tree sources into [Renode
 
 ## Installation
 
-This tool uses the `devicetree` library from Zephyr RTOS. You can either
-install it directly with `pip`:
-
-```
-pip install devicetree
-```
-
-or by setting up the Zephyr development environment by following the
-[Getting Started Guide](https://docs.zephyrproject.org/latest/getting_started/index.html)
-from the Zephyr documentation and then installing it manually:
-
-```
-pushd ~/zephyrproject/zephyr/scripts/dts/python-devicetree/
-python3 setup.py install
-popd
-```
-
-Note that if you plan to use Zephyr RTOS build system, you need to use the
-`devicetree` library version provided by its repository.
-
-Next, use pip to install this package:
+Use pip to install this package:
 
 ```
 pip install git+https://github.com/antmicro/dts2repl.git
@@ -48,7 +28,7 @@ Some boards need additional overlays located under ``dts2repl/overlay`` to be
 used to generate a proper repl file. Check the ``includes.txt`` output file
 from the command mentioned above to see if any files overlap listed there
 correspond to overlay files provided by this tool. For the previous command,
-the `include.txt` file has the following content:
+the `includes.txt` file has the following content:
 
 ```
 . dts/riscv/riscv32-fe310.dtsi
