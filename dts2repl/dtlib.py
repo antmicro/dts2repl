@@ -1,11 +1,7 @@
 # Copyright (c) 2019, Nordic Semiconductor
 # SPDX-License-Identifier: BSD-3-Clause
 
-# Tip: You can view just the documentation with 'pydoc3 dtlib'
-
-# _init_tokens() builds names dynamically.
-#
-# pylint: disable=undefined-variable
+# Tip: You can view just the documentation with 'pydoc3 devicetree.dtlib'
 
 """
 A library for extracting information from .dts (devicetree) files. See the
@@ -17,13 +13,660 @@ files.
 """
 
 import collections
+import enum
 import errno
 import os
 import re
+import string
 import sys
 import textwrap
+from typing import Any, Dict, Iterable, List, \
+    NamedTuple, NoReturn, Optional, Tuple, Union
 
-# NOTE: testdtlib.py is the test suite for this library.
+# NOTE: tests/test_dtlib.py is the test suite for this library.
+
+class DTError(Exception):
+    "Exception raised for devicetree-related errors"
+
+class Node:
+    r"""
+    Represents a node in the devicetree ('node-name { ... };').
+
+    These attributes are available on Node instances:
+
+    name:
+      The name of the node (a string).
+
+    unit_addr:
+      The portion after the '@' in the node's name, or the empty string if the
+      name has no '@' in it.
+
+      Note that this is a string. Run int(node.unit_addr, 16) to get an
+      integer.
+
+    props:
+      A collections.OrderedDict that maps the properties defined on the node to
+      their values. 'props' is indexed by property name (a string), and values
+      are Property objects.
+
+      To convert property values to Python numbers or strings, use
+      dtlib.to_num(), dtlib.to_nums(), or dtlib.to_string().
+
+      Property values are represented as 'bytes' arrays to support the full
+      generality of DTS, which allows assignments like
+
+        x = "foo", < 0x12345678 >, [ 9A ];
+
+      This gives x the value b"foo\0\x12\x34\x56\x78\x9A". Numbers in DTS are
+      stored in big-endian format.
+
+    nodes:
+      A collections.OrderedDict containing the subnodes of the node, indexed by
+      name.
+
+    labels:
+      A list with all labels pointing to the node, in the same order as the
+      labels appear, but with duplicates removed.
+
+      'label_1: label_2: node { ... };' gives 'labels' the value
+      ["label_1", "label_2"].
+
+    parent:
+      The parent Node of the node. 'None' for the root node.
+
+    path:
+      The path to the node as a string, e.g. "/foo/bar".
+
+    dt:
+      The DT instance this node belongs to.
+    """
+
+    #
+    # Public interface
+    #
+
+    def __init__(self, name: str, parent: Optional['Node'], dt: 'DT'):
+        """
+        Node constructor. Not meant to be called directly by clients.
+        """
+        self.name = name
+        self.parent = parent
+        self.dt = dt
+
+        if name.count("@") > 1:
+            dt._parse_error("multiple '@' in node name")
+        if not name == "/":
+            for char in name:
+                if char not in _nodename_chars:
+                    dt._parse_error(f"{self.path}: bad character '{char}' "
+                                    "in node name")
+
+        self.props: Dict[str, 'Property'] = collections.OrderedDict()
+        self.nodes: Dict[str, 'Node'] = collections.OrderedDict()
+        self.labels: List[str] = []
+        self._omit_if_no_ref = False
+        self._is_referenced = False
+
+    @property
+    def unit_addr(self) -> str:
+        """
+        See the class documentation.
+        """
+        return self.name.partition("@")[2]
+
+    @property
+    def path(self) -> str:
+        """
+        See the class documentation.
+        """
+        node_names = []
+
+        cur = self
+        while cur.parent:
+            node_names.append(cur.name)
+            cur = cur.parent
+
+        return "/" + "/".join(reversed(node_names))
+
+    def node_iter(self) -> Iterable['Node']:
+        """
+        Returns a generator for iterating over the node and its children,
+        recursively.
+
+        For example, this will iterate over all nodes in the tree (like
+        dt.node_iter()).
+
+          for node in dt.root.node_iter():
+              ...
+        """
+        yield self
+        for node in self.nodes.values():
+            yield from node.node_iter()
+
+    def _get_prop(self, name: str) -> 'Property':
+        # Returns the property named 'name' on the node, creating it if it
+        # doesn't already exist
+
+        prop = self.props.get(name)
+        if not prop:
+            prop = Property(self, name)
+            self.props[name] = prop
+        return prop
+
+    def _del(self) -> None:
+        # Removes the node from the tree
+        self.parent.nodes.pop(self.name)  # type: ignore
+
+    def __str__(self):
+        """
+        Returns a DTS representation of the node. Called automatically if the
+        node is print()ed.
+        """
+        s = "".join(label + ": " for label in self.labels)
+
+        s += f"{self.name} {{\n"
+
+        for prop in self.props.values():
+            s += "\t" + str(prop) + "\n"
+
+        for child in self.nodes.values():
+            s += textwrap.indent(child.__str__(), "\t") + "\n"
+
+        s += "};"
+
+        return s
+
+    def __repr__(self):
+        """
+        Returns some information about the Node instance. Called automatically
+        if the Node instance is evaluated.
+        """
+        return f"<Node {self.path} in '{self.dt.filename}'>"
+
+# See Property.type
+class Type(enum.IntEnum):
+    EMPTY = 0
+    BYTES = 1
+    NUM = 2
+    NUMS = 3
+    STRING = 4
+    STRINGS = 5
+    PATH = 6
+    PHANDLE = 7
+    PHANDLES = 8
+    PHANDLES_AND_NUMS = 9
+    COMPOUND = 10
+
+class _MarkerType(enum.IntEnum):
+    # Types of markers in property values
+
+    # References
+    PATH = 0     # &foo
+    PHANDLE = 1  # <&foo>
+    LABEL = 2    # foo: <1 2 3>
+
+    # Start of data blocks of specific type
+    UINT8 = 3   # [00 01 02] (and also used for /incbin/)
+    UINT16 = 4  # /bits/ 16 <1 2 3>
+    UINT32 = 5  # <1 2 3>
+    UINT64 = 6  # /bits/ 64 <1 2 3>
+    STRING = 7  # "foo"
+
+class Property:
+    """
+    Represents a property ('x = ...').
+
+    These attributes are available on Property instances:
+
+    name:
+      The name of the property (a string).
+
+    value:
+      The value of the property, as a 'bytes' string. Numbers are stored in
+      big-endian format, and strings are null-terminated. Putting multiple
+      comma-separated values in an assignment (e.g., 'x = < 1 >, "foo"') will
+      concatenate the values.
+
+      See the to_*() methods for converting the value to other types.
+
+    type:
+      The type of the property, inferred from the syntax used in the
+      assignment. This is one of the following constants (with example
+      assignments):
+
+        Assignment                  | Property.type
+        ----------------------------+------------------------
+        foo;                        | dtlib.Type.EMPTY
+        foo = [];                   | dtlib.Type.BYTES
+        foo = [01 02];              | dtlib.Type.BYTES
+        foo = /bits/ 8 <1>;         | dtlib.Type.BYTES
+        foo = <1>;                  | dtlib.Type.NUM
+        foo = <>;                   | dtlib.Type.NUMS
+        foo = <1 2 3>;              | dtlib.Type.NUMS
+        foo = <1 2>, <3>;           | dtlib.Type.NUMS
+        foo = "foo";                | dtlib.Type.STRING
+        foo = "foo", "bar";         | dtlib.Type.STRINGS
+        foo = <&l>;                 | dtlib.Type.PHANDLE
+        foo = <&l1 &l2 &l3>;        | dtlib.Type.PHANDLES
+        foo = <&l1 &l2>, <&l3>;     | dtlib.Type.PHANDLES
+        foo = <&l1 1 2 &l2 3 4>;    | dtlib.Type.PHANDLES_AND_NUMS
+        foo = <&l1 1 2>, <&l2 3 4>; | dtlib.Type.PHANDLES_AND_NUMS
+        foo = &l;                   | dtlib.Type.PATH
+        *Anything else*             | dtlib.Type.COMPOUND
+
+      *Anything else* includes properties mixing phandle (<&label>) and node
+      path (&label) references with other data.
+
+      Data labels in the property value do not influence the type.
+
+    labels:
+      A list with all labels pointing to the property, in the same order as the
+      labels appear, but with duplicates removed.
+
+      'label_1: label2: x = ...' gives 'labels' the value
+      {"label_1", "label_2"}.
+
+    offset_labels:
+      A dictionary that maps any labels within the property's value to their
+      offset, in bytes. For example, 'x = < 0 label_1: 1 label_2: >' gives
+      'offset_labels' the value {"label_1": 4, "label_2": 8}.
+
+      Iteration order will match the order of the labels on Python versions
+      that preserve dict insertion order.
+
+    node:
+      The Node the property is on.
+    """
+
+    #
+    # Public interface
+    #
+
+    def __init__(self, node: Node, name: str):
+        if "@" in name:
+            node.dt._parse_error("'@' is only allowed in node names")
+
+        self.name = name
+        self.node = node
+        self.value = b""
+        self.labels: List[str] = []
+        self._label_offset_lst: List[Tuple[str, int]] = []
+        # We have to wait to set this until later, when we've got
+        # the entire tree.
+        self.offset_labels: Dict[str, int] = {}
+
+        # A list of [offset, label, type] lists (sorted by offset),
+        # giving the locations of references within the value. 'type'
+        # is either _MarkerType.PATH, for a node path reference,
+        # _MarkerType.PHANDLE, for a phandle reference, or
+        # _MarkerType.LABEL, for a label on/within data. Node paths
+        # and phandles need to be patched in after parsing.
+        self._markers: List[List] = []
+
+    def to_num(self, signed=False) -> int:
+        """
+        Returns the value of the property as a number.
+
+        Raises DTError if the property was not assigned with this syntax (has
+        Property.type Type.NUM):
+
+            foo = < 1 >;
+
+        signed (default: False):
+          If True, the value will be interpreted as signed rather than
+          unsigned.
+        """
+        if self.type is not Type.NUM:
+            _err("expected property '{0}' on {1} in {2} to be assigned with "
+                 "'{0} = < (number) >;', not '{3}'"
+                 .format(self.name, self.node.path, self.node.dt.filename,
+                         self))
+
+        return int.from_bytes(self.value, "big", signed=signed)
+
+    def to_nums(self, signed=False) -> List[int]:
+        """
+        Returns the value of the property as a list of numbers.
+
+        Raises DTError if the property was not assigned with this syntax (has
+        Property.type Type.NUM or Type.NUMS):
+
+            foo = < 1 2 ... >;
+
+        signed (default: False):
+          If True, the values will be interpreted as signed rather than
+          unsigned.
+        """
+        if self.type not in (Type.NUM, Type.NUMS):
+            _err("expected property '{0}' on {1} in {2} to be assigned with "
+                 "'{0} = < (number) (number) ... >;', not '{3}'"
+                 .format(self.name, self.node.path, self.node.dt.filename,
+                         self))
+
+        return [int.from_bytes(self.value[i:i + 4], "big", signed=signed)
+                for i in range(0, len(self.value), 4)]
+
+    def to_bytes(self) -> bytes:
+        """
+        Returns the value of the property as a raw 'bytes', like
+        Property.value, except with added type checking.
+
+        Raises DTError if the property was not assigned with this syntax (has
+        Property.type Type.BYTES):
+
+            foo = [ 01 ... ];
+        """
+        if self.type is not Type.BYTES:
+            _err("expected property '{0}' on {1} in {2} to be assigned with "
+                 "'{0} = [ (byte) (byte) ... ];', not '{3}'"
+                 .format(self.name, self.node.path, self.node.dt.filename,
+                         self))
+
+        return self.value
+
+    def to_string(self) -> str:
+        """
+        Returns the value of the property as a string.
+
+        Raises DTError if the property was not assigned with this syntax (has
+        Property.type Type.STRING):
+
+            foo = "string";
+
+        This function might also raise UnicodeDecodeError if the string is
+        not valid UTF-8.
+        """
+        if self.type is not Type.STRING:
+            _err("expected property '{0}' on {1} in {2} to be assigned with "
+                 "'{0} = \"string\";', not '{3}'"
+                 .format(self.name, self.node.path, self.node.dt.filename,
+                         self))
+
+        try:
+            ret = self.value.decode("utf-8")[:-1]  # Strip null
+        except UnicodeDecodeError:
+            _err(f"value of property '{self.name}' ({self.value!r}) "
+                 f"on {self.node.path} in {self.node.dt.filename} "
+                 "is not valid UTF-8")
+
+        return ret  # The separate 'return' appeases the type checker.
+
+    def to_strings(self) -> List[str]:
+        """
+        Returns the value of the property as a list of strings.
+
+        Raises DTError if the property was not assigned with this syntax (has
+        Property.type Type.STRING or Type.STRINGS):
+
+            foo = "string", "string", ... ;
+
+        Also raises DTError if any of the strings are not valid UTF-8.
+        """
+        if self.type not in (Type.STRING, Type.STRINGS):
+            _err("expected property '{0}' on {1} in {2} to be assigned with "
+                 "'{0} = \"string\", \"string\", ... ;', not '{3}'"
+                 .format(self.name, self.node.path, self.node.dt.filename,
+                         self))
+
+        try:
+            ret = self.value.decode("utf-8").split("\0")[:-1]
+        except UnicodeDecodeError:
+            _err(f"value of property '{self.name}' ({self.value!r}) "
+                 f"on {self.node.path} in {self.node.dt.filename} "
+                 "is not valid UTF-8")
+
+        return ret  # The separate 'return' appeases the type checker.
+
+    def to_node(self) -> Node:
+        """
+        Returns the Node the phandle in the property points to.
+
+        Raises DTError if the property was not assigned with this syntax (has
+        Property.type Type.PHANDLE).
+
+            foo = < &bar >;
+        """
+        if self.type is not Type.PHANDLE:
+            _err("expected property '{0}' on {1} in {2} to be assigned with "
+                 "'{0} = < &foo >;', not '{3}'"
+                 .format(self.name, self.node.path, self.node.dt.filename,
+                         self))
+
+        return self.node.dt.phandle2node[int.from_bytes(self.value, "big")]
+
+    def to_nodes(self) -> List[Node]:
+        """
+        Returns a list with the Nodes the phandles in the property point to.
+
+        Raises DTError if the property value contains anything other than
+        phandles. All of the following are accepted:
+
+            foo = < >
+            foo = < &bar >;
+            foo = < &bar &baz ... >;
+            foo = < &bar ... >, < &baz ... >;
+        """
+        def type_ok():
+            if self.type in (Type.PHANDLE, Type.PHANDLES):
+                return True
+            # Also accept 'foo = < >;'
+            return self.type is Type.NUMS and not self.value
+
+        if not type_ok():
+            _err("expected property '{0}' on {1} in {2} to be assigned with "
+                 "'{0} = < &foo &bar ... >;', not '{3}'"
+                 .format(self.name, self.node.path,
+                         self.node.dt.filename, self))
+
+        return [self.node.dt.phandle2node[int.from_bytes(self.value[i:i + 4],
+                                                         "big")]
+                for i in range(0, len(self.value), 4)]
+
+    def to_path(self) -> Node:
+        """
+        Returns the Node referenced by the path stored in the property.
+
+        Raises DTError if the property was not assigned with either of these
+        syntaxes (has Property.type Type.PATH or Type.STRING):
+
+            foo = &bar;
+            foo = "/bar";
+
+        For the second case, DTError is raised if the path does not exist.
+        """
+        if self.type not in (Type.PATH, Type.STRING):
+            _err("expected property '{0}' on {1} in {2} to be assigned with "
+                 "either '{0} = &foo' or '{0} = \"/path/to/node\"', not '{3}'"
+                 .format(self.name, self.node.path, self.node.dt.filename,
+                         self))
+
+        try:
+            path = self.value.decode("utf-8")[:-1]
+        except UnicodeDecodeError:
+            _err(f"value of property '{self.name}' ({self.value!r}) "
+                 f"on {self.node.path} in {self.node.dt.filename} "
+                 "is not valid UTF-8")
+
+        try:
+            ret = self.node.dt.get_node(path)
+        except DTError:
+            _err(f"property '{self.name}' on {self.node.path} in "
+                 f"{self.node.dt.filename} points to the non-existent node "
+                 f'"{path}"')
+
+        return ret  # The separate 'return' appeases the type checker.
+
+    @property
+    def type(self) -> int:
+        """
+        See the class docstring.
+        """
+        # Data labels (e.g. 'foo = label: <3>') are irrelevant, so filter them
+        # out
+        types = [marker[1] for marker in self._markers
+                 if marker[1] != _MarkerType.LABEL]
+
+        if not types:
+            return Type.EMPTY
+
+        if types == [_MarkerType.UINT8]:
+            return Type.BYTES
+
+        if types == [_MarkerType.UINT32]:
+            return Type.NUM if len(self.value) == 4 else Type.NUMS
+
+        # Treat 'foo = <1 2 3>, <4 5>, ...' as Type.NUMS too
+        if set(types) == {_MarkerType.UINT32}:
+            return Type.NUMS
+
+        if set(types) == {_MarkerType.STRING}:
+            return Type.STRING if len(types) == 1 else Type.STRINGS
+
+        if types == [_MarkerType.PATH]:
+            return Type.PATH
+
+        if types == [_MarkerType.UINT32, _MarkerType.PHANDLE] and \
+                len(self.value) == 4:
+            return Type.PHANDLE
+
+        if set(types) == {_MarkerType.UINT32, _MarkerType.PHANDLE}:
+            if len(self.value) == 4*types.count(_MarkerType.PHANDLE):
+                # Array with just phandles in it
+                return Type.PHANDLES
+            # Array with both phandles and numbers
+            return Type.PHANDLES_AND_NUMS
+
+        return Type.COMPOUND
+
+    def __str__(self):
+        s = "".join(label + ": " for label in self.labels) + self.name
+        if not self.value:
+            return s + ";"
+
+        s += " ="
+
+        for i, (pos, marker_type, ref) in enumerate(self._markers):
+            if i < len(self._markers) - 1:
+                next_marker = self._markers[i + 1]
+            else:
+                next_marker = None
+
+            # End of current marker
+            end = next_marker[0] if next_marker else len(self.value)
+
+            if marker_type is _MarkerType.STRING:
+                # end - 1 to strip off the null terminator
+                s += f' "{_decode_and_escape(self.value[pos:end - 1])}"'
+                if end != len(self.value):
+                    s += ","
+            elif marker_type is _MarkerType.PATH:
+                s += " &" + ref
+                if end != len(self.value):
+                    s += ","
+            else:
+                # <> or []
+
+                if marker_type is _MarkerType.LABEL:
+                    s += f" {ref}:"
+                elif marker_type is _MarkerType.PHANDLE:
+                    s += " &" + ref
+                    pos += 4
+                    # Subtle: There might be more data between the phandle and
+                    # the next marker, so we can't 'continue' here
+                else:  # marker_type is _MarkerType.UINT*
+                    elm_size = _TYPE_TO_N_BYTES[marker_type]
+                    s += _N_BYTES_TO_START_STR[elm_size]
+
+                while pos != end:
+                    num = int.from_bytes(self.value[pos:pos + elm_size],
+                                         "big")
+                    if elm_size == 1:
+                        s += f" {num:02X}"
+                    else:
+                        s += f" {hex(num)}"
+
+                    pos += elm_size
+
+                if pos != 0 and \
+                   (not next_marker or
+                    next_marker[1] not in (_MarkerType.PHANDLE, _MarkerType.LABEL)):
+
+                    s += _N_BYTES_TO_END_STR[elm_size]
+                    if pos != len(self.value):
+                        s += ","
+
+        return s + ";"
+
+
+    def __repr__(self):
+        return f"<Property '{self.name}' at '{self.node.path}' in " \
+            f"'{self.node.dt.filename}'>"
+
+    #
+    # Internal functions
+    #
+
+    def _add_marker(self, marker_type: _MarkerType, data: Any = None):
+        # Helper for registering markers in the value that are processed after
+        # parsing. See _fixup_props(). 'marker_type' identifies the type of
+        # marker, and 'data' has any optional data associated with the marker.
+
+        # len(self.value) gives the current offset. This function is called
+        # while the value is built. We use a list instead of a tuple to be able
+        # to fix up offsets later (they might increase if the value includes
+        # path references, e.g. 'foo = &bar, <3>;', which are expanded later).
+        self._markers.append([len(self.value), marker_type, data])
+
+        # For phandle references, add a dummy value with the same length as a
+        # phandle. This is handy for the length check in _register_phandles().
+        if marker_type is _MarkerType.PHANDLE:
+            self.value += b"\0\0\0\0"
+
+class _T(enum.IntEnum):
+    # Token IDs used by the DT lexer.
+
+    # These values must be contiguous and start from 1.
+    INCLUDE = 1
+    LINE = 2
+    STRING = 3
+    DTS_V1 = 4
+    PLUGIN = 5
+    MEMRESERVE = 6
+    BITS = 7
+    DEL_PROP = 8
+    DEL_NODE = 9
+    OMIT_IF_NO_REF = 10
+    LABEL = 11
+    CHAR_LITERAL = 12
+    REF = 13
+    INCBIN = 14
+    SKIP = 15
+    EOF = 16
+
+    # These values must be larger than the above contiguous range.
+    NUM = 17
+    PROPNODENAME = 18
+    MISC = 19
+    BYTE = 20
+    BAD = 21
+
+class _FileStackElt(NamedTuple):
+    # Used for maintaining the /include/ stack.
+
+    filename: str
+    lineno: int
+    contents: str
+    pos: int
+
+_TokVal = Union[int, str]
+
+class _Token(NamedTuple):
+    id: int
+    val: _TokVal
+
+    def __repr__(self):
+        id_repr = _T(self.id).name
+        return f'Token(id=_T.{id_repr}, val={repr(self.val)})'
 
 class DT:
     """
@@ -73,7 +716,8 @@ class DT:
     # Public interface
     #
 
-    def __init__(self, filename, include_path=()):
+    def __init__(self, filename: str, include_path: Iterable[str] = (),
+                 force: bool = False):
         """
         Parses a DTS file to create a DT instance. Raises OSError if 'filename'
         can't be opened, and DTError for any parse errors.
@@ -85,22 +729,29 @@ class DT:
           An iterable (e.g. list or tuple) containing paths to search for
           /include/d and /incbin/'d files. By default, files are only looked up
           relative to the .dts file that contains the /include/ or /incbin/.
+
+        force:
+          Try not to raise DTError even if the input tree has errors.
+          For experimental use; results not guaranteed.
         """
         self.filename = filename
-        self._include_path = include_path
+        self._include_path = list(include_path)
+        self._force = force
 
         with open(filename, encoding="utf-8") as f:
             self._file_contents = f.read()
 
         self._tok_i = self._tok_end_i = 0
-        self._filestack = []
+        self._filestack: List[_FileStackElt] = []
 
-        self.alias2node = {}
+        self.alias2node: Dict[str, Node] = {}
 
-        self._lexer_state = _DEFAULT
-        self._saved_token = None
+        self._lexer_state: int = _DEFAULT
+        self._saved_token: Optional[_Token] = None
 
-        self._lineno = 1
+        self._lineno: int = 1
+
+        self._root: Optional[Node] = None
 
         self._parse_dt()
 
@@ -110,7 +761,17 @@ class DT:
         self._remove_unreferenced()
         self._register_labels()
 
-    def get_node(self, path):
+    @property
+    def root(self) -> Node:
+        """
+        See the class documentation.
+        """
+        # This is necessary because mypy can't tell that we never
+        # treat self._root as a non-None value until it's initialized
+        # properly in _parse_dt().
+        return self._root       # type: ignore
+
+    def get_node(self, path: str) -> Node:
         """
         Returns the Node instance for the node with path or alias 'path' (a
         string). Raises DTError if the path or alias doesn't exist.
@@ -142,12 +803,12 @@ class DT:
         # Path does not start with '/'. First component must be an alias.
         alias, _, rest = path.partition("/")
         if alias not in self.alias2node:
-            _err("no alias '{}' found -- did you forget the leading '/' in "
-                 "the node path?".format(alias))
+            _err(f"no alias '{alias}' found -- did you forget the leading "
+                 "'/' in the node path?")
 
         return _root_and_path_to_node(self.alias2node[alias], rest, path)
 
-    def has_node(self, path):
+    def has_node(self, path: str) -> bool:
         """
         Returns True if the path or alias 'path' exists. See Node.get_node().
         """
@@ -157,7 +818,7 @@ class DT:
         except DTError:
             return False
 
-    def node_iter(self):
+    def node_iter(self) -> Iterable[Node]:
         """
         Returns a generator for iterating over all nodes in the devicetree.
 
@@ -181,9 +842,8 @@ class DT:
             for labels, address, offset in self.memreserves:
                 # List the labels in a consistent order to help with testing
                 for label in labels:
-                    s += label + ": "
-                s += "/memreserve/ {:#018x} {:#018x};\n" \
-                     .format(address, offset)
+                    s += f"{label}: "
+                s += f"/memreserve/ {address:#018x} {offset:#018x};\n"
             s += "\n"
 
         return s + str(self.root)
@@ -193,8 +853,8 @@ class DT:
         Returns some information about the DT instance. Called automatically if
         the DT instance is evaluated.
         """
-        return "DT(filename='{}', include_path={})" \
-               .format(self.filename, self._include_path)
+        return f"DT(filename='{self.filename}', " \
+            f"include_path={self._include_path})"
 
     #
     # Parsing
@@ -206,25 +866,23 @@ class DT:
         self._parse_header()
         self._parse_memreserves()
 
-        self.root = None
-
         while True:
             tok = self._next_token()
 
             if tok.val == "/":
                 # '/ { ... };', the root node
-                if not self.root:
-                    self.root = Node(name="/", parent=None, dt=self)
+                if not self._root:
+                    self._root = Node(name="/", parent=None, dt=self)
                 self._parse_node(self.root)
 
-            elif tok.id in (_T_LABEL, _T_REF):
+            elif tok.id in (_T.LABEL, _T.REF):
                 # '&foo { ... };' or 'label: &foo { ... };'. The C tools only
                 # support a single label here too.
 
-                if tok.id is _T_LABEL:
+                if tok.id == _T.LABEL:
                     label = tok.val
                     tok = self._next_token()
-                    if tok.id is not _T_REF:
+                    if tok.id != _T.REF:
                         self._parse_error("expected label reference (&foo)")
                 else:
                     label = None
@@ -238,16 +896,16 @@ class DT:
                 if label:
                     _append_no_dup(node.labels, label)
 
-            elif tok.id is _T_DEL_NODE:
+            elif tok.id == _T.DEL_NODE:
                 self._next_ref2node()._del()
                 self._expect_token(";")
 
-            elif tok.id is _T_OMIT_IF_NO_REF:
+            elif tok.id == _T.OMIT_IF_NO_REF:
                 self._next_ref2node()._omit_if_no_ref = True
                 self._expect_token(";")
 
-            elif tok.id is _T_EOF:
-                if not self.root:
+            elif tok.id == _T.EOF:
+                if not self._root:
                     self._parse_error("no root node defined")
                 return
 
@@ -260,12 +918,12 @@ class DT:
 
         has_dts_v1 = False
 
-        while self._peek_token().id is _T_DTS_V1:
+        while self._peek_token().id == _T.DTS_V1:
             has_dts_v1 = True
             self._next_token()
             self._expect_token(";")
             # /plugin/ always comes after /dts-v1/
-            if self._peek_token().id is _T_PLUGIN:
+            if self._peek_token().id == _T.PLUGIN:
                 self._parse_error("/plugin/ is not supported")
 
         if not has_dts_v1:
@@ -278,10 +936,10 @@ class DT:
         while True:
             # Labels before /memreserve/
             labels = []
-            while self._peek_token().id is _T_LABEL:
+            while self._peek_token().id == _T.LABEL:
                 _append_no_dup(labels, self._next_token().val)
 
-            if self._peek_token().id is _T_MEMRESERVE:
+            if self._peek_token().id == _T.MEMRESERVE:
                 self._next_token()
                 self.memreserves.append(
                     (labels, self._eval_prim(), self._eval_prim()))
@@ -301,12 +959,9 @@ class DT:
             labels, omit_if_no_ref = self._parse_propnode_labels()
             tok = self._next_token()
 
-            if tok.id is _T_PROPNODENAME:
+            if tok.id == _T.PROPNODENAME:
                 if self._peek_token().val == "{":
                     # '<tok> { ...', expect node
-
-                    if tok.val.count("@") > 1:
-                        self._parse_error("multiple '@' in node name")
 
                     # Fetch the existing node if it already exists. This
                     # happens when overriding nodes.
@@ -340,17 +995,17 @@ class DT:
                     for label in labels:
                         _append_no_dup(prop.labels, label)
 
-            elif tok.id is _T_DEL_NODE:
+            elif tok.id == _T.DEL_NODE:
                 tok2 = self._next_token()
-                if tok2.id is not _T_PROPNODENAME:
+                if tok2.id != _T.PROPNODENAME:
                     self._parse_error("expected node name")
                 if tok2.val in node.nodes:
                     node.nodes[tok2.val]._del()
                 self._expect_token(";")
 
-            elif tok.id is _T_DEL_PROP:
+            elif tok.id == _T.DEL_PROP:
                 tok2 = self._next_token()
-                if tok2.id is not _T_PROPNODENAME:
+                if tok2.id != _T.PROPNODENAME:
                     self._parse_error("expected property name")
                 node.props.pop(tok2.val, None)
                 self._expect_token(";")
@@ -371,11 +1026,11 @@ class DT:
         omit_if_no_ref = False
         while True:
             tok = self._peek_token()
-            if tok.id is _T_LABEL:
+            if tok.id == _T.LABEL:
                 _append_no_dup(labels, tok.val)
-            elif tok.id is _T_OMIT_IF_NO_REF:
+            elif tok.id == _T.OMIT_IF_NO_REF:
                 omit_if_no_ref = True
-            elif (labels or omit_if_no_ref) and tok.id is not _T_PROPNODENAME:
+            elif (labels or omit_if_no_ref) and tok.id != _T.PROPNODENAME:
                 # Got something like 'foo: bar: }'
                 self._parse_error("expected node or property name")
             else:
@@ -403,7 +1058,7 @@ class DT:
             if tok.val == "<":
                 self._parse_cells(prop, 4)
 
-            elif tok.id is _T_BITS:
+            elif tok.id == _T.BITS:
                 n_bits = self._expect_num()
                 if n_bits not in {8, 16, 32, 64}:
                     self._parse_error("expected 8, 16, 32, or 64")
@@ -413,14 +1068,14 @@ class DT:
             elif tok.val == "[":
                 self._parse_bytes(prop)
 
-            elif tok.id is _T_STRING:
-                prop._add_marker(_TYPE_STRING)
+            elif tok.id == _T.STRING:
+                prop._add_marker(_MarkerType.STRING)
                 prop.value += self._unescape(tok.val.encode("utf-8")) + b"\0"
 
-            elif tok.id is _T_REF:
-                prop._add_marker(_REF_PATH, tok.val)
+            elif tok.id == _T.REF:
+                prop._add_marker(_MarkerType.PATH, tok.val)
 
-            elif tok.id is _T_INCBIN:
+            elif tok.id == _T.INCBIN:
                 self._parse_incbin(prop)
 
             else:
@@ -443,15 +1098,15 @@ class DT:
 
         while True:
             tok = self._peek_token()
-            if tok.id is _T_REF:
+            if tok.id == _T.REF:
                 self._next_token()
                 if n_bytes != 4:
                     self._parse_error("phandle references are only allowed in "
                                       "arrays with 32-bit elements")
-                prop._add_marker(_REF_PHANDLE, tok.val)
+                prop._add_marker(_MarkerType.PHANDLE, tok.val)
 
-            elif tok.id is _T_LABEL:
-                prop._add_marker(_REF_LABEL, tok.val)
+            elif tok.id == _T.LABEL:
+                prop._add_marker(_MarkerType.LABEL, tok.val)
                 self._next_token()
 
             elif self._check_token(">"):
@@ -467,21 +1122,21 @@ class DT:
                         # Try again as a signed number, in case it's negative
                         prop.value += num.to_bytes(n_bytes, "big", signed=True)
                     except OverflowError:
-                        self._parse_error("{} does not fit in {} bits"
-                                          .format(num, 8*n_bytes))
+                        self._parse_error(
+                            f"{num} does not fit in {8*n_bytes} bits")
 
     def _parse_bytes(self, prop):
         # Parses '[ ... ]'
 
-        prop._add_marker(_TYPE_UINT8)
+        prop._add_marker(_MarkerType.UINT8)
 
         while True:
             tok = self._next_token()
-            if tok.id is _T_BYTE:
+            if tok.id == _T.BYTE:
                 prop.value += tok.val.to_bytes(1, "big")
 
-            elif tok.id is _T_LABEL:
-                prop._add_marker(_REF_LABEL, tok.val)
+            elif tok.id == _T.LABEL:
+                prop._add_marker(_MarkerType.LABEL, tok.val)
 
             elif tok.val == "]":
                 return
@@ -498,12 +1153,12 @@ class DT:
         #
         #   /incbin/ ("filename", <offset>, <size>)
 
-        prop._add_marker(_TYPE_UINT8)
+        prop._add_marker(_MarkerType.UINT8)
 
         self._expect_token("(")
 
         tok = self._next_token()
-        if tok.id is not _T_STRING:
+        if tok.id != _T.STRING:
             self._parse_error("expected quoted filename")
         filename = tok.val
 
@@ -526,8 +1181,7 @@ class DT:
                     f.seek(offset)
                     prop.value += f.read(size)
         except OSError as e:
-            self._parse_error("could not read '{}': {}"
-                              .format(filename, e))
+            self._parse_error(f"could not read '{filename}': {e}")
 
     def _parse_value_labels(self, prop):
         # _parse_assignment() helper for parsing labels before/after each
@@ -535,9 +1189,9 @@ class DT:
 
         while True:
             tok = self._peek_token()
-            if tok.id is not _T_LABEL:
+            if tok.id != _T.LABEL:
                 return
-            prop._add_marker(_REF_LABEL, tok.val)
+            prop._add_marker(_MarkerType.LABEL, tok.val)
             self._next_token()
 
     def _node_phandle(self, node):
@@ -551,7 +1205,7 @@ class DT:
             phandle_prop = node.props["phandle"]
         else:
             phandle_prop = Property(node, "phandle")
-            phandle_prop._add_marker(_TYPE_UINT32)  # For displaying
+            phandle_prop._add_marker(_MarkerType.UINT32)  # For displaying
             phandle_prop.value = b'\0\0\0\0'
 
         if phandle_prop.value == b'\0\0\0\0':
@@ -569,7 +1223,7 @@ class DT:
 
     def _eval_prim(self):
         tok = self._peek_token()
-        if tok.id in (_T_NUM, _T_CHAR_LITERAL):
+        if tok.id in (_T.NUM, _T.CHAR_LITERAL):
             return self._next_token().val
 
         tok = self._next_token()
@@ -716,7 +1370,7 @@ class DT:
             match = _token_re.match(self._file_contents, self._tok_end_i)
             if match:
                 tok_id = match.lastindex
-                if tok_id is _T_CHAR_LITERAL:
+                if tok_id == _T.CHAR_LITERAL:
                     val = self._unescape(match.group(tok_id).encode("utf-8"))
                     if len(val) != 1:
                         self._parse_error("character literals must be length 1")
@@ -727,7 +1381,7 @@ class DT:
             elif self._lexer_state is _DEFAULT:
                 match = _num_re.match(self._file_contents, self._tok_end_i)
                 if match:
-                    tok_id = _T_NUM
+                    tok_id = _T.NUM
                     num_s = match.group(1)
                     tok_val = int(num_s,
                                   16 if num_s.startswith(("0x", "0X")) else
@@ -738,21 +1392,20 @@ class DT:
                 match = _propnodename_re.match(self._file_contents,
                                                self._tok_end_i)
                 if match:
-                    tok_id = _T_PROPNODENAME
+                    tok_id = _T.PROPNODENAME
                     tok_val = match.group(1)
                     self._lexer_state = _DEFAULT
 
             else:  # self._lexer_state is _EXPECT_BYTE
                 match = _byte_re.match(self._file_contents, self._tok_end_i)
                 if match:
-                    tok_id = _T_BYTE
+                    tok_id = _T.BYTE
                     tok_val = int(match.group(), 16)
-
 
             if not tok_id:
                 match = _misc_re.match(self._file_contents, self._tok_end_i)
                 if match:
-                    tok_id = _T_MISC
+                    tok_id = _T.MISC
                     tok_val = match.group()
                 else:
                     self._tok_i = self._tok_end_i
@@ -761,18 +1414,18 @@ class DT:
                     # files. Generate a token for it so that the error can
                     # trickle up to some context where we can give a more
                     # helpful error message.
-                    return _Token(_T_BAD, "<unknown token>")
+                    return _Token(_T.BAD, "<unknown token>")
 
             self._tok_i = match.start()
             self._tok_end_i = match.end()
 
-            if tok_id is _T_SKIP:
+            if tok_id == _T.SKIP:
                 self._lineno += tok_val.count("\n")
                 continue
 
             # /include/ is handled in the lexer in the C tools as well, and can
             # appear anywhere
-            if tok_id is _T_INCLUDE:
+            if tok_id == _T.INCLUDE:
                 # Can have newlines between /include/ and the filename
                 self._lineno += tok_val.count("\n")
                 # Do this manual extraction instead of doing it in the regex so
@@ -781,21 +1434,21 @@ class DT:
                 self._enter_file(filename)
                 continue
 
-            if tok_id is _T_LINE:
+            if tok_id == _T.LINE:
                 # #line directive
                 self._lineno = int(tok_val.split()[0]) - 1
                 self.filename = tok_val[tok_val.find('"') + 1:-1]
                 continue
 
-            if tok_id is _T_EOF:
+            if tok_id == _T.EOF:
                 if self._filestack:
                     self._leave_file()
                     continue
-                return _Token(_T_EOF, "<EOF>")
+                return _Token(_T.EOF, "<EOF>")
 
             # State handling
 
-            if tok_id in (_T_DEL_PROP, _T_DEL_NODE, _T_OMIT_IF_NO_REF) or \
+            if tok_id in (_T.DEL_PROP, _T.DEL_NODE, _T.OMIT_IF_NO_REF) or \
                tok_val in ("{", ";"):
 
                 self._lexer_state = _EXPECT_PROPNODENAME
@@ -803,7 +1456,7 @@ class DT:
             elif tok_val == "[":
                 self._lexer_state = _EXPECT_BYTE
 
-            elif tok_id in (_T_MEMRESERVE, _T_BITS) or tok_val == "]":
+            elif tok_id in (_T.MEMRESERVE, _T.BITS) or tok_val == "]":
                 self._lexer_state = _DEFAULT
 
             return _Token(tok_id, tok_val)
@@ -814,8 +1467,7 @@ class DT:
 
         tok = self._next_token()
         if tok.val != tok_val:
-            self._parse_error("expected '{}', not '{}'"
-                              .format(tok_val, tok.val))
+            self._parse_error(f"expected '{tok_val}', not '{tok.val}'")
 
         return tok
 
@@ -823,24 +1475,25 @@ class DT:
         # Raises an error if the next token is not a number. Returns the token.
 
         tok = self._next_token()
-        if tok.id is not _T_NUM:
+        if tok.id != _T.NUM:
             self._parse_error("expected number")
         return tok.val
 
     def _parse_error(self, s):
-        _err("{}:{} (column {}): parse error: {}".format(
-            self.filename, self._lineno,
-            # This works out for the first line of the file too, where rfind()
-            # returns -1
-            self._tok_i - self._file_contents.rfind("\n", 0, self._tok_i + 1),
-            s))
+        # This works out for the first line of the file too, where rfind()
+        # returns -1
+        column = self._tok_i - self._file_contents.rfind("\n", 0,
+                                                         self._tok_i + 1)
+        _err(f"{self.filename}:{self._lineno} (column {column}): "
+             f"parse error: {s}")
 
     def _enter_file(self, filename):
         # Enters the /include/d file 'filename', remembering the position in
         # the /include/ing file for later
 
-        self._filestack.append((self.filename, self._lineno,
-                                self._file_contents, self._tok_end_i))
+        self._filestack.append(
+            _FileStackElt(self.filename, self._lineno,
+                          self._file_contents, self._tok_end_i))
 
         # Handle escapes in filenames, just for completeness
         filename = self._unescape(filename.encode("utf-8"))
@@ -859,8 +1512,8 @@ class DT:
         for i, parent in enumerate(self._filestack):
             if filename == parent[0]:
                 self._parse_error("recursive /include/:\n" + " ->\n".join(
-                    ["{}:{}".format(parent[0], parent[1])
-                        for parent in self._filestack[i:]] +
+                    [f"{parent[0]}:{parent[1]}"
+                     for parent in self._filestack[i:]] +
                     [filename]))
 
         self.filename = f.name
@@ -879,7 +1532,7 @@ class DT:
         # on errors to save some code in callers.
 
         label = self._next_token()
-        if label.id is not _T_REF:
+        if label.id != _T.REF:
             self._parse_error(
                 "expected label (&foo) or path (&{/foo/bar}) reference")
         try:
@@ -894,7 +1547,7 @@ class DT:
             # Path reference (&{/foo/bar})
             path = s[1:-1]
             if not path.startswith("/"):
-                _err("node path '{}' does not start with '/'".format(path))
+                _err(f"node path '{path}' does not start with '/'")
             # Will raise DTError if the path doesn't exist
             return _root_and_path_to_node(self.root, path, path)
 
@@ -906,7 +1559,7 @@ class DT:
             if s in node.labels:
                 return node
 
-        _err("undefined node label '{}'".format(s))
+        _err(f"undefined node label '{s}'")
 
     #
     # Post-processing
@@ -923,13 +1576,13 @@ class DT:
             phandle = node.props.get("phandle")
             if phandle:
                 if len(phandle.value) != 4:
-                    _err("{}: bad phandle length ({}), expected 4 bytes"
-                         .format(node.path, len(phandle.value)))
+                    _err(f"{node.path}: bad phandle length "
+                         f"({len(phandle.value)}), expected 4 bytes")
 
                 is_self_referential = False
                 for marker in phandle._markers:
                     _, marker_type, ref = marker
-                    if marker_type is _REF_PHANDLE:
+                    if marker_type is _MarkerType.PHANDLE:
                         # The phandle's value is itself a phandle reference
                         if self._ref2node(ref) is node:
                             # Alright to set a node's phandle equal to its own
@@ -939,8 +1592,8 @@ class DT:
                             is_self_referential = True
                             break
 
-                        _err("{}: {} refers to another node"
-                             .format(node.path, phandle.name))
+                        _err(f"{node.path}: {phandle.name} "
+                             "refers to another node")
 
                 # Could put on else on the 'for' above too, but keep it
                 # somewhat readable
@@ -948,13 +1601,13 @@ class DT:
                     phandle_val = int.from_bytes(phandle.value, "big")
 
                     if phandle_val in {0, 0xFFFFFFFF}:
-                        _err("{}: bad value {:#010x} for {}"
-                             .format(node.path, phandle_val, phandle.name))
+                        _err(f"{node.path}: bad value {phandle_val:#010x} "
+                             f"for {phandle.name}")
 
                     if phandle_val in self.phandle2node:
-                        _err("{}: duplicated phandle {:#x} (seen before at {})"
-                             .format(node.path, phandle_val,
-                                     self.phandle2node[phandle_val].path))
+                        _err(f"{node.path}: duplicated phandle {phandle_val:#x} "
+                             "(seen before at "
+                             f"{self.phandle2node[phandle_val].path})")
 
                     self.phandle2node[phandle_val] = node
 
@@ -986,23 +1639,23 @@ class DT:
                     # references, which expand to something like "/foo/bar".
                     marker[0] = len(res)
 
-                    if marker_type is _REF_LABEL:
+                    if marker_type is _MarkerType.LABEL:
                         # This is a temporary format so that we can catch
-                        # duplicate references. prop.offset_labels is changed
+                        # duplicate references. prop._label_offset_lst is changed
                         # to a dictionary that maps labels to offsets in
                         # _register_labels().
-                        _append_no_dup(prop.offset_labels, (ref, len(res)))
-                    elif marker_type in (_REF_PATH, _REF_PHANDLE):
+                        _append_no_dup(prop._label_offset_lst, (ref, len(res)))
+                    elif marker_type in (_MarkerType.PATH, _MarkerType.PHANDLE):
                         # Path or phandle reference
                         try:
                             ref_node = self._ref2node(ref)
                         except DTError as e:
-                            _err("{}: {}".format(prop.node.path, e))
+                            _err(f"{prop.node.path}: {e}")
 
                         # For /omit-if-no-ref/
                         ref_node._is_referenced = True
 
-                        if marker_type is _REF_PATH:
+                        if marker_type is _MarkerType.PATH:
                             res += ref_node.path.encode("utf-8") + b'\0'
                         else:  # marker_type is PHANDLE
                             res += self._node_phandle(ref_node)
@@ -1029,11 +1682,18 @@ class DT:
         if aliases:
             for prop in aliases.props.values():
                 if not alias_re.match(prop.name):
-                    _err("/aliases: alias property name '{}' should include "
-                         "only characters from [0-9a-z-]".format(prop.name))
+                    _err(f"/aliases: alias property name '{prop.name}' "
+                         "should include only characters from [0-9a-z-]")
 
-                # Property.to_path() already checks that the node exists
-                alias2node[prop.name] = prop.to_path()
+                # Property.to_path() checks that the node exists, has
+                # the right type, etc. Swallow errors for invalid
+                # aliases with self._force.
+                try:
+                    alias2node[prop.name] = prop.to_path()
+                except DTError:
+                    if self._force:
+                        continue
+                    raise
 
         self.alias2node = alias2node
 
@@ -1068,34 +1728,32 @@ class DT:
                     label2things[label].add(prop)
                     self.label2prop[label] = prop
 
-                for label, offset in prop.offset_labels:
+                for label, offset in prop._label_offset_lst:
                     label2things[label].add((prop, offset))
                     self.label2prop_offset[label] = (prop, offset)
 
                 # See _fixup_props()
-                prop.offset_labels = {label: offset for label, offset in
-                                      prop.offset_labels}
+                prop.offset_labels = dict(prop._label_offset_lst)
 
         for label, things in label2things.items():
             if len(things) > 1:
                 strings = []
                 for thing in things:
                     if isinstance(thing, Node):
-                        strings.append("on " + thing.path)
+                        strings.append(f"on {thing.path}")
                     elif isinstance(thing, Property):
-                        strings.append("on property '{}' of node {}"
-                                       .format(thing.name, thing.node.path))
+                        strings.append(f"on property '{thing.name}' "
+                                       f"of node {thing.node.path}")
                     else:
                         # Label within property value
-                        strings.append("in the value of property '{}' of node {}"
-                                       .format(thing[0].name,
-                                               thing[0].node.path))
+                        strings.append("in the value of property "
+                                       f"'{thing[0].name}' of node "
+                                       f"{thing[0].node.path}")
 
                 # Give consistent error messages to help with testing
                 strings.sort()
 
-                _err("Label '{}' appears ".format(label) +
-                     " and ".join(strings))
+                _err(f"Label '{label}' appears " + " and ".join(strings))
 
 
     #
@@ -1159,566 +1817,14 @@ class DT:
                         self._parse_error(e)
                     continue
 
-            self._parse_error("'{}' could not be found".format(filename))
-
-
-class Node:
-    r"""
-    Represents a node in the devicetree ('node-name { ... };').
-
-    These attributes are available on Node instances:
-
-    name:
-      The name of the node (a string).
-
-    unit_addr:
-      The portion after the '@' in the node's name, or the empty string if the
-      name has no '@' in it.
-
-      Note that this is a string. Run int(node.unit_addr, 16) to get an
-      integer.
-
-    props:
-      A collections.OrderedDict that maps the properties defined on the node to
-      their values. 'props' is indexed by property name (a string), and values
-      are represented as 'bytes' arrays.
-
-      To convert property values to Python numbers or strings, use
-      dtlib.to_num(), dtlib.to_nums(), or dtlib.to_string().
-
-      Property values are represented as 'bytes' arrays to support the full
-      generality of DTS, which allows assignments like
-
-        x = "foo", < 0x12345678 >, [ 9A ];
-
-      This gives x the value b"foo\0\x12\x34\x56\x78\x9A". Numbers in DTS are
-      stored in big-endian format.
-
-    nodes:
-      A collections.OrderedDict containing the subnodes of the node, indexed by
-      name.
-
-    labels:
-      A list with all labels pointing to the node, in the same order as the
-      labels appear, but with duplicates removed.
-
-      'label_1: label_2: node { ... };' gives 'labels' the value
-      ["label_1", "label_2"].
-
-    parent:
-      The parent Node of the node. 'None' for the root node.
-
-    path:
-      The path to the node as a string, e.g. "/foo/bar".
-
-    dt:
-      The DT instance this node belongs to.
-    """
-
-    #
-    # Public interface
-    #
-
-    def __init__(self, name, parent, dt):
-        """
-        Node constructor. Not meant to be called directly by clients.
-        """
-        self.name = name
-        self.parent = parent
-        self.dt = dt
-
-        self.props = collections.OrderedDict()
-        self.nodes = collections.OrderedDict()
-        self.labels = []
-        self._omit_if_no_ref = False
-        self._is_referenced = False
-
-    @property
-    def unit_addr(self):
-        """
-        See the class documentation.
-        """
-        return self.name.partition("@")[2]
-
-    @property
-    def path(self):
-        """
-        See the class documentation.
-        """
-        node_names = []
-
-        cur = self
-        while cur.parent:
-            node_names.append(cur.name)
-            cur = cur.parent
-
-        return "/" + "/".join(reversed(node_names))
-
-    def node_iter(self):
-        """
-        Returns a generator for iterating over the node and its children,
-        recursively.
-
-        For example, this will iterate over all nodes in the tree (like
-        dt.node_iter()).
-
-          for node in dt.root.node_iter():
-              ...
-        """
-        yield self
-        for node in self.nodes.values():
-            yield from node.node_iter()
-
-    def _get_prop(self, name):
-        # Returns the property named 'name' on the node, creating it if it
-        # doesn't already exist
-
-        prop = self.props.get(name)
-        if not prop:
-            prop = Property(self, name)
-            self.props[name] = prop
-        return prop
-
-    def _del(self):
-        # Removes the node from the tree
-
-        self.parent.nodes.pop(self.name)
-
-    def __str__(self):
-        """
-        Returns a DTS representation of the node. Called automatically if the
-        node is print()ed.
-        """
-        s = "".join(label + ": " for label in self.labels)
-
-        s += "{} {{\n".format(self.name)
-
-        for prop in self.props.values():
-            s += "\t" + str(prop) + "\n"
-
-        for child in self.nodes.values():
-            s += textwrap.indent(child.__str__(), "\t") + "\n"
-
-        s += "};"
-
-        return s
-
-    def __repr__(self):
-        """
-        Returns some information about the Node instance. Called automatically
-        if the Node instance is evaluated.
-        """
-        return "<Node {} in '{}'>" \
-               .format(self.path, self.dt.filename)
-
-
-class Property:
-    """
-    Represents a property ('x = ...').
-
-    These attributes are available on Property instances:
-
-    name:
-      The name of the property (a string).
-
-    value:
-      The value of the property, as a 'bytes' string. Numbers are stored in
-      big-endian format, and strings are null-terminated. Putting multiple
-      comma-separated values in an assignment (e.g., 'x = < 1 >, "foo"') will
-      concatenate the values.
-
-      See the to_*() methods for converting the value to other types.
-
-    type:
-      The type of the property, inferred from the syntax used in the
-      assignment. This is one of the following constants (with example
-      assignments):
-
-        Assignment                  | Property.type
-        ----------------------------+------------------------
-        foo;                        | dtlib.TYPE_EMPTY
-        foo = [];                   | dtlib.TYPE_BYTES
-        foo = [01 02];              | dtlib.TYPE_BYTES
-        foo = /bits/ 8 <1>;         | dtlib.TYPE_BYTES
-        foo = <1>;                  | dtlib.TYPE_NUM
-        foo = <>;                   | dtlib.TYPE_NUMS
-        foo = <1 2 3>;              | dtlib.TYPE_NUMS
-        foo = <1 2>, <3>;           | dtlib.TYPE_NUMS
-        foo = "foo";                | dtlib.TYPE_STRING
-        foo = "foo", "bar";         | dtlib.TYPE_STRINGS
-        foo = <&l>;                 | dtlib.TYPE_PHANDLE
-        foo = <&l1 &l2 &l3>;        | dtlib.TYPE_PHANDLES
-        foo = <&l1 &l2>, <&l3>;     | dtlib.TYPE_PHANDLES
-        foo = <&l1 1 2 &l2 3 4>;    | dtlib.TYPE_PHANDLES_AND_NUMS
-        foo = <&l1 1 2>, <&l2 3 4>; | dtlib.TYPE_PHANDLES_AND_NUMS
-        foo = &l;                   | dtlib.TYPE_PATH
-        *Anything else*             | dtlib.TYPE_COMPOUND
-
-      *Anything else* includes properties mixing phandle (<&label>) and node
-      path (&label) references with other data.
-
-      Data labels in the property value do not influence the type.
-
-    labels:
-      A list with all labels pointing to the property, in the same order as the
-      labels appear, but with duplicates removed.
-
-      'label_1: label2: x = ...' gives 'labels' the value
-      {"label_1", "label_2"}.
-
-    offset_labels:
-      A dictionary that maps any labels within the property's value to their
-      offset, in bytes. For example, 'x = < 0 label_1: 1 label_2: >' gives
-      'offset_labels' the value {"label_1": 4, "label_2": 8}.
-
-      Iteration order will match the order of the labels on Python versions
-      that preserve dict insertion order.
-
-    node:
-      The Node the property is on.
-    """
-
-    #
-    # Public interface
-    #
-
-    def __init__(self, node, name):
-        if "@" in name:
-            node.dt._parse_error("'@' is only allowed in node names")
-
-        self.name = name
-        self.node = node
-        self.value = b""
-        self.labels = []
-        self.offset_labels = []
-
-        # A list of (offset, label, type) tuples (sorted by offset), giving the
-        # locations of references within the value. 'type' is either _REF_PATH,
-        # for a node path reference, _REF_PHANDLE, for a phandle reference, or
-        # _REF_LABEL, for a label on/within data. Node paths and phandles need
-        # to be patched in after parsing.
-        self._markers = []
-
-    def to_num(self, signed=False):
-        """
-        Returns the value of the property as a number.
-
-        Raises DTError if the property was not assigned with this syntax (has
-        Property.type TYPE_NUM):
-
-            foo = < 1 >;
-
-        signed (default: False):
-          If True, the value will be interpreted as signed rather than
-          unsigned.
-        """
-        if self.type is not TYPE_NUM:
-            _err("expected property '{0}' on {1} in {2} to be assigned with "
-                 "'{0} = < (number) >;', not '{3}'"
-                 .format(self.name, self.node.path, self.node.dt.filename,
-                         self))
-
-        return int.from_bytes(self.value, "big", signed=signed)
-
-    def to_nums(self, signed=False):
-        """
-        Returns the value of the property as a list of numbers.
-
-        Raises DTError if the property was not assigned with this syntax (has
-        Property.type TYPE_NUM or TYPE_NUMS):
-
-            foo = < 1 2 ... >;
-
-        signed (default: False):
-          If True, the values will be interpreted as signed rather than
-          unsigned.
-        """
-        if self.type not in (TYPE_NUM, TYPE_NUMS):
-            _err("expected property '{0}' on {1} in {2} to be assigned with "
-                 "'{0} = < (number) (number) ... >;', not '{3}'"
-                 .format(self.name, self.node.path, self.node.dt.filename,
-                         self))
-
-        return [int.from_bytes(self.value[i:i + 4], "big", signed=signed)
-                for i in range(0, len(self.value), 4)]
-
-    def to_bytes(self):
-        """
-        Returns the value of the property as a raw 'bytes', like
-        Property.value, except with added type checking.
-
-        Raises DTError if the property was not assigned with this syntax (has
-        Property.type TYPE_BYTES):
-
-            foo = [ 01 ... ];
-        """
-        if self.type is not TYPE_BYTES:
-            _err("expected property '{0}' on {1} in {2} to be assigned with "
-                 "'{0} = [ (byte) (byte) ... ];', not '{3}'"
-                 .format(self.name, self.node.path, self.node.dt.filename,
-                         self))
-
-        return self.value
-
-    def to_string(self):
-        """
-        Returns the value of the property as a string.
-
-        Raises DTError if the property was not assigned with this syntax (has
-        Property.type TYPE_STRING):
-
-            foo = "string";
-
-        This function might also raise UnicodeDecodeError if the string is
-        not valid UTF-8.
-        """
-        if self.type is not TYPE_STRING:
-            _err("expected property '{0}' on {1} in {2} to be assigned with "
-                 "'{0} = \"string\";', not '{3}'"
-                 .format(self.name, self.node.path, self.node.dt.filename,
-                         self))
-
-        try:
-            return self.value.decode("utf-8")[:-1]  # Strip null
-        except UnicodeDecodeError:
-            _err("value of property '{}' ({}) on {} in {} is not valid UTF-8"
-                 .format(self.name, self.value, self.node.path,
-                         self.node.dt.filename))
-
-    def to_strings(self):
-        """
-        Returns the value of the property as a list of strings.
-
-        Raises DTError if the property was not assigned with this syntax (has
-        Property.type TYPE_STRING or TYPE_STRINGS):
-
-            foo = "string", "string", ... ;
-
-        Also raises DTError if any of the strings are not valid UTF-8.
-        """
-        if self.type not in (TYPE_STRING, TYPE_STRINGS):
-            _err("expected property '{0}' on {1} in {2} to be assigned with "
-                 "'{0} = \"string\", \"string\", ... ;', not '{3}'"
-                 .format(self.name, self.node.path, self.node.dt.filename,
-                         self))
-
-        try:
-            return self.value.decode("utf-8").split("\0")[:-1]
-        except UnicodeDecodeError:
-            _err("value of property '{}' ({}) on {} in {} is not valid UTF-8"
-                 .format(self.name, self.value, self.node.path,
-                         self.node.dt.filename))
-
-    def to_node(self):
-        """
-        Returns the Node the phandle in the property points to.
-
-        Raises DTError if the property was not assigned with this syntax (has
-        Property.type TYPE_PHANDLE).
-
-            foo = < &bar >;
-        """
-        if self.type is not TYPE_PHANDLE:
-            _err("expected property '{0}' on {1} in {2} to be assigned with "
-                 "'{0} = < &foo >;', not '{3}'"
-                 .format(self.name, self.node.path, self.node.dt.filename,
-                         self))
-
-        return self.node.dt.phandle2node[int.from_bytes(self.value, "big")]
-
-    def to_nodes(self):
-        """
-        Returns a list with the Nodes the phandles in the property point to.
-
-        Raises DTError if the property value contains anything other than
-        phandles. All of the following are accepted:
-
-            foo = < >
-            foo = < &bar >;
-            foo = < &bar &baz ... >;
-            foo = < &bar ... >, < &baz ... >;
-        """
-        def type_ok():
-            if self.type in (TYPE_PHANDLE, TYPE_PHANDLES):
-                return True
-            # Also accept 'foo = < >;'
-            return self.type is TYPE_NUMS and not self.value
-
-        if not type_ok():
-            _err("expected property '{0}' on {1} in {2} to be assigned with "
-                 "'{0} = < &foo &bar ... >;', not '{3}'"
-                 .format(self.name, self.node.path,
-                         self.node.dt.filename, self))
-
-        return [self.node.dt.phandle2node[int.from_bytes(self.value[i:i + 4],
-                                                         "big")]
-                for i in range(0, len(self.value), 4)]
-
-    def to_path(self):
-        """
-        Returns the Node referenced by the path stored in the property.
-
-        Raises DTError if the property was not assigned with either of these
-        syntaxes (has Property.type TYPE_PATH or TYPE_STRING):
-
-            foo = &bar;
-            foo = "/bar";
-
-        For the second case, DTError is raised if the path does not exist.
-        """
-        if self.type not in (TYPE_PATH, TYPE_STRING):
-            _err("expected property '{0}' on {1} in {2} to be assigned with "
-                 "either '{0} = &foo' or '{0} = \"/path/to/node\"', not '{3}'"
-                 .format(self.name, self.node.path, self.node.dt.filename,
-                         self))
-
-        try:
-            path = self.value.decode("utf-8")[:-1]
-        except UnicodeDecodeError:
-            _err("value of property '{}' ({}) on {} in {} is not valid UTF-8"
-                 .format(self.name, self.value, self.node.path,
-                         self.node.dt.filename))
-
-        try:
-            return self.node.dt.get_node(path)
-        except DTError:
-            _err("property '{}' on {} in {} points to the non-existent node "
-                 "\"{}\"".format(self.name, self.node.path,
-                                 self.node.dt.filename, path))
-
-    @property
-    def type(self):
-        """
-        See the class docstring.
-        """
-        # Data labels (e.g. 'foo = label: <3>') are irrelevant, so filter them
-        # out
-        types = [marker[1] for marker in self._markers
-                 if marker[1] != _REF_LABEL]
-
-        if not types:
-            return TYPE_EMPTY
-
-        if types == [_TYPE_UINT8]:
-            return TYPE_BYTES
-
-        if types == [_TYPE_UINT32]:
-            return TYPE_NUM if len(self.value) == 4 else TYPE_NUMS
-
-        # Treat 'foo = <1 2 3>, <4 5>, ...' as TYPE_NUMS too
-        if set(types) == {_TYPE_UINT32}:
-            return TYPE_NUMS
-
-        if set(types) == {_TYPE_STRING}:
-            return TYPE_STRING if len(types) == 1 else TYPE_STRINGS
-
-        if types == [_REF_PATH]:
-            return TYPE_PATH
-
-        if types == [_TYPE_UINT32, _REF_PHANDLE] and len(self.value) == 4:
-            return TYPE_PHANDLE
-
-        if set(types) == {_TYPE_UINT32, _REF_PHANDLE}:
-            if len(self.value) == 4*types.count(_REF_PHANDLE):
-                # Array with just phandles in it
-                return TYPE_PHANDLES
-            # Array with both phandles and numbers
-            return TYPE_PHANDLES_AND_NUMS
-
-        return TYPE_COMPOUND
-
-    def __str__(self):
-        s = "".join(label + ": " for label in self.labels) + self.name
-        if not self.value:
-            return s + ";"
-
-        s += " ="
-
-        for i, (pos, marker_type, ref) in enumerate(self._markers):
-            if i < len(self._markers) - 1:
-                next_marker = self._markers[i + 1]
-            else:
-                next_marker = None
-
-            # End of current marker
-            end = next_marker[0] if next_marker else len(self.value)
-
-            if marker_type is _TYPE_STRING:
-                # end - 1 to strip off the null terminator
-                s += ' "{}"'.format(_decode_and_escape(
-                    self.value[pos:end - 1]))
-                if end != len(self.value):
-                    s += ","
-            elif marker_type is _REF_PATH:
-                s += " &" + ref
-                if end != len(self.value):
-                    s += ","
-            else:
-                # <> or []
-
-                if marker_type is _REF_LABEL:
-                    s += " {}:".format(ref)
-                elif marker_type is _REF_PHANDLE:
-                    s += " &" + ref
-                    pos += 4
-                    # Subtle: There might be more data between the phandle and
-                    # the next marker, so we can't 'continue' here
-                else:  # marker_type is _TYPE_UINT*
-                    elm_size = _TYPE_TO_N_BYTES[marker_type]
-                    s += _N_BYTES_TO_START_STR[elm_size]
-
-                while pos != end:
-                    num = int.from_bytes(self.value[pos:pos + elm_size],
-                                         "big")
-                    if elm_size == 1:
-                        s += " {:02X}".format(num)
-                    else:
-                        s += " " + hex(num)
-
-                    pos += elm_size
-
-                if pos != 0 and \
-                   (not next_marker or
-                    next_marker[1] not in (_REF_PHANDLE, _REF_LABEL)):
-
-                    s += _N_BYTES_TO_END_STR[elm_size]
-                    if pos != len(self.value):
-                        s += ","
-
-        return s + ";"
-
-
-    def __repr__(self):
-        return "<Property '{}' at '{}' in '{}'>" \
-               .format(self.name, self.node.path, self.node.dt.filename)
-
-    #
-    # Internal functions
-    #
-
-    def _add_marker(self, marker_type, data=None):
-        # Helper for registering markers in the value that are processed after
-        # parsing. See _fixup_props(). 'marker_type' identifies the type of
-        # marker, and 'data' has any optional data associated with the marker.
-
-        # len(self.value) gives the current offset. This function is called
-        # while the value is built. We use a list instead of a tuple to be able
-        # to fix up offsets later (they might increase if the value includes
-        # path references, e.g. 'foo = &bar, <3>;', which are expanded later).
-        self._markers.append([len(self.value), marker_type, data])
-
-        # For phandle references, add a dummy value with the same length as a
-        # phandle. This is handy for the length check in _register_phandles().
-        if marker_type is _REF_PHANDLE:
-            self.value += b"\0\0\0\0"
-
+            self._parse_error(f"'{filename}' could not be found")
 
 #
 # Public functions
 #
 
-
-def to_num(data, length=None, signed=False):
+def to_num(data: bytes, length: Optional[int] = None,
+           signed: bool = False) -> int:
     """
     Converts the 'bytes' array 'data' to a number. The value is expected to be
     in big-endian format, which is standard in devicetree.
@@ -1734,13 +1840,11 @@ def to_num(data, length=None, signed=False):
     if length is not None:
         _check_length_positive(length)
         if len(data) != length:
-            _err("{} is {} bytes long, expected {}"
-                 .format(data, len(data), length))
+            _err(f"{data!r} is {len(data)} bytes long, expected {length}")
 
     return int.from_bytes(data, "big", signed=signed)
 
-
-def to_nums(data, length=4, signed=False):
+def to_nums(data: bytes, length: int = 4, signed: bool = False) -> List[int]:
     """
     Like Property.to_nums(), but takes an arbitrary 'bytes' array. The values
     are assumed to be in big-endian format, which is standard in devicetree.
@@ -1749,41 +1853,23 @@ def to_nums(data, length=4, signed=False):
     _check_length_positive(length)
 
     if len(data) % length:
-        _err("{} is {} bytes long, expected a length that's a a multiple of {}"
-             .format(data, len(data), length))
+        _err(f"{data!r} is {len(data)} bytes long, "
+             f"expected a length that's a a multiple of {length}")
 
     return [int.from_bytes(data[i:i + length], "big", signed=signed)
             for i in range(0, len(data), length)]
-
 
 #
 # Public constants
 #
 
-# See Property.type
-TYPE_EMPTY = 0
-TYPE_BYTES = 1
-TYPE_NUM = 2
-TYPE_NUMS = 3
-TYPE_STRING = 4
-TYPE_STRINGS = 5
-TYPE_PATH = 6
-TYPE_PHANDLE = 7
-TYPE_PHANDLES = 8
-TYPE_PHANDLES_AND_NUMS = 9
-TYPE_COMPOUND = 10
-
-
 def _check_is_bytes(data):
     if not isinstance(data, bytes):
-        _err("'{}' has type '{}', expected 'bytes'"
-             .format(data, type(data).__name__))
-
+        _err(f"'{data}' has type '{type(data).__name__}', expected 'bytes'")
 
 def _check_length_positive(length):
     if length < 1:
         _err("'length' must be greater than zero, was " + str(length))
-
 
 def _append_no_dup(lst, elm):
     # Appends 'elm' to 'lst', but only if it isn't already in 'lst'. Lets us
@@ -1791,7 +1877,6 @@ def _append_no_dup(lst, elm):
 
     if elm not in lst:
         lst.append(elm)
-
 
 def _decode_and_escape(b):
     # Decodes the 'bytes' array 'b' as UTF-8 and backslash-escapes special
@@ -1806,7 +1891,6 @@ def _decode_and_escape(b):
             .encode("utf-8", "surrogateescape") \
             .decode("utf-8", "backslashreplace")
 
-
 def _root_and_path_to_node(cur, path, fullpath):
     # Returns the node pointed at by 'path', relative to the Node 'cur'. For
     # example, if 'cur' has path /foo/bar, and 'path' is "baz/qaz", then the
@@ -1819,17 +1903,15 @@ def _root_and_path_to_node(cur, path, fullpath):
             continue
 
         if component not in cur.nodes:
-            _err("component '{}' in path '{}' does not exist"
-                 .format(component, fullpath))
+            _err(f"component '{component}' in path '{fullpath}' "
+                 "does not exist")
 
         cur = cur.nodes[component]
 
     return cur
 
-
-def _err(msg):
+def _err(msg) -> NoReturn:
     raise DTError(msg)
-
 
 _escape_table = str.maketrans({
     "\\": "\\\\",
@@ -1842,13 +1924,6 @@ _escape_table = str.maketrans({
     "\f": "\\f",
     "\r": "\\r"})
 
-
-class DTError(Exception):
-    "Exception raised for devicetree-related errors"
-
-
-_Token = collections.namedtuple("Token", "id val")
-
 # Lexer states
 _DEFAULT = 0
 _EXPECT_PROPNODENAME = 1
@@ -1859,6 +1934,9 @@ _num_re = re.compile(r"(0[xX][0-9a-fA-F]+|[0-9]+)(?:ULL|UL|LL|U|L)?")
 # A leading \ is allowed property and node names, probably to allow weird node
 # names that would clash with other stuff
 _propnodename_re = re.compile(r"\\?([a-zA-Z0-9,._+*#?@-]+)")
+
+# Node names are more restrictive than property names.
+_nodename_chars = set(string.ascii_letters + string.digits + ',._+-@')
 
 # Misc. tokens that are tried after a property/node name. This is important, as
 # there's overlap with the allowed characters in names.
@@ -1874,92 +1952,59 @@ _byte_re = re.compile(r"[0-9a-fA-F]{2}")
 # '\c', where c might be a single character or an octal/hex escape.
 _unescape_re = re.compile(br'\\([0-7]{1,3}|x[0-9A-Fa-f]{1,2}|.)')
 
-# #line directive (this is the regex the C tools use)
-_line_re = re.compile(
-    r'^#(?:line)?[ \t]+([0-9]+)[ \t]+"((?:[^\\"]|\\.)*)"(?:[ \t]+[0-9]+)?',
-    re.MULTILINE)
-
-
 def _init_tokens():
-    # Builds a (<token 1>)|(<token 2>)|... regex and assigns the index of each
-    # capturing group to a corresponding _T_<TOKEN> variable. This makes the
-    # token type appear in match.lastindex after a match.
-
-    global _token_re
-    global _T_NUM
-    global _T_PROPNODENAME
-    global _T_MISC
-    global _T_BYTE
-    global _T_BAD
+    # Builds a (<token 1>)|(<token 2>)|... regex and returns it. The
+    # way this is constructed makes the token's value as an int appear
+    # in match.lastindex after a match.
 
     # Each pattern must have exactly one capturing group, which can capture any
     # part of the pattern. This makes match.lastindex match the token type.
     # _Token.val is based on the captured string.
-    token_spec = (("_T_INCLUDE",        r'(/include/\s*"(?:[^\\"]|\\.)*")'),
-                  ("_T_LINE",  # #line directive
-                   r'^#(?:line)?[ \t]+([0-9]+[ \t]+"(?:[^\\"]|\\.)*")(?:[ \t]+[0-9]+)?'),
-                  ("_T_STRING",         r'"((?:[^\\"]|\\.)*)"'),
-                  ("_T_DTS_V1",         r"(/dts-v1/)"),
-                  ("_T_PLUGIN",         r"(/plugin/)"),
-                  ("_T_MEMRESERVE",     r"(/memreserve/)"),
-                  ("_T_BITS",           r"(/bits/)"),
-                  ("_T_DEL_PROP",       r"(/delete-property/)"),
-                  ("_T_DEL_NODE",       r"(/delete-node/)"),
-                  ("_T_OMIT_IF_NO_REF", r"(/omit-if-no-ref/)"),
-                  ("_T_LABEL",          r"([a-zA-Z_][a-zA-Z0-9_]*):"),
-                  ("_T_CHAR_LITERAL",   r"'((?:[^\\']|\\.)*)'"),
-                  ("_T_REF",
-                   r"&([a-zA-Z_][a-zA-Z0-9_]*|{[a-zA-Z0-9,._+*#?@/-]*})"),
-                  ("_T_INCBIN",         r"(/incbin/)"),
-                  # Whitespace, C comments, and C++ comments
-                  ("_T_SKIP", r"(\s+|(?:/\*(?:.|\n)*?\*/)|//.*$)"),
-                  # Return a token for end-of-file so that the parsing code can
-                  # always assume that there are more tokens when looking
-                  # ahead. This simplifies things.
-                  ("_T_EOF",            r"(\Z)"))
+    token_spec = {
+        _T.INCLUDE: r'(/include/\s*"(?:[^\\"]|\\.)*")',
+        # #line directive or GCC linemarker
+        _T.LINE:
+        r'^#(?:line)?[ \t]+([0-9]+[ \t]+"(?:[^\\"]|\\.)*")(?:[ \t]+[0-9]+){0,4}',
+
+        _T.STRING: r'"((?:[^\\"]|\\.)*)"',
+        _T.DTS_V1: r"(/dts-v1/)",
+        _T.PLUGIN: r"(/plugin/)",
+        _T.MEMRESERVE: r"(/memreserve/)",
+        _T.BITS: r"(/bits/)",
+        _T.DEL_PROP: r"(/delete-property/)",
+        _T.DEL_NODE: r"(/delete-node/)",
+        _T.OMIT_IF_NO_REF: r"(/omit-if-no-ref/)",
+        _T.LABEL: r"([a-zA-Z_][a-zA-Z0-9_]*):",
+        _T.CHAR_LITERAL: r"'((?:[^\\']|\\.)*)'",
+        _T.REF: r"&([a-zA-Z_][a-zA-Z0-9_]*|{[a-zA-Z0-9,._+*#?@/-]*})",
+        _T.INCBIN: r"(/incbin/)",
+        # Whitespace, C comments, and C++ comments
+        _T.SKIP: r"(\s+|(?:/\*(?:.|\n)*?\*/)|//.*$)",
+        # Return a token for end-of-file so that the parsing code can
+        # always assume that there are more tokens when looking
+        # ahead. This simplifies things.
+        _T.EOF: r"(\Z)",
+    }
 
     # MULTILINE is needed for C++ comments and #line directives
-    _token_re = re.compile("|".join(spec[1] for spec in token_spec),
-                           re.MULTILINE | re.ASCII)
+    return re.compile("|".join(token_spec[tok_id] for tok_id in
+                               range(1, _T.EOF + 1)),
+                      re.MULTILINE | re.ASCII)
 
-    for i, spec in enumerate(token_spec, 1):
-        globals()[spec[0]] = i
-
-    # pylint: disable=undefined-loop-variable
-    _T_NUM = i + 1
-    _T_PROPNODENAME = i + 2
-    _T_MISC = i + 3
-    _T_BYTE = i + 4
-    _T_BAD = i + 5
-
-
-_init_tokens()
-
-# Markers in property values
-
-# References
-_REF_PATH = 0     # &foo
-_REF_PHANDLE = 1  # <&foo>
-_REF_LABEL = 2    # foo: <1 2 3>
-# Start of data blocks of specific type
-_TYPE_UINT8 = 3   # [00 01 02] (and also used for /incbin/)
-_TYPE_UINT16 = 4  # /bits/ 16 <1 2 3>
-_TYPE_UINT32 = 5  # <1 2 3>
-_TYPE_UINT64 = 6  # /bits/ 64 <1 2 3>
-_TYPE_STRING = 7  # "foo"
+_token_re = _init_tokens()
 
 _TYPE_TO_N_BYTES = {
-    _TYPE_UINT8: 1,
-    _TYPE_UINT16: 2,
-    _TYPE_UINT32: 4,
-    _TYPE_UINT64: 8,
+    _MarkerType.UINT8: 1,
+    _MarkerType.UINT16: 2,
+    _MarkerType.UINT32: 4,
+    _MarkerType.UINT64: 8,
 }
 
 _N_BYTES_TO_TYPE = {
-    1: _TYPE_UINT8,
-    2: _TYPE_UINT16,
-    4: _TYPE_UINT32,
-    8: _TYPE_UINT64,
+    1: _MarkerType.UINT8,
+    2: _MarkerType.UINT16,
+    4: _MarkerType.UINT32,
+    8: _MarkerType.UINT64,
 }
 
 _N_BYTES_TO_START_STR = {

@@ -61,6 +61,7 @@
 
     "riscv": "CPU.VexRiscv",
     "riscv,clint0": "IRQControllers.CoreLevelInterruptor",
+    "riscv,sifive-e31": "CPU.RiscV32",
 
     "sifive,dtim0": "Memory.MappedMemory",
     "sifive,maskrom0": "Memory.MappedMemory",

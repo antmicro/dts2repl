@@ -123,8 +123,9 @@ def generate(args):
     nodes = sorted(dt.node_iter(), key=lambda x: get_node_prop(x, 'compatible')[0] if 'compatible' in x.props else '')
 
     # get mcu compat name
-    mcu = next(filter(lambda x: 'cpu' in x.name and get_node_prop(x, 'compatible'), dt.node_iter()))
-    mcu = get_node_prop(mcu, 'compatible')[0]
+    mcu = next(filter(lambda x: 'cpu' in x.name and get_node_prop(x, 'compatible'), dt.node_iter()), None)
+    if mcu is not None:
+        mcu = get_node_prop(mcu, 'compatible')[0]
 
     for node in nodes:
         # filter out nodes without compat strings
@@ -217,7 +218,7 @@ def generate(args):
                 cpu = cpu[:-1]
             indent.append(f'cpuType: "{cpu}"')
             indent.append('nvic: nvic')
-        if compat.startswith('sifive,rocket'):
+        if compat.startswith('riscv,sifive'):
             indent.append('cpuType: "rv32imac"')
             indent.append('privilegeArchitecture: PrivilegeArchitecture.Priv1_10')
             indent.append('timeProvider: clint')
@@ -254,9 +255,9 @@ def generate(args):
             if 'reg' in node.props:
                 indent.append(f'size: {hex(get_node_prop(node, "reg")[-1])}')
 
-        if 'interrupts' in node.props:
+        if 'interrupts' in node.props and mcu is not None:
             # decide which IRQ destination to use in Renode model
-            if any(map (lambda x: mcu.startswith(x), ['sifive', 'starfive'])):
+            if any(map (lambda x: mcu.startswith(x), ['riscv,sifive', 'starfive'])):
                 irq_dest = 'plic'
             elif mcu.startswith('riscv'):  # this is for LiteX!
                 irq_dest = 'cpu0'
