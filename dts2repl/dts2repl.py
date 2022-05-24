@@ -187,7 +187,8 @@ def generate(args):
 
             if any(map(lambda x: x in compat, ['stm32', 'silabs,gecko', 'gaisler,irqmp', 'gaisler,gptimer', 'gaisler,apbuart'])):
                 start, size = list(map(lambda x: hex(x), get_node_prop(node, 'reg')))
-                address = f'<{start}, +{size}>'
+                if compat != 'st,stm32-rcc':
+                    address = f'<{start}, +{size}>'
 
         repl.append(f'{name}: {model} @ sysbus {address}')
         indent = []
@@ -199,7 +200,9 @@ def generate(args):
             indent.append('frequency: 10000000')
             indent.append('initialLimit: 0xFFFFFFFF')
         if compat.startswith("st,stm32") and compat.endswith("rcc"):
-            indent.append('rtcPeripheral: rtc')
+            indent.append('size: 0x400')
+            indent.append('initable: true')
+            indent.append('filename: "scripts/pydev/rolling-bit.py"')
         if compat == "st,stm32-lpuart":
             indent.append('frequency: 200000000')
         if compat.startswith('litex,timer'):

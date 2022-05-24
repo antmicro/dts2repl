@@ -79,15 +79,15 @@
     "st,stm32-gpio": "GPIOPort.STM32_GPIOPort",
     "st,stm32-lpuart": "UART.STM32F7_USART",
     "st,stm32-nv-flash": "Memory.MappedMemory",
-    "st,stm32-rcc": "Miscellaneous.STM32F4_RCC",
+    "st,stm32-rcc": "Python.PythonPeripheral",
     "st,stm32-rng": "Miscellaneous.STM32F4_RNG",
     "st,stm32-rtc": "Timers.STM32F4_RTC",
     "st,stm32-timers": "Timers.STM32_Timer",
     "st,stm32-uart": "UART.STM32_UART",
     "st,stm32-usart": "UART.STM32_UART",
     "st,stm32-watchdog": "Timers.STM32F4_IndependentWatchdog",
-    "st,stm32f0-rcc": "Miscellaneous.STM32F4_RCC",
-    "st,stm32wl-rcc": "Miscellaneous.STM32F4_RCC",
+    "st,stm32f0-rcc": "Python.PythonPeripheral",
+    "st,stm32wl-rcc": "Python.PythonPeripheral",
 
     "starfive,itim0": "Memory.MappedMemory",
     "starfive,rocket0": "CPU.RiscV64"
