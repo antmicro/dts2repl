@@ -167,11 +167,6 @@ def generate(args):
             compat = "st,stm32-lpuart"
             model = models[compat]
 
-        # this hack is needed for nucleo_l552ze_q_ns; we don't want to
-        # instantiate some models with some cpus
-        if compat == "st,stm32-rcc" and mcu == "arm,cortex-m33":
-            continue
-
         address = ''
         if not name.startswith('cpu'):
             parent_node = node.parent
