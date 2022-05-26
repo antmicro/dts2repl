@@ -1,0 +1,15 @@
+gclk_phctrl1: Python.PythonPeripheral @ sysbus 0x40001c84
+    size: 0x4
+    initable: true
+    filename: "scripts/pydev/flipflop.py"
+
+pac_intflag: Python.PythonPeripheral @ sysbus 0x40001010
+    size: 0x4
+    initable: true
+    filename: "scripts/pydev/flipflop.py"
+
+pac_status: Python.PythonPeripheral @ sysbus 0x40001040
+    size: 0x4
+    initable: true
+    filename: "scripts/pydev/counter.py"
+
