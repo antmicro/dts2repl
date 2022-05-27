@@ -389,13 +389,13 @@ def generate_peripherals(filename):
                     for index in range(len(node.interrupts)):
                         irq_nums.append(node.interrupts[index].data.get('irq'))
                 if node.regs and node.interrupts:
-                    result[node.name] = {"driver":driver_name, "unit_addr":unit_addr, "compats":node.compats[0], "irq_num":irq_nums.copy(), "size":hex(size)}
+                    result[node.name] = {"driver":driver_name, "unit_addr":unit_addr, "compats":node.compats, "irq_num":irq_nums.copy(), "size":hex(size)}
                 elif node.regs:
-                    result[node.name] = {"driver":driver_name, "unit_addr":unit_addr, "compats":node.compats[0], "size":hex(size)}
+                    result[node.name] = {"driver":driver_name, "unit_addr":unit_addr, "compats":node.compats, "size":hex(size)}
                 elif node.interrupts:
-                    result[node.name] = {"driver":driver_name, "unit_addr":unit_addr, "compats":node.compats[0], "irq_num":irq_nums.copy()}
+                    result[node.name] = {"driver":driver_name, "unit_addr":unit_addr, "compats":node.compats, "irq_num":irq_nums.copy()}
                 else:
-                    result[node.name] = {"driver":driver_name, "unit_addr":unit_addr, "compats":node.compats[0]}
+                    result[node.name] = {"driver":driver_name, "unit_addr":unit_addr, "compats":node.compats}
     return result
 
 def main():
