@@ -20,6 +20,7 @@
     "gaisler,irqmp": "IRQControllers.GaislerMIC",
     "gaisler,leon3": "CPU.Sparc",
 
+    "litex,clk": "Miscellaneous.LiteX_MMCM_CSR32",
     "litex,timer0": "Timers.LiteX_Timer_CSR32",
     "litex,uart0": "UART.LiteX_UART",
 
