@@ -109,26 +109,28 @@ def get_dt(filename):
 def get_edt(filename, binding_dirs, zephyr_path):
     sys.path.append(f'{zephyr_path}/zephyr/scripts/dts/python-devicetree/src')
     from devicetree import edtlib
+    if Path(filename).exists():
+        with open(filename) as f:
+            dts_file = f.readlines()
+            dts_file = filter(lambda x: 'pinctrl-0;' not in x, dts_file)
+            dts_file = ''.join(dts_file)
 
-    with open(filename) as f:
-        dts_file = f.readlines()
-        dts_file = filter(lambda x: 'pinctrl-0;' not in x, dts_file)
-        dts_file = ''.join(dts_file)
+        with tempfile.NamedTemporaryFile(mode='w', encoding='utf-8') as f:
+            f.write(dts_file)
+            f.flush()
 
-    with tempfile.NamedTemporaryFile(mode='w', encoding='utf-8') as f:
-        f.write(dts_file)
-        f.flush()
-
-        try:
-            edt = edtlib.EDT(f.name, binding_dirs,
-                             # Suppress this warning if it's suppressed in dtc
-                             warn_reg_unit_address_mismatch=True,
-                             default_prop_types=False,
-                             infer_binding_for_paths=["/zephyr,user,soc"])
-            return edt
-        except (edtlib.EDTError, edtlib.DTError) as e:
-            logging.error(f"devicetree error: {e}")
-            return None
+            try:
+                edt = edtlib.EDT(f.name, binding_dirs,
+                                # Suppress this warning if it's suppressed in dtc
+                                warn_reg_unit_address_mismatch=True,
+                                default_prop_types=False,
+                                infer_binding_for_paths=["/zephyr,user,soc"])
+                return edt
+            except (edtlib.EDTError, edtlib.DTError) as e:
+                logging.error(f"devicetree error: {e}")
+                return None
+    else:
+        return None
 
 
 def get_node_prop(node, prop):
@@ -357,13 +359,15 @@ def generate(args):
 
 
 def generate_peripherals(filename):
-    binding_dirs = setup('zephyrproject')
-
-    edt = get_edt(filename, binding_dirs, 'zephyrproject')
-
     result = {}
     par = ''
     irq_nums = []
+
+    binding_dirs = setup('zephyrproject')
+
+    edt = get_edt(filename, binding_dirs, 'zephyrproject')
+    if edt is None:
+        return ''
 
     print("Generating soc peripherals for " + str(Path(filename).stem ))
     if edt is not None:
