@@ -369,7 +369,7 @@ def generate_peripherals(filename):
     if edt is None:
         return ''
 
-    print("Generating soc peripherals for " + str(Path(filename).stem ))
+    # print("Generating soc peripherals for " + str(Path(filename).stem ))
     if edt is not None:
         for node in edt.nodes:
             if node.compats == []:
