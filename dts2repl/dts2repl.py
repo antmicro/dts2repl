@@ -352,6 +352,10 @@ def generate_peripherals(filename):
                 size = sum(reg[1::2])
         else:
             continue
+        if node.labels:
+            label = node.labels[0]
+        else:
+            label = ''
 
         if 'interrupts' in node.props:
             irq_nums = [irq for irq in get_node_prop(node, 'interrupts')[::2]]
