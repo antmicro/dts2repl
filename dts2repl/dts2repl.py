@@ -336,30 +336,34 @@ def generate_peripherals(filename):
             if compats is None:
                 logging.info(f"No compats (type) for node {node}. Skipping...")
                 continue
-            compat = compats[0]
-            print(compat)
             if node.name == 'soc':
                 par = node
 
-            if node.parent == par:
-                reg = get_node_prop(node, 'reg')
-                unit_addr = hex(reg[0]) if len(reg) > 0 else None
+    for node in par.node_iter():
+        compats = get_node_prop(node, 'compatible')
+        if compats is None:
+            logging.info(f"No compats (type) for node {node}. Skipping...")
+            continue
 
-                if len(reg) > 1:
-                    size = sum(reg[1::2])
+        if 'reg' in node.props:
+            reg = get_node_prop(node, 'reg')
+            unit_addr = hex(reg[0]) if len(reg) > 0 else None
+            if len(reg) > 1:
+                size = sum(reg[1::2])
+        else:
+            continue
 
-                if 'interrupts' in node.props:
-                    irq_nums = [irq for irq in get_node_prop(node, 'interrupts')[::2]]
+        if 'interrupts' in node.props:
+            irq_nums = [irq for irq in get_node_prop(node, 'interrupts')[::2]]
 
-                if reg is not None and irq_nums != []:
-                    result[node.name] = {"unit_addr":unit_addr, "compats":compats.copy(), "irq_num":irq_nums.copy(), "size":hex(size)}
-                elif reg:
-                    result[node.name] = {"unit_addr":unit_addr, "compats":compats.copy(), "size":hex(size)}
-                elif irq_nums != []:
-                    result[node.name] = {"unit_addr":unit_addr, "compats":compats.copy(), "irq_num":irq_nums.copy()}
-                else:
-                    result[node.name] = {"unit_addr":unit_addr, "compats":compats.copy()}
-
+        if reg is not None and irq_nums != []:
+            result[node.name] = {"unit_addr":unit_addr, "label":label, "compats":compats.copy(), "irq_num":irq_nums.copy(), "size":hex(size)}
+        elif reg:
+            result[node.name] = {"unit_addr":unit_addr, "label":label, "compats":compats.copy(), "size":hex(size)}
+        elif irq_nums != []:
+            result[node.name] = {"unit_addr":unit_addr, "label":label, "compats":compats.copy(), "irq_num":irq_nums.copy()}
+        else:
+            result[node.name] = {"unit_addr":unit_addr, "label":label, "compats":compats.copy()}
     return result
 
 def main():
@@ -395,7 +399,6 @@ def main():
 
     with open(args.output, 'w') as f:
         f.write(generate(args))
-
 
 if __name__ == "__main__":
     main()
