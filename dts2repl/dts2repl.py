@@ -174,6 +174,9 @@ def generate(args):
                 compat = "st,stm32-lpuart"
                 model = models[compat]
 
+            if compat == "st,stm32-rcc":
+                model = 'Miscellaneous.STM32F4_RCC'
+
         if compat == "atmel,sam0-uart" and 'samd20' in args.overlays:
             model = 'UART.SAMD20_UART'
 
@@ -204,7 +207,7 @@ def generate(args):
         if compat == "st,stm32-timers":
             indent.append('frequency: 10000000')
             indent.append('initialLimit: 0xFFFFFFFF')
-        if compat.startswith("st,stm32") and compat.endswith("rcc"):
+        if compat.startswith("st,stm32") and compat.endswith("rcc") and model == "Python.PythonPeripheral":
             indent.append('size: 0x400')
             indent.append('initable: true')
             indent.append('filename: "scripts/pydev/rolling-bit.py"')
@@ -241,6 +244,10 @@ def generate(args):
             indent.append(f'hartId: {node.name.split("@")[1]}')
             indent.append('privilegeArchitecture: PrivilegeArchitecture.Priv1_10')
             indent.append('timeProvider: clint')
+
+        # additional parameters for STM32F4_RCC
+        if model == 'Miscellaneous.STM32F4_RCC':
+            indent.append('rtcPeripheral: rtc')
 
         # additional parameters for IRQ ctrls
         if compat.endswith('nvic'):
