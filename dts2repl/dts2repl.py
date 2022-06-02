@@ -167,6 +167,16 @@ def generate(args):
             compat = "st,stm32-lpuart"
             model = models[compat]
 
+        # compat-based mapping of peripheral models for the following SoCs is not enough
+        # as there are ifdefs in the driver; adding a manual map for now as a workaround
+        if 'stm32g4' in args.overlays or 'stm32l4' in args.overlays or 'stm32wl' in args.overlays:
+            if compat == "st,stm32-usart":
+                compat = "st,stm32-lpuart"
+                model = models[compat]
+
+        if compat == "atmel,sam0-uart" and 'samd20' in args.overlays:
+            model = 'UART.SAMD20_UART'
+
         address = ''
         if not name.startswith('cpu'):
             parent_node = node.parent
