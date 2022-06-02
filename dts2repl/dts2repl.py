@@ -81,19 +81,6 @@ def get_uart(dts_filename):
                     uart = l[l.index('&')+1:l.index(';')].strip()
                     return uart
 
-def setup(zephyr_path):
-    sys.path.append(f'{zephyr_path}/zephyr/scripts/dts')
-
-    try:
-        from gen_defines import setup_edtlib_logging
-    except ModuleNotFoundError:
-        print(f'Could not find Zephyr RTOS sources. Is the path {zephyr_path} valid?')
-        exit(1)
-
-    setup_edtlib_logging()
-    dirs = glob.glob(f'{zephyr_path}/zephyr/dts/bindings/**')
-
-    return dirs
 
 def get_dt(filename):
     with open(filename) as f:
@@ -105,32 +92,6 @@ def get_dt(filename):
         f.write(dts_file)
         f.flush()
         return dtlib.DT(f.name)
-
-def get_edt(filename, binding_dirs, zephyr_path):
-    sys.path.append(f'{zephyr_path}/zephyr/scripts/dts/python-devicetree/src')
-    from devicetree import edtlib
-    if Path(filename).exists():
-        with open(filename) as f:
-            dts_file = f.readlines()
-            dts_file = filter(lambda x: 'pinctrl-0;' not in x, dts_file)
-            dts_file = ''.join(dts_file)
-
-        with tempfile.NamedTemporaryFile(mode='w', encoding='utf-8') as f:
-            f.write(dts_file)
-            f.flush()
-
-            try:
-                edt = edtlib.EDT(f.name, binding_dirs,
-                                # Suppress this warning if it's suppressed in dtc
-                                warn_reg_unit_address_mismatch=True,
-                                default_prop_types=False,
-                                infer_binding_for_paths=["/zephyr,user,soc"])
-                return edt
-            except (edtlib.EDTError, edtlib.DTError) as e:
-                logging.error(f"devicetree error: {e}")
-                return None
-    else:
-        return None
 
 
 def get_node_prop(node, prop):
@@ -362,40 +323,43 @@ def generate_peripherals(filename):
     result = {}
     par = ''
     irq_nums = []
+    reg = None
 
-    binding_dirs = setup('zephyrproject')
-
-    edt = get_edt(filename, binding_dirs, 'zephyrproject')
-    if edt is None:
+    dt = get_dt(filename)
+    if dt is None:
         return ''
 
-    # print("Generating soc peripherals for " + str(Path(filename).stem ))
-    if edt is not None:
-        for node in edt.nodes:
-            if node.compats == []:
+    print("Generating soc peripherals for " + str(Path(filename).stem ))
+    if dt is not None:
+        for node in dt.node_iter():
+            compats = get_node_prop(node, 'compatible')
+            if compats is None:
                 logging.info(f"No compats (type) for node {node}. Skipping...")
                 continue
+            compat = compats[0]
+            print(compat)
             if node.name == 'soc':
                 par = node
+
             if node.parent == par:
-                unit_addr = hex(node.unit_addr) if node.unit_addr != None else None
-                driver_name = Path(node.binding_path).parts[-2] if node.binding_path else 'Not found'
-                if node.regs:
-                    size = 0;
-                    for index in range(len(node.regs)):
-                        size += int(node.regs[index].size)
-                if node.interrupts:
-                    irq_nums.clear()
-                    for index in range(len(node.interrupts)):
-                        irq_nums.append(node.interrupts[index].data.get('irq'))
-                if node.regs and node.interrupts:
-                    result[node.name] = {"driver":driver_name, "unit_addr":unit_addr, "compats":node.compats, "irq_num":irq_nums.copy(), "size":hex(size)}
-                elif node.regs:
-                    result[node.name] = {"driver":driver_name, "unit_addr":unit_addr, "compats":node.compats, "size":hex(size)}
-                elif node.interrupts:
-                    result[node.name] = {"driver":driver_name, "unit_addr":unit_addr, "compats":node.compats, "irq_num":irq_nums.copy()}
+                reg = get_node_prop(node, 'reg')
+                unit_addr = hex(reg[0]) if len(reg) > 0 else None
+
+                if len(reg) > 1:
+                    size = sum(reg[1::2])
+
+                if 'interrupts' in node.props:
+                    irq_nums = [irq for irq in get_node_prop(node, 'interrupts')[::2]]
+
+                if reg is not None and irq_nums != []:
+                    result[node.name] = {"unit_addr":unit_addr, "compats":compats.copy(), "irq_num":irq_nums.copy(), "size":hex(size)}
+                elif reg:
+                    result[node.name] = {"unit_addr":unit_addr, "compats":compats.copy(), "size":hex(size)}
+                elif irq_nums != []:
+                    result[node.name] = {"unit_addr":unit_addr, "compats":compats.copy(), "irq_num":irq_nums.copy()}
                 else:
-                    result[node.name] = {"driver":driver_name, "unit_addr":unit_addr, "compats":node.compats}
+                    result[node.name] = {"unit_addr":unit_addr, "compats":compats.copy()}
+
     return result
 
 def main():
