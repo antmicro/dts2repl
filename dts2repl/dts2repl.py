@@ -332,10 +332,6 @@ def generate_peripherals(filename):
     print("Generating soc peripherals for " + str(Path(filename).stem ))
     if dt is not None:
         for node in dt.node_iter():
-            compats = get_node_prop(node, 'compatible')
-            if compats is None:
-                logging.info(f"No compats (type) for node {node}. Skipping...")
-                continue
             if node.name == 'soc':
                 par = node
 
@@ -351,7 +347,9 @@ def generate_peripherals(filename):
             if len(reg) > 1:
                 size = sum(reg[1::2])
         else:
+            logging.info(f"No regs for node {node}. Skipping...")
             continue
+
         if node.labels:
             label = node.labels[0]
         else:
