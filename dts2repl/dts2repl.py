@@ -180,6 +180,11 @@ def generate(args):
         if compat == "atmel,sam0-uart" and 'samd20' in args.overlays:
             model = 'UART.SAMD20_UART'
 
+        # compat-based mapping for MiV and PolarFire SoC is not enough, as one is 32-bit
+        # and the other 64-bit
+        if compat == "microsemi,miv" and 'mpfs_icicle' in args.overlays:
+            model = 'CPU.RiscV64'
+
         address = ''
         if not name.startswith('cpu'):
             parent_node = node.parent
@@ -234,7 +239,8 @@ def generate(args):
             indent.append('privilegeArchitecture: PrivilegeArchitecture.Priv1_10')
             indent.append('timeProvider: clint')
         if compat.startswith('microsemi,miv'):
-            indent.append('cpuType: "rv32imac"')
+            isa = get_node_prop(node, 'riscv,isa')
+            indent.append(f'cpuType: "{isa}"')
             indent.append('privilegeArchitecture: PrivilegeArchitecture.Priv1_09')
             indent.append('timeProvider: clint')
         if compat == 'gaisler,leon3':
@@ -272,7 +278,7 @@ def generate(args):
 
         if 'interrupts' in node.props and mcu is not None:
             # decide which IRQ destination to use in Renode model
-            if any(map (lambda x: mcu.startswith(x), ['riscv,sifive', 'starfive'])):
+            if any(map (lambda x: mcu.startswith(x), ['microsemi,miv', 'riscv,sifive', 'starfive'])):
                 irq_dest = 'plic'
             elif mcu.startswith('riscv'):  # this is for LiteX!
                 irq_dest = 'cpu0'

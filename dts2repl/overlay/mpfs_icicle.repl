@@ -1,0 +1,25 @@
+// mpfs_icicle overlay
+clint: IRQControllers.CoreLevelInterruptor @ sysbus 0x2000000
+    numberOfTargets: 2
+    [0, 1] -> cpu0@[3, 7]
+    [2, 3] -> cpu1@[3, 7]
+    frequency: 1000000
+
+plic:
+    0 -> cpu0@11
+    [1,2] -> cpu1@[11,9]
+    numberOfSources: 186
+    numberOfContexts: 3
+    prioritiesEnabled: false
+
+mstimer: Timers.MPFS_Timer @ sysbus 0x20125000
+    Timer1IRQ -> plic@82
+    Timer2IRQ -> plic@83
+
+cpu0:
+    privilegeArchitecture: PrivilegeArchitecture.Priv1_10
+    hartId: 0
+
+cpu1:
+    privilegeArchitecture: PrivilegeArchitecture.Priv1_10
+    hartId: 1
