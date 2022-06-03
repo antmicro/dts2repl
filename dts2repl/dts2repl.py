@@ -318,6 +318,14 @@ def generate(args):
 
     return '\n'.join(repl)
 
+def get_mcu_compat(filename):
+    dt = get_dt(filename)
+    if dt is None:
+        return ''
+    mcu = next(filter(lambda x: 'cpu' in x.name and get_node_prop(x, 'compatible'), dt.node_iter()), None)
+    if mcu is not None:
+        mcu = get_node_prop(mcu, 'compatible')[0]
+    return mcu
 
 def generate_peripherals(filename):
     result = {}
@@ -357,7 +365,6 @@ def generate_peripherals(filename):
 
         if 'interrupts' in node.props:
             irq_nums = [irq for irq in get_node_prop(node, 'interrupts')[::2]]
-
         if reg is not None and irq_nums != []:
             result[node.name] = {"unit_addr":unit_addr, "label":label, "compats":compats.copy(), "irq_num":irq_nums.copy(), "size":hex(size)}
         elif reg:
