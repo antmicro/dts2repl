@@ -374,6 +374,11 @@ def generate_peripherals(filename, overlays):
 
             if compat == "atmel,sam0-uart" and 'samd20' in overlays:
                 model = 'UART.SAMD20_UART'
+
+            # compat-based mapping for MiV and PolarFire SoC is not enough, as one is 32-bit
+            # and the other 64-bit
+            if compat == "microsemi,miv" and 'mpfs_icicle' in overlays:
+                model = 'CPU.RiscV64'
         else:
             model = ''
 
