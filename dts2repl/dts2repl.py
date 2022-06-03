@@ -5,6 +5,7 @@ import glob
 import logging
 import os
 import pathlib
+from pathlib import Path
 import subprocess
 import sys
 import json
@@ -317,6 +318,95 @@ def generate(args):
 
     return '\n'.join(repl)
 
+def get_mcu_compat(filename):
+    dt = get_dt(filename)
+    if dt is None:
+        return ''
+
+    mcu = next(filter(lambda x: 'cpu' in x.name and get_node_prop(x, 'compatible'), dt.node_iter()), None)
+    if mcu is not None:
+        mcu = get_node_prop(mcu, 'compatible')[0]
+    return mcu
+
+def generate_peripherals(filename, overlays):
+    result = {}
+    par = ''
+    irq_nums = []
+    reg = None
+
+    dt = get_dt(filename)
+    if dt is None:
+        return ''
+
+    models_path = f'{pathlib.Path(__file__).parent.resolve()}/models.json'
+    with open(models_path) as f:
+        models = json.load(f)
+
+    mcu = get_mcu_compat(filename)
+
+    print("Generating soc peripherals for " + str(Path(filename).stem ))
+    if dt is not None:
+        for node in dt.node_iter():
+            if node.name == 'soc':
+                par = node
+
+    for node in par.node_iter():
+        compats = get_node_prop(node, 'compatible')
+
+        if compats is None:
+            logging.info(f"No compats (type) for node {node}. Skipping...")
+            continue
+        compat = get_node_prop(node, 'compatible')[0]
+
+        if get_node_prop(node, 'compatible')[0] in models:
+            model = models[compat]
+            if compat == "st,stm32-usart" and mcu in ("arm,cortex-m0", "arm,cortex-m7", "arm,cortex-m33"):
+                compat = "st,stm32-lpuart"
+                model = models[compat]
+
+            if 'stm32g4' in overlays or 'stm32l4' in overlays or 'stm32wl' in overlays:
+                if compat == "st,stm32-usart":
+                    compat = "st,stm32-lpuart"
+                    model = models[compat]
+
+                if compat == "st,stm32-rcc":
+                    model = 'Miscellaneous.STM32F4_RCC'
+
+            if compat == "atmel,sam0-uart" and 'samd20' in overlays:
+                model = 'UART.SAMD20_UART'
+
+            # compat-based mapping for MiV and PolarFire SoC is not enough, as one is 32-bit
+            # and the other 64-bit
+            if compat == "microsemi,miv" and 'mpfs_icicle' in overlays:
+                model = 'CPU.RiscV64'
+        else:
+            model = ''
+
+        if 'reg' in node.props:
+            reg = get_node_prop(node, 'reg')
+            unit_addr = hex(reg[0]) if len(reg) > 0 else None
+            if len(reg) > 1:
+                size = sum(reg[1::2])
+        else:
+            logging.info(f"No regs for node {node}. Skipping...")
+            continue
+
+        if node.labels:
+            label = node.labels[0]
+        else:
+            label = ''
+
+        if 'interrupts' in node.props:
+            irq_nums = [irq for irq in get_node_prop(node, 'interrupts')[::2]]
+        if reg is not None and irq_nums != []:
+            result[node.name] = {"unit_addr":unit_addr, "label":label, "model":model, "compats":compats.copy(), "irq_num":irq_nums.copy(), "size":hex(size)}
+        elif reg:
+            result[node.name] = {"unit_addr":unit_addr, "label":label, "model":model, "compats":compats.copy(), "size":hex(size)}
+        elif irq_nums != []:
+            result[node.name] = {"unit_addr":unit_addr, "label":label, "model":model, "compats":compats.copy(), "irq_num":irq_nums.copy()}
+        else:
+            result[node.name] = {"unit_addr":unit_addr, "label":label, "model":model, "compats":compats.copy()}
+    return result
 
 def main():
     args = parse_args()
@@ -351,7 +441,6 @@ def main():
 
     with open(args.output, 'w') as f:
         f.write(generate(args))
-
 
 if __name__ == "__main__":
     main()
