@@ -89,6 +89,7 @@
     "st,stm32-watchdog": "Timers.STM32F4_IndependentWatchdog",
     "st,stm32f0-rcc": "Python.PythonPeripheral",
     "st,stm32wl-rcc": "Python.PythonPeripheral",
+    "st,stm32-ethernet": "Network.SynopsysEthernetMAC",
 
     "starfive,itim0": "Memory.MappedMemory",
     "starfive,rocket0": "CPU.RiscV64"
