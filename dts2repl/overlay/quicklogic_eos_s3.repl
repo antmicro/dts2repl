@@ -1,0 +1,5 @@
+sysbus:
+    init:
+        Tag <0x40005400, 0x4000549F> "AnalogIP" 0x0
+        Tag <0x400054A0, 0x400057FF> "AnalogIP (unlocked)" 0x1
+
