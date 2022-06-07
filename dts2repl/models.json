@@ -92,5 +92,7 @@
     "st,stm32-ethernet": "Network.SynopsysEthernetMAC",
 
     "starfive,itim0": "Memory.MappedMemory",
-    "starfive,rocket0": "CPU.RiscV64"
+    "starfive,rocket0": "CPU.RiscV64",
+
+    "quicklogic,usbserial": "UART.USBSerialPort_S3B"
 }
