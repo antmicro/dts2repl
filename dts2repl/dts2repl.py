@@ -384,9 +384,14 @@ def generate_peripherals(filename, overlays):
 
         if 'reg' in node.props:
             reg = get_node_prop(node, 'reg')
-            unit_addr = hex(reg[0]) if len(reg) > 0 else None
-            if len(reg) > 1:
-                size = sum(reg[1::2])
+            if len(reg) == 1:
+                reg = None
+                size = None
+                continue
+            else:
+                unit_addr = hex(reg[0]) if len(reg) > 0 else None
+                if len(reg) > 1:
+                    size = sum(reg[1::2])
         else:
             logging.info(f"No regs for node {node}. Skipping...")
             continue
