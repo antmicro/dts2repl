@@ -181,6 +181,10 @@ def generate(args):
         if compat == "atmel,sam0-uart" and 'samd20' in args.overlays:
             model = 'UART.SAMD20_UART'
 
+        # LiteX on Fomu is built in the 8-bit CSR data width configuration
+        if compat == "litex,timer0" and "fomu" in args.overlays:
+            model = 'Timers.LiteX_Timer'
+
         # compat-based mapping for MiV and PolarFire SoC is not enough, as one is 32-bit
         # and the other 64-bit
         if compat == "microsemi,miv" and 'mpfs_icicle' in args.overlays:
@@ -267,6 +271,8 @@ def generate(args):
         if compat == 'riscv':
             if get_node_prop(node.parent.parent, 'compatible')[0] == 'litex,vexriscv':
                 indent.append('cpuType: "rv32imac"')
+            elif get_node_prop(node.parent.parent, 'compatible')[0] == 'kosagi,fomu':
+                indent.append('cpuType: "rv32im"')
             else:
                 repl.pop()
 
