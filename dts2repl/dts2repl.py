@@ -281,7 +281,12 @@ def generate(args):
                 indent.append(f'numberOfEvents: {str(get_node_prop(node, "cc-num"))}')
         if model.startswith('Memory'):
             if 'reg' in node.props:
-                indent.append(f'size: {hex(get_node_prop(node, "reg")[-1])}')
+                size = get_node_prop(node, "reg")[-1]
+                if size != 0:
+                    indent.append(f'size: {hex(size)}')
+                else:
+                    # do not generate memory regions of size 0
+                    repl.pop()
 
         if 'interrupts' in node.props and mcu is not None:
             # decide which IRQ destination to use in Renode model
