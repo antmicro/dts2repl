@@ -25,6 +25,7 @@
 
     "memory": "Memory.MappedMemory",
     "mmio-sram": "Memory.MappedMemory",
+    "jedec,spi-nor": "Memory.MappedMemory",
 
     "microsemi,miv": "CPU.RiscV32",
     "microsemi,coreuart": "UART.MiV_CoreUART",
