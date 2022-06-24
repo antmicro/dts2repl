@@ -239,7 +239,7 @@ def generate(args):
                 cpu = cpu[:-1]
             indent.append(f'cpuType: "{cpu}"')
             indent.append('nvic: nvic')
-        if compat.startswith('riscv,sifive'):
+        if compat.startswith('riscv,sifive') or compat == 'sifive,e31':
             indent.append('cpuType: "rv32imac"')
             indent.append('privilegeArchitecture: PrivilegeArchitecture.Priv1_10')
             indent.append('timeProvider: clint')
@@ -290,7 +290,7 @@ def generate(args):
 
         if 'interrupts' in node.props and mcu is not None:
             # decide which IRQ destination to use in Renode model
-            if any(map (lambda x: mcu.startswith(x), ['microsemi,miv', 'riscv,sifive', 'starfive'])):
+            if any(map (lambda x: mcu.startswith(x), ['microsemi,miv', 'riscv,sifive', 'starfive', 'sifive,e'])):
                 irq_dest = 'plic'
             elif mcu.startswith('riscv'):  # this is for LiteX!
                 irq_dest = 'cpu0'
