@@ -110,6 +110,39 @@ def get_node_prop(node, prop):
 
     return val
 
+def renode_model_overlay(compat, mcu, models, overlays):
+    model = models[compat]
+
+    # this hack is needed for stm32f072b_disco, as needs UART.STM32F7_USART
+    # model to work properly while using the same compat strings as boards
+    # which require UART.STM32_UART model
+    if compat == "st,stm32-usart" and mcu in ("arm,cortex-m0", "arm,cortex-m7", "arm,cortex-m33"):
+        compat = "st,stm32-lpuart"
+        model = models[compat]
+
+    # compat-based mapping of peripheral models for the following SoCs is not enough
+    # as there are ifdefs in the driver; adding a manual map for now as a workaround
+    if 'stm32g4' in overlays or 'stm32l4' in overlays or 'stm32wl' in overlays:
+        if compat == "st,stm32-usart":
+            compat = "st,stm32-lpuart"
+            model = models[compat]
+
+        if compat == "st,stm32-rcc":
+            model = 'Miscellaneous.STM32F4_RCC'
+
+    if compat == "atmel,sam0-uart" and 'samd20' in overlays:
+        model = 'UART.SAMD20_UART'
+
+    # LiteX on Fomu is built in the 8-bit CSR data width configuration
+    if compat == "litex,timer0" and "fomu" in overlays:
+        model = 'Timers.LiteX_Timer'
+
+    # compat-based mapping for MiV and PolarFire SoC is not enough, as one is 32-bit
+    # and the other 64-bit
+    if compat == "microsemi,miv" and 'mpfs_icicle' in overlays:
+        model = 'CPU.RiscV64'
+
+    return model, compat
 
 def generate(args):
     dt = get_dt(args.filename)
@@ -159,36 +192,7 @@ def generate(args):
 
         # decide which Renode model to use
         compat = get_node_prop(node, 'compatible')[0]
-        model = models[compat]
-
-        # this hack is needed for stm32f072b_disco, as needs UART.STM32F7_USART
-        # model to work properly while using the same compat strings as boards
-        # which require UART.STM32_UART model
-        if compat == "st,stm32-usart" and mcu in ("arm,cortex-m0", "arm,cortex-m7", "arm,cortex-m33"):
-            compat = "st,stm32-lpuart"
-            model = models[compat]
-
-        # compat-based mapping of peripheral models for the following SoCs is not enough
-        # as there are ifdefs in the driver; adding a manual map for now as a workaround
-        if 'stm32g4' in args.overlays or 'stm32l4' in args.overlays or 'stm32wl' in args.overlays:
-            if compat == "st,stm32-usart":
-                compat = "st,stm32-lpuart"
-                model = models[compat]
-
-            if compat == "st,stm32-rcc":
-                model = 'Miscellaneous.STM32F4_RCC'
-
-        if compat == "atmel,sam0-uart" and 'samd20' in args.overlays:
-            model = 'UART.SAMD20_UART'
-
-        # LiteX on Fomu is built in the 8-bit CSR data width configuration
-        if compat == "litex,timer0" and "fomu" in args.overlays:
-            model = 'Timers.LiteX_Timer'
-
-        # compat-based mapping for MiV and PolarFire SoC is not enough, as one is 32-bit
-        # and the other 64-bit
-        if compat == "microsemi,miv" and 'mpfs_icicle' in args.overlays:
-            model = 'CPU.RiscV64'
+        model, compat = renode_model_overlay(compat, mcu, models, args.overlays)
 
         address = ''
         if not name.startswith('cpu'):
@@ -367,31 +371,14 @@ def generate_peripherals(filename, overlays):
         if compats is None:
             logging.info(f"No compats (type) for node {node}. Skipping...")
             continue
+
+        if get_node_prop(node, 'compatible')[0] not in models:
+            logging.info(f'Node {node.name} does not have a matching Renode model. Skipping...')
+            continue
+
         compat = get_node_prop(node, 'compatible')[0]
 
-        if get_node_prop(node, 'compatible')[0] in models:
-            model = models[compat]
-            if compat == "st,stm32-usart" and mcu in ("arm,cortex-m0", "arm,cortex-m7", "arm,cortex-m33"):
-                compat = "st,stm32-lpuart"
-                model = models[compat]
-
-            if 'stm32g4' in overlays or 'stm32l4' in overlays or 'stm32wl' in overlays:
-                if compat == "st,stm32-usart":
-                    compat = "st,stm32-lpuart"
-                    model = models[compat]
-
-                if compat == "st,stm32-rcc":
-                    model = 'Miscellaneous.STM32F4_RCC'
-
-            if compat == "atmel,sam0-uart" and 'samd20' in overlays:
-                model = 'UART.SAMD20_UART'
-
-            # compat-based mapping for MiV and PolarFire SoC is not enough, as one is 32-bit
-            # and the other 64-bit
-            if compat == "microsemi,miv" and 'mpfs_icicle' in overlays:
-                model = 'CPU.RiscV64'
-        else:
-            model = ''
+        model = renode_model_overlay(compat, mcu, models, overlays)
 
         if 'reg' in node.props:
             reg = get_node_prop(node, 'reg')
