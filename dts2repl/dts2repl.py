@@ -372,13 +372,12 @@ def generate_peripherals(filename, overlays):
             logging.info(f"No compats (type) for node {node}. Skipping...")
             continue
 
-        if get_node_prop(node, 'compatible')[0] not in models:
-            logging.info(f'Node {node.name} does not have a matching Renode model. Skipping...')
-            continue
-
         compat = get_node_prop(node, 'compatible')[0]
 
-        model, compat = renode_model_overlay(compat, mcu, models, overlays)
+        if compat in models:
+            model, compat = renode_model_overlay(compat, mcu, models, overlays)
+        else:
+            model = ''
 
         if 'reg' in node.props:
             reg = get_node_prop(node, 'reg')
