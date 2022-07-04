@@ -378,7 +378,7 @@ def generate_peripherals(filename, overlays):
 
         compat = get_node_prop(node, 'compatible')[0]
 
-        model = renode_model_overlay(compat, mcu, models, overlays)
+        model, compat = renode_model_overlay(compat, mcu, models, overlays)
 
         if 'reg' in node.props:
             reg = get_node_prop(node, 'reg')
