@@ -120,6 +120,11 @@ def renode_model_overlay(compat, mcu, models, overlays):
         compat = "st,stm32-lpuart"
         model = models[compat]
 
+    # this hack is required for stm32f3, stm32g0 and stm32l0 based boards uarts
+    # to work properly
+    if compat == 'st,stm32-usart' and any(map(lambda x: x in overlays, ('stm32f3', 'stm32g0', 'stm32l0'))):
+        model = 'UART.STM32F7_USART'
+
     # compat-based mapping of peripheral models for the following SoCs is not enough
     # as there are ifdefs in the driver; adding a manual map for now as a workaround
     if 'stm32g4' in overlays or 'stm32l4' in overlays or 'stm32wl' in overlays:
@@ -260,6 +265,9 @@ def generate(args):
             indent.append('privilegeArchitecture: PrivilegeArchitecture.Priv1_10')
             indent.append('timeProvider: clint')
 
+        if model == 'UART.STM32F7_USART' and compat != 'st,stm32-lpuart':
+            indent.append('frequency: 200000000')
+
         # additional parameters for STM32F4_RCC
         if model == 'Miscellaneous.STM32F4_RCC':
             indent.append('rtcPeripheral: rtc')
@@ -294,7 +302,7 @@ def generate(args):
 
         if 'interrupts' in node.props and mcu is not None:
             # decide which IRQ destination to use in Renode model
-            if any(map (lambda x: mcu.startswith(x), ['microsemi,miv', 'riscv,sifive', 'starfive', 'sifive,e'])):
+            if any(map(lambda x: mcu.startswith(x), ['microsemi,miv', 'riscv,sifive', 'starfive', 'sifive,e'])):
                 irq_dest = 'plic'
             elif mcu.startswith('riscv'):  # this is for LiteX!
                 irq_dest = 'cpu0'
