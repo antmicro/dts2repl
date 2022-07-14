@@ -226,10 +226,6 @@ def generate(args):
         if compat == "st,stm32-timers":
             indent.append('frequency: 10000000')
             indent.append('initialLimit: 0xFFFFFFFF')
-        if compat.startswith("st,stm32") and compat.endswith("rcc") and model == "Python.PythonPeripheral":
-            indent.append('size: 0x400')
-            indent.append('initable: true')
-            indent.append('filename: "scripts/pydev/rolling-bit.py"')
         if compat == "st,stm32-lpuart":
             indent.append('frequency: 200000000')
         if compat.startswith('litex,timer'):
@@ -240,6 +236,20 @@ def generate(args):
             indent.append('frequency: 32000')
         if compat == 'microsemi,coreuart':
             indent.append('clockFrequency: 66000000')
+
+        # additional parameters for python peripherals
+        if compat.startswith("st,stm32") and compat.endswith("rcc") and model == "Python.PythonPeripheral":
+            indent.append('size: 0x400')
+            indent.append('initable: true')
+            indent.append('filename: "scripts/pydev/rolling-bit.py"')
+        elif compat == 'nordic,nrf91-flash-controller':
+            indent.append('initable: true')
+            indent.append('filename: "scripts/pydev/rolling-bit.py"')
+            indent.append('size: 0x1000')
+        elif model == 'Python.PythonPeripheral':
+            indent.append('size: 0x1000')
+            indent.append('initable: true')
+            indent.append('filename: "scripts/pydev/flipflop.py"')
 
         # additional parameters for CPUs
         if compat.startswith('arm,cortex-m'):

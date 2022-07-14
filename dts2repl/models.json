@@ -41,6 +41,7 @@
     "nordic,nrf-uart": "UART.NRF52840_UART",
     "nordic,nrf-uarte": "UART.NRF52840_UART",
     "nordic,nrf-watchdog": "Timers.NRF52840_Watchdog",
+    "nordic,nrf91-flash-controller": "Python.PythonPeripheral",
 
     "ns16550": "UART.NS16550",
 
