@@ -361,7 +361,7 @@ def get_mcu_compat(filename):
         mcu = get_node_prop(mcu, 'compatible')[0]
     return mcu
 
-def generate_peripherals(filename, overlays):
+def generate_peripherals(filename, overlays, type):
     result = {}
     par = ''
     irq_nums = []
@@ -377,11 +377,10 @@ def generate_peripherals(filename, overlays):
 
     mcu = get_mcu_compat(filename)
 
-    print("Generating soc peripherals for " + str(Path(filename).stem ))
-    if dt is not None:
-        for node in dt.node_iter():
-            if node.name == 'soc':
-                par = node
+    print(f"Generating {type} peripherals for {str(Path(filename).stem)}")
+    for node in dt.node_iter():
+        if node.name == 'soc':
+            par = node
 
     for node in par.node_iter():
         compats = get_node_prop(node, 'compatible')
@@ -389,6 +388,11 @@ def generate_peripherals(filename, overlays):
         if compats is None:
             logging.info(f"No compats (type) for node {node}. Skipping...")
             continue
+
+        if type == "board":
+            status = get_node_prop(node, 'status')
+            if status == 'disabled':
+                continue
 
         compat = get_node_prop(node, 'compatible')[0]
 
@@ -418,14 +422,14 @@ def generate_peripherals(filename, overlays):
 
         if 'interrupts' in node.props:
             irq_nums = [irq for irq in get_node_prop(node, 'interrupts')[::2]]
-        if reg is not None and irq_nums != []:
-            result[node.name] = {"unit_addr":unit_addr, "label":label, "model":model, "compats":compats.copy(), "irq_num":irq_nums.copy(), "size":hex(size)}
-        elif reg:
-            result[node.name] = {"unit_addr":unit_addr, "label":label, "model":model, "compats":compats.copy(), "size":hex(size)}
-        elif irq_nums != []:
-            result[node.name] = {"unit_addr":unit_addr, "label":label, "model":model, "compats":compats.copy(), "irq_num":irq_nums.copy()}
-        else:
-            result[node.name] = {"unit_addr":unit_addr, "label":label, "model":model, "compats":compats.copy()}
+
+        result[node.name] = {"unit_addr":unit_addr, "label":label, "model":model, "compats":compats.copy()}
+
+        if reg:
+            result[node.name]["size"] = hex(size)
+        if irq_nums != []:
+            result[node.name]["irq_nums"] = irq_nums.copy()
+
     return result
 
 def main():
