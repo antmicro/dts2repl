@@ -64,7 +64,8 @@
     "nxp,mcux-12b1msps-sar": "Analog.IMXRT_ADC",
 
     "riscv": "CPU.VexRiscv",
-    "riscv,clint0": "IRQControllers.CoreLevelInterruptor",
+    "sifive,clint0": "IRQControllers.CoreLevelInterruptor",
+    "starfive,jh7100-clint": "IRQControllers.CoreLevelInterruptor",
     "riscv,sifive-e31": "CPU.RiscV32",
     "sifive,e31": "CPU.RiscV32",
 
