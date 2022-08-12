@@ -98,5 +98,5 @@
     "starfive,itim0": "Memory.MappedMemory",
     "starfive,rocket0": "CPU.RiscV64",
 
-    "quicklogic,usbserial": "UART.USBSerialPort_S3B"
+    "quicklogic,eos-s3-usbserial": "UART.USBSerialPort_S3B"
 }
