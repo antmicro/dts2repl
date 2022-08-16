@@ -1,5 +1,5 @@
 // mpfs_icicle overlay
-clint: IRQControllers.CoreLevelInterruptor @ sysbus 0x2000000
+clint:
     numberOfTargets: 2
     [0, 1] -> cpu0@[3, 7]
     [2, 3] -> cpu1@[3, 7]

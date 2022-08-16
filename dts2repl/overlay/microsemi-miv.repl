@@ -1,5 +1,5 @@
 // microsemi-miv overlay
-clint: IRQControllers.CoreLevelInterruptor @ sysbus 0x44000000
+clint:
     [0, 1] -> cpu0@[3, 7]
     frequency: 66000000
 
