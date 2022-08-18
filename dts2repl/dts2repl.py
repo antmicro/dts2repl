@@ -216,7 +216,7 @@ def generate(args):
                 # weird mismatch, need to investigate, manually patching for now
                 address = address[0:-3] + '0' + address[-2:]
 
-            if any(map(lambda x: x in compat, ['stm32', 'silabs,gecko', 'gaisler,irqmp', 'gaisler,gptimer', 'gaisler,apbuart'])):
+            if any(map(lambda x: x in compat, ['stm32', 'silabs,gecko', 'gaisler,irqmp', 'gaisler,gptimer', 'gaisler,apbuart', 'arm,cortex-a9-twd-timer', 'xlnx,xuartps'])):
                 start, size = list(map(lambda x: hex(x), get_node_prop(node, 'reg')))
                 if compat != 'st,stm32-rcc':
                     address = f'<{start}, +{size}>'
