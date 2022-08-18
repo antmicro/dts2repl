@@ -260,6 +260,9 @@ def generate(args):
             indent.append('filename: "scripts/pydev/flipflop.py"')
 
         # additional parameters for CPUs
+        if compat.startswith('arm,cortex-a') and compat.count('-') == 1:
+            cpu = compat.split(',')[1]
+            indent.append(f'cpuType: "{cpu}"')
         if compat.startswith('arm,cortex-m'):
             cpu = compat.split(',')[1]
             if cpu == 'cortex-m33f':
