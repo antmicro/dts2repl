@@ -250,6 +250,10 @@ def generate(args):
             indent.append('initable: true')
             indent.append('filename: "scripts/pydev/rolling-bit.py"')
             indent.append('size: 0x1000')
+        elif compat == 'xlnx,ps7-clkc':
+            indent.append('size: 0x100')
+            indent.append('initable: false')
+            indent.append('script: "request.value = {0x0: 0x0001A008, 0x20: 0x1F000400, 0x24: 0x18400003}.get(request.offset, 0)"')
         elif model == 'Python.PythonPeripheral':
             indent.append('size: 0x1000')
             indent.append('initable: true')
