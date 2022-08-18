@@ -1,4 +1,6 @@
 {
+    "arm,cortex-a9": "CPU.Arm",
+    "arm,cortex-a9-twd-timer": "Timers.CortexAPrivateTimer",
     "arm,cortex-m0": "CPU.CortexM",
     "arm,cortex-m0+": "CPU.CortexM",
     "arm,cortex-m3": "CPU.CortexM",
@@ -99,5 +101,8 @@
     "starfive,itim0": "Memory.MappedMemory",
     "starfive,rocket0": "CPU.RiscV64",
 
-    "quicklogic,eos-s3-usbserial": "UART.USBSerialPort_S3B"
+    "quicklogic,eos-s3-usbserial": "UART.USBSerialPort_S3B",
+
+    "xlnx,ps7-clkc": "Python.PythonPeripheral",
+    "xlnx,xuartps": "UART.CadenceUart"
 }
