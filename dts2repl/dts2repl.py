@@ -207,7 +207,7 @@ def generate(args):
         if not name.startswith('cpu'):
             parent_node = node.parent
             addr_offset = '0'
-            if parent_node is not None and 'peripheral' in parent_node.name:
+            if parent_node is not None and '@' in parent_node.name and 'ranges' in parent_node.props:
                 _, addr_offset = parent_node.name.split('@')
 
             addr = hex(int(addr, 16) + int(addr_offset, 16))[2:]
