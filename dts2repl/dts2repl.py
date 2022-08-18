@@ -99,7 +99,7 @@ def get_node_prop(node, prop):
         return None
 
     val = node.props[prop]
-    if prop == 'compatible':
+    if prop in ('compatible', 'device_type'):
         val = val.to_strings()
     elif prop in ('interrupts', 'reg'):
         val = val.to_nums()
@@ -168,9 +168,13 @@ def generate(args):
 
     for node in nodes:
         # filter out nodes without compat strings
-        if get_node_prop(node, 'compatible') is None:
-            logging.info(f'Node {node.name} has no compat string. Skipping...')
-            continue
+        compatible = get_node_prop(node, 'compatible')
+        if compatible is None:
+            logging.debug(f'Node {node.name} has no compat string. Trying device_type...')
+            compatible = get_node_prop(node, 'device_type')
+            if compatible is None:
+                logging.debug(f'Node {node.name} has no compat string or device_type. Skipping...')
+                continue
 
         # filter out nodes without a sysbus address
         if len(node.name.split('@')) < 2:
@@ -178,7 +182,8 @@ def generate(args):
             continue
 
         # filter out nodes without a matching Renode model
-        if get_node_prop(node, 'compatible')[0] not in models:
+        compat = compatible[0]
+        if compat not in models:
             logging.info(f'Node {node.name} does not have a matching Renode model. Skipping...')
             continue
 
@@ -196,7 +201,6 @@ def generate(args):
             name += addr
 
         # decide which Renode model to use
-        compat = get_node_prop(node, 'compatible')[0]
         model, compat = renode_model_overlay(compat, mcu, models, args.overlays)
 
         address = ''
