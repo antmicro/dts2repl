@@ -322,8 +322,11 @@ def generate(args):
                 irq_dest = 'cpu0'
             elif mcu.startswith('gaisler'):
                 irq_dest = 'irqmp'
-            else:
+            elif mcu.startswith('arm,cortex-m'):
                 irq_dest = 'nvic'
+            else:
+                irq_dest = None
+                logging.warning(f'Unknown IRQ destination for {node.name}')
 
             # decide which IRQ names to use in Renode model
             if compat == 'st,stm32-rtc':
@@ -338,8 +341,9 @@ def generate(args):
                 irq_names = ['']
 
             # assign IRQ signals
-            for name, irq in zip(irq_names, get_node_prop(node, 'interrupts')[::2]):
-                indent.append(f'{name}->{irq_dest}@{irq}')
+            if irq_dest is not None:
+                for name, irq in zip(irq_names, get_node_prop(node, 'interrupts')[::2]):
+                    indent.append(f'{name}->{irq_dest}@{irq}')
 
         repl.extend(map(lambda x: f'    {x}', indent))
         repl.append('')
