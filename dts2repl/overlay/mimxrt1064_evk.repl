@@ -15,8 +15,5 @@ sysbus:
         Tag <0x400FC024, 0x400FC027> "CCM(CSCDR1)" 0x40
         Tag <0x400D8030, 0x400D8033> "analog02" 0x80002001
 
-sdram0: Memory.MappedMemory @ sysbus 0x80000000
-    size: 0x2000000
-
 flash_mem: Memory.MappedMemory @ sysbus 0x70000000
     size: 0x400000
