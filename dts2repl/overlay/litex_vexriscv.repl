@@ -1,10 +1,4 @@
 // litex_vexriscv overlay
-ram: Memory.MappedMemory @ {
-        sysbus 0x40000000;
-        sysbus 0xc0000000 // shadow
-    }
-    size: 0x10000000
-
 eth: Network.LiteX_Ethernet_CSR32 @ {
         sysbus 0x60009800;
         sysbus 0xE0009800; // shadow
