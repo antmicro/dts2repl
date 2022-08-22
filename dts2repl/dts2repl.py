@@ -101,7 +101,7 @@ def get_node_prop(node, prop):
     val = node.props[prop]
     if prop in ('compatible', 'device_type'):
         val = val.to_strings()
-    elif prop in ('interrupts', 'reg'):
+    elif prop in ('interrupts', 'reg', 'ranges'):
         val = val.to_nums()
     elif prop == 'cc-num':
         val = val.to_num()
@@ -148,6 +148,13 @@ def renode_model_overlay(compat, mcu, models, overlays):
         model = 'CPU.RiscV64'
 
     return model, compat
+
+
+def get_ranges(ranges):
+    while ranges:
+        child_addr, parent_addr, size, *ranges = ranges
+        yield child_addr, parent_addr, size
+
 
 def generate(args):
     dt = get_dt(args.filename)
@@ -207,10 +214,21 @@ def generate(args):
         if not name.startswith('cpu'):
             parent_node = node.parent
             addr_offset = '0'
+            ranges = []
             if parent_node is not None and '@' in parent_node.name and 'ranges' in parent_node.props:
                 _, addr_offset = parent_node.name.split('@')
+                if parent_node.props['ranges'].value:
+                    ranges = get_ranges(get_node_prop(parent_node, 'ranges'))
 
-            addr = hex(int(addr, 16) + int(addr_offset, 16))[2:]
+            addr = int(addr, 16)
+            addr_offset = int(addr_offset, 16)
+
+            for child_addr, parent_addr, size in ranges:
+                if child_addr <= addr < child_addr + size:
+                    addr_offset = parent_addr - child_addr
+                    break
+
+            addr = hex(addr + addr_offset)[2:]
             address = f'0x{addr.upper()}'
             if name == 'nvic':
                 # weird mismatch, need to investigate, manually patching for now
