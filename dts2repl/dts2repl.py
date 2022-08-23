@@ -193,9 +193,10 @@ def generate(args):
             logging.info(f'Node {node.name} has no sysbus address. Skipping...')
             continue
 
-        # filter out nodes without a matching Renode model
-        compat = compatible[0]
-        if compat not in models:
+        # look at all compat strings and take the first one that has a Renode model
+        # if none of them do, skip the node
+        compat = next(filter(lambda x: x in models, compatible), None)
+        if compat is None:
             logging.info(f'Node {node.name} does not have a matching Renode model. Skipping...')
             continue
 
