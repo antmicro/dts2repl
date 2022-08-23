@@ -46,6 +46,7 @@
     "nordic,nrf91-flash-controller": "Python.PythonPeripheral",
 
     "ns16550": "UART.NS16550",
+    "ns16550a": "UART.NS16550",
 
     "nxp,flexpwm": "Timers.IMXRT_PWM",
     "nxp,imx-code-bus": "Memory.MappedMemory",
@@ -82,6 +83,8 @@
     "silabs,gecko-uart": "UART.EFM32_UART",
     "silabs,gecko-usart": "UART.EFR32_USART",
 
+    "snps,dw-apb-uart": "UART.NS16550",
+
     "soc-nv-flash": "Memory.MappedMemory",
 
     "st,stm32-adc": "Analog.STM32_ADC",
@@ -104,6 +107,8 @@
     "starfive,rocket0": "CPU.RiscV64",
 
     "quicklogic,eos-s3-usbserial": "UART.USBSerialPort_S3B",
+
+    "ti,omap2-uart": "UART.NS16550",
 
     "xlnx,xuartps": "UART.CadenceUart",
     "xlnx,zynq-slcr": "Python.PythonPeripheral"
