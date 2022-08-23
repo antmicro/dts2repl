@@ -238,8 +238,12 @@ def generate(args):
                     addr_offset = parent_addr - child_addr
                     break
 
-            addr = hex(addr + addr_offset)[2:]
-            address = f'0x{addr.upper()}'
+            addr += addr_offset
+            if addr % 4 != 0:
+                logging.info(f'Node {node.name} has misaligned address {addr}. Skipping...')
+                continue
+
+            address = f'0x{addr:X}'
             if name == 'nvic':
                 # weird mismatch, need to investigate, manually patching for now
                 address = address[0:-3] + '0' + address[-2:]
