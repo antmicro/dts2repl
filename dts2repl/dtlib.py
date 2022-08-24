@@ -1676,14 +1676,14 @@ class DT:
         # looking up paths via other aliases while verifying aliases
         alias2node = {}
 
-        alias_re = re.compile("[0-9a-z-]+$")
+        alias_re = re.compile("[0-9a-z_-]+$")
 
         aliases = self.root.nodes.get("aliases")
         if aliases:
             for prop in aliases.props.values():
                 if not alias_re.match(prop.name):
                     _err(f"/aliases: alias property name '{prop.name}' "
-                         "should include only characters from [0-9a-z-]")
+                         "should include only characters from [0-9a-z_-]")
 
                 # Property.to_path() checks that the node exists, has
                 # the right type, etc. Swallow errors for invalid
