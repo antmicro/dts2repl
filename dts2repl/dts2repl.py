@@ -493,19 +493,24 @@ def main():
     dirs = []
     for top in args.include.split(','):
         for root, _, _ in os.walk(top):
-            dirs.append(f'-I {root}')
+            dirs.append(root)
 
-    incl_dirs = ' '.join(dirs)
+    incl_dirs = ' '.join(f'-I {dir}' for dir in dirs)
 
     if args.automatch:
         board_name = os.path.splitext(os.path.basename(args.filename))[0]
         cmd = f'gcc -H -E -P -x assembler-with-cpp {incl_dirs} {args.filename}'.split()
         ret = subprocess.run(cmd, capture_output=True)
 
-        # save flattened device tree
+        # save partially flattened device tree
         flat_dts = f'{os.path.splitext(args.output)[0]}.flat.dts'
         with open(flat_dts, 'w') as f:
             f.write(ret.stdout.decode('utf-8'))
+
+        # save fully flattened device tree (also /include/s)
+        dts = dtlib.DT(flat_dts, dirs)
+        with open(flat_dts, 'w') as f:
+            f.write(str(dts))
         args.filename = flat_dts
 
         # try to automatch overlays
