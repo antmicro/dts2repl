@@ -17,6 +17,9 @@
     "atmel,sam-usart": "UART.SAM_USART",
     "atmel,sam0-uart": "UART.SAMD5_UART",
 
+    "fsl,imx6q-uart": "UART.MxcUart",
+    "fsl,imx21-uart": "UART.MxcUart",
+
     "gaisler,apbuart": "UART.GaislerUART",
     "gaisler,gptimer": "Timers.GaislerGPTimer",
     "gaisler,irqmp": "IRQControllers.GaislerMIC",
