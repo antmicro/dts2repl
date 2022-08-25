@@ -111,6 +111,8 @@
 
     "quicklogic,eos-s3-usbserial": "UART.USBSerialPort_S3B",
 
+    "ti,am335x-timer": "Timers.OMAP_Timer",
+    "ti,am4372-timer": "Timers.OMAP_Timer",
     "ti,omap2-uart": "UART.NS16550",
 
     "xlnx,xuartps": "UART.CadenceUart",
