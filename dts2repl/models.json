@@ -17,6 +17,12 @@
     "atmel,sam-usart": "UART.SAM_USART",
     "atmel,sam0-uart": "UART.SAMD5_UART",
 
+    "fsl,imx31-gpt": "Timers.IMX_GPTimer",
+    "fsl,imx6dl-gpt": "Timers.IMX_GPTimer",
+    "fsl,imx6q-gpt": "Timers.IMX_GPTimer",
+    "fsl,imx6sx-gpt": "Timers.IMX_GPTimer",
+    "fsl,imx6sl-gpt": "Timers.IMX_GPTimer",
+    "fsl,imx6sll-gpt": "Timers.IMX_GPTimer",
     "fsl,imx6q-uart": "UART.MxcUart",
     "fsl,imx21-uart": "UART.MxcUart",
 
