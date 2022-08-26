@@ -17,6 +17,8 @@
     "atmel,sam-usart": "UART.SAM_USART",
     "atmel,sam0-uart": "UART.SAMD5_UART",
 
+    "fsl,imx6q-anatop": "Python.PythonPeripheral",
+    "fsl,imx6sx-anatop": "Python.PythonPeripheral",
     "fsl,imx31-gpt": "Timers.IMX_GPTimer",
     "fsl,imx6dl-gpt": "Timers.IMX_GPTimer",
     "fsl,imx6q-gpt": "Timers.IMX_GPTimer",

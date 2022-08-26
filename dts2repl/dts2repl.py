@@ -298,6 +298,17 @@ def generate(args):
             indent.append('size: 0x200')
             indent.append('initable: false')
             indent.append('script: "request.value = {0x100: 0x0001A008, 0x120: 0x1F000400, 0x124: 0x18400003}.get(request.offset, 0)"')
+        elif compat.startswith('fsl,imx6') and compat.endswith('-anatop'):
+            indent.append('size: 0x1000')
+            indent.append('initable: false')
+            indent.append('// 0x10: usb1_pll_480_ctrl')
+            indent.append('// 0xe0: pll_enet')
+            indent.append('// 0x100: pfd_528')
+            indent.append('// 0x150: ana_misc0')
+            indent.append('// 0x180: tempsense0')
+            indent.append('// 0x260: digprog, report mx6ul')
+            indent.append('// 0x280: digprog_sololite, report mx6ul')
+            indent.append('script: "request.value = {0x10: 0x80000000, 0xe0: 0x80000000, 0x100: 0xffffffff, 0x150: 0x80, 0x180: 0x4, 0x260: 0x640000, 0x280: 0x640000}.get(request.offset, 0)"')
         elif model == 'Python.PythonPeripheral':
             indent.append('size: 0x1000')
             indent.append('initable: true')
