@@ -1,0 +1,3 @@
+// imx6q-novena overlay
+dram: Memory.MappedMemory @ sysbus 0x10000000
+    size: 0x10000000
