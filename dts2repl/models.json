@@ -25,6 +25,7 @@
     "fsl,imx6sx-gpt": "Timers.IMX_GPTimer",
     "fsl,imx6sl-gpt": "Timers.IMX_GPTimer",
     "fsl,imx6sll-gpt": "Timers.IMX_GPTimer",
+    "fsl,imx6q-mmdc": "Python.PythonPeripheral",
     "fsl,imx6q-uart": "UART.MxcUart",
     "fsl,imx21-uart": "UART.MxcUart",
 
