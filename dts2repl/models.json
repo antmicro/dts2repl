@@ -19,6 +19,9 @@
 
     "fsl,imx6q-anatop": "Python.PythonPeripheral",
     "fsl,imx6sx-anatop": "Python.PythonPeripheral",
+    "fsl,imx25-fec": "Python.PythonPeripheral",
+    "fsl,imx6q-fec": "Python.PythonPeripheral",
+    "fsl,imx6sl-fec": "Python.PythonPeripheral",
     "fsl,imx31-gpt": "Timers.IMX_GPTimer",
     "fsl,imx6dl-gpt": "Timers.IMX_GPTimer",
     "fsl,imx6q-gpt": "Timers.IMX_GPTimer",

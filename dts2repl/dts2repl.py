@@ -316,6 +316,11 @@ def generate(args):
             indent.append('// 0x18: misc')
             indent.append('// these settings mean 256 MB of DRAM')
             indent.append('script: "request.value = {0x0: 0x4000000, 0x18: 0x0}.get(request.offset, 0)"')
+        elif compat.startswith('fsl,imx') and compat.endswith('-fec'):
+            indent.append('size: 0x4000')
+            indent.append('initable: false')
+            indent.append('// 0x4: ievent')
+            indent.append('script: "request.value = {0x4: 0x800000}.get(request.offset, 0)"')
         elif model == 'Python.PythonPeripheral':
             indent.append('size: 0x1000')
             indent.append('initable: true')
