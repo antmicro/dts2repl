@@ -10,6 +10,7 @@ import subprocess
 import sys
 import json
 import tempfile
+import re
 from dts2repl import dtlib
 
 
@@ -209,6 +210,9 @@ def generate(args):
         name, addr = node.name.split('@')
         if len(node.labels) > 0:
             name = node.labels[0].lower().replace("_", "")
+
+        # make name a valid repl GeneralIdentifier
+        name = re.sub('[^A-Za-z0-9_]', '_', name)
 
         if name == 'cpu':
             name += addr
