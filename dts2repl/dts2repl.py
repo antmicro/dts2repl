@@ -181,6 +181,9 @@ def generate(args):
     if mcu is not None:
         mcu = get_node_prop(mcu, 'compatible')[0]
 
+    # get platform compat names
+    platform = get_node_prop(dt.get_node('/'), 'compatible')
+
     for node in nodes:
         # filter out nodes without compat strings
         compatible = get_node_prop(node, 'compatible')
@@ -418,6 +421,14 @@ def generate(args):
         if model.startswith('Memory'):
             if 'reg' in node.props:
                 size = get_node_prop(node, "reg")[-1]
+                # increase OCRAM size for imx6 platforms
+                # the device trees in U-Boot all have 0x20000, but some platforms
+                # actually have 0x40000 and the config headers reflect this, which
+                # would make the stack end up outside of memory if the size from
+                # the device tree was used
+                if platform and any('imx6' in p for p in platform):
+                    if node.labels and 'ocram' in node.labels[0]:
+                        size = 0x40000
                 if size != 0:
                     indent.append(f'size: {hex(size)}')
                 else:
