@@ -123,9 +123,11 @@
 
     "quicklogic,eos-s3-usbserial": "UART.USBSerialPort_S3B",
 
+    "ti,am4372-i2c": "Python.PythonPeripheral",
     "ti,am335x-timer": "Timers.OMAP_Timer",
     "ti,am4372-timer": "Timers.OMAP_Timer",
     "ti,omap2-uart": "UART.NS16550",
+    "ti,omap4-i2c": "Python.PythonPeripheral",
 
     "xlnx,xuartps": "UART.CadenceUart",
     "xlnx,zynq-slcr": "Python.PythonPeripheral"
