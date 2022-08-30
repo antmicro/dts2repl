@@ -126,6 +126,7 @@
     "ti,am4372-i2c": "Python.PythonPeripheral",
     "ti,am335x-timer": "Timers.OMAP_Timer",
     "ti,am4372-timer": "Timers.OMAP_Timer",
+    "ti,am4-prcm": "Python.PythonPeripheral",
     "ti,omap2-uart": "UART.NS16550",
     "ti,omap4-i2c": "Python.PythonPeripheral",
 

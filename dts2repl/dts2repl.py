@@ -321,6 +321,10 @@ def generate(args):
             indent.append('initable: false')
             indent.append('// 0x4: ievent')
             indent.append('script: "request.value = {0x4: 0x800000}.get(request.offset, 0)"')
+        elif compat == 'ti,am4-prcm':
+            indent.append('size: 0x11000')
+            indent.append('initable: true')
+            indent.append('filename: "scripts/pydev/rolling-bit.py"')
         elif compat in ('ti,am4372-i2c', 'ti,omap4-i2c'):
             indent.append('size: 0x1000')
             indent.append('initable: false')
