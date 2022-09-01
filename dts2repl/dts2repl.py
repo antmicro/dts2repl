@@ -105,7 +105,7 @@ def get_node_prop(node, prop):
         val = val.to_strings()
     elif prop in ('interrupts', 'reg', 'ranges'):
         val = val.to_nums()
-    elif prop == 'cc-num':
+    elif prop in ('#address-cells', '#size-cells', 'cc-num'):
         val = val.to_num()
     else:
         val = val.to_string()
@@ -157,9 +157,32 @@ def renode_model_overlay(compat, mcu, models, overlays):
     return model, compat
 
 
-def get_ranges(ranges):
+def get_ranges(node):
+    def get_cells(cells, n):
+        current, rest = cells[:n], cells[n:]
+        value = 0
+        for cell in current[::-1]:
+            value <<= 32
+            value |= cell
+        return value, rest
+
+    if not node.props['ranges'].value:  # ranges;
+        return []
+
+    ranges = get_node_prop(node, 'ranges')
+    if not ranges:  # ranges = < >;
+        return []
+    # #address-cells from this node only applies to its address space (child addresses in ranges)
+    address_cells = get_node_prop(node, '#address-cells')
+    size_cells = get_node_prop(node, '#size-cells')
+    parent_address_cells = 1
+    if node.parent and '#address-cells' in node.parent.props:
+        parent_address_cells = get_node_prop(node.parent, '#address-cells')
+
     while ranges:
-        child_addr, parent_addr, size, *ranges = ranges
+        child_addr, ranges = get_cells(ranges, address_cells)
+        parent_addr, ranges = get_cells(ranges, parent_address_cells)
+        size, ranges = get_cells(ranges, size_cells)
         yield child_addr, parent_addr, size
 
 
@@ -232,8 +255,7 @@ def generate(args):
             ranges = []
             if parent_node is not None and '@' in parent_node.name and 'ranges' in parent_node.props:
                 _, addr_offset = parent_node.name.split('@')
-                if parent_node.props['ranges'].value:
-                    ranges = get_ranges(get_node_prop(parent_node, 'ranges'))
+                ranges = get_ranges(parent_node)
 
             addr = int(addr, 16)
             addr_offset = int(addr_offset, 16)
