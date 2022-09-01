@@ -11,6 +11,7 @@ import sys
 import json
 import tempfile
 import re
+from collections import Counter
 from dts2repl import dtlib
 
 
@@ -163,6 +164,7 @@ def get_ranges(ranges):
 
 
 def generate(args):
+    name_counter = Counter()
     dt = get_dt(args.filename)
     if dt is None:
         return ''
@@ -257,6 +259,14 @@ def generate(args):
             ):
                 start, size = list(map(lambda x: hex(x), get_node_prop(node, 'reg')))
                 address = f'<{start}, +{size}>'
+
+        # "timer" becomes "timer1", "timer2", etc
+        # if we have "timer" -> "timer1" but there was already a peripheral named "timer1",
+        # we'll end up with "timer" -> "timer1" -> "timer11"
+        while name in name_counter:
+            name_counter[name] += 1
+            name += str(name_counter[name] - 1)
+        name_counter[name] += 1
 
         repl.append(f'{name}: {model} @ sysbus {address}')
         indent = []
