@@ -277,8 +277,8 @@ def generate(args):
                      'xlnx,xuartps']))
                 or model == 'UART.STM32_UART'
             ):
-                start, size = list(map(lambda x: hex(x), get_node_prop(node, 'reg')))
-                address = f'<{start}, +{size}>'
+                _, size = list(map(lambda x: hex(x), get_node_prop(node, 'reg')))
+                address = f'<{address}, +{size}>'
 
         # "timer" becomes "timer1", "timer2", etc
         # if we have "timer" -> "timer1" but there was already a peripheral named "timer1",
