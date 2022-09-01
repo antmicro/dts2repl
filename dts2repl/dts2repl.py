@@ -331,6 +331,12 @@ def generate(args):
             indent.append('size: 0x1000')
             indent.append('initable: false')
             indent.append('script: "request.value = 1"')
+        elif compat == 'marvell,mbus-controller':
+            indent.append('size: 0x200')
+            indent.append('initable: false')
+            indent.append('// 0x180: win_bar')
+            indent.append('// 0x184: win_sz')
+            indent.append('script: "request.value = {0x180: 0x0, 0x184: 0xf000001}.get(request.offset, 0)"')
         elif model == 'Python.PythonPeripheral':
             indent.append('size: 0x1000')
             indent.append('initable: true')
