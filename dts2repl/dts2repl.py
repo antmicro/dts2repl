@@ -251,19 +251,14 @@ def generate(args):
         address = ''
         if not name.startswith('cpu'):
             parent_node = node.parent
-            addr_offset = '0'
-            ranges = []
-            if parent_node is not None and '@' in parent_node.name and 'ranges' in parent_node.props:
-                _, addr_offset = parent_node.name.split('@')
-                ranges = get_ranges(parent_node)
-
             addr = int(addr, 16)
-            addr_offset = int(addr_offset, 16)
-
-            for child_addr, parent_addr, size in ranges:
-                if child_addr <= addr < child_addr + size:
-                    addr_offset = parent_addr - child_addr
-                    break
+            addr_offset = 0
+            while parent_node is not None and 'ranges' in parent_node.props:
+                for child_addr, parent_addr, size in get_ranges(parent_node):
+                    if child_addr <= addr + addr_offset < child_addr + size:
+                        addr_offset += parent_addr - child_addr
+                        break
+                parent_node = parent_node.parent
 
             addr += addr_offset
             if addr % 4 != 0:
