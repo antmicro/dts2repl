@@ -45,6 +45,9 @@
     "mmio-sram": "Memory.MappedMemory",
     "jedec,spi-nor": "Memory.MappedMemory",
 
+    "marvell,armada-370-timer": "Timers.Marvell_Armada_Timer",
+    "marvell,armada-375-timer": "Timers.Marvell_Armada_Timer",
+
     "microsemi,miv": "CPU.RiscV32",
     "microsemi,coreuart": "UART.MiV_CoreUART",
 

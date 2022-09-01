@@ -281,6 +281,8 @@ def generate(args):
             indent.append('frequency: 4000000')
         if model == 'Timers.IMX_GPTimer':
             indent.append('frequency: 240000000')
+        if model == 'Timers.Marvell_Armada_Timer':
+            indent.append('frequency: 100000000')
 
         # additional parameters for python peripherals
         if compat.startswith("st,stm32") and compat.endswith("rcc") and model == "Python.PythonPeripheral":
