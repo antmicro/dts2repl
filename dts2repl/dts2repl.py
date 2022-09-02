@@ -346,6 +346,8 @@ def generate(args):
         if compat.startswith('arm,cortex-a') and compat.count('-') == 1:
             cpu = compat.split(',')[1]
             indent.append(f'cpuType: "{cpu}"')
+        if compat == 'marvell,sheeva-v7':
+            indent.append('cpuType: "cortex-a9"')
         if compat.startswith('arm,cortex-m'):
             cpu = compat.split(',')[1]
             if cpu == 'cortex-m33f':
