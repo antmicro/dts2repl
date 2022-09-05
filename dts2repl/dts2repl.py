@@ -133,7 +133,10 @@ def renode_model_overlay(compat, mcu, models, overlays):
             model = models[compat]
 
         if compat == "st,stm32-rcc":
-            model = 'Miscellaneous.STM32F4_RCC'
+            if 'stm32l4' in overlays:
+                model = 'Python.PythonPeripheral'
+            else:
+                model = 'Miscellaneous.STM32F4_RCC'
 
     if compat == "atmel,sam0-uart" and 'samd20' in overlays:
         model = 'UART.SAMD20_UART'
@@ -263,7 +266,10 @@ def generate(args):
         if compat.startswith("st,stm32") and compat.endswith("rcc") and model == "Python.PythonPeripheral":
             indent.append('size: 0x400')
             indent.append('initable: true')
-            indent.append('filename: "scripts/pydev/rolling-bit.py"')
+            if 'stm32l4' in args.overlays:
+                indent.append('filename: "scripts/pydev/flipflop.py"')
+            else:
+                indent.append('filename: "scripts/pydev/rolling-bit.py"')
         elif compat == 'nordic,nrf91-flash-controller':
             indent.append('initable: true')
             indent.append('filename: "scripts/pydev/rolling-bit.py"')
