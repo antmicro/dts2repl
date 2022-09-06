@@ -48,6 +48,8 @@
     "marvell,armada-370-timer": "Timers.Marvell_Armada_Timer",
     "marvell,armada-375-timer": "Timers.Marvell_Armada_Timer",
     "marvell,armada-xp-timer": "Timers.Marvell_Armada_Timer",
+    "marvell,armada370-nand-controller": "Python.PythonPeripheral",
+    "marvell,armada-8k-nand-controller": "Python.PythonPeripheral",
     "marvell,mbus-controller": "Python.PythonPeripheral",
     "marvell,sheeva-v7": "CPU.Arm",
 
