@@ -341,6 +341,10 @@ def generate(args):
             indent.append('size: 0x100')
             indent.append('initable: false')
             indent.append('script: "request.value = 0xffffffe1"')
+        elif compat.startswith('marvell,mv') and compat.endswith('-i2c'):
+            indent.append('size: 0x100')
+            indent.append('initable: false')
+            indent.append('script: "request.value = 0xf8"')
         elif model == 'Python.PythonPeripheral':
             indent.append('size: 0x1000')
             indent.append('initable: true')

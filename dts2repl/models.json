@@ -51,6 +51,8 @@
     "marvell,armada370-nand-controller": "Python.PythonPeripheral",
     "marvell,armada-8k-nand-controller": "Python.PythonPeripheral",
     "marvell,mbus-controller": "Python.PythonPeripheral",
+    "marvell,mv64xxx-i2c": "Python.PythonPeripheral",
+    "marvell,mv78230-a0-i2c": "Python.PythonPeripheral",
     "marvell,sheeva-v7": "CPU.Arm",
 
     "microsemi,miv": "CPU.RiscV32",
