@@ -105,6 +105,6 @@
 
     "quicklogic,eos-s3-usbserial": "UART.USBSerialPort_S3B",
 
-    "xlnx,ps7-clkc": "Python.PythonPeripheral",
-    "xlnx,xuartps": "UART.CadenceUart"
+    "xlnx,xuartps": "UART.CadenceUart",
+    "xlnx,zynq-slcr": "Python.PythonPeripheral"
 }
