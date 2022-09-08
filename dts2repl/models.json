@@ -91,6 +91,7 @@
     "st,stm32-rcc": "Python.PythonPeripheral",
     "st,stm32-rng": "Miscellaneous.STM32F4_RNG",
     "st,stm32-rtc": "Timers.STM32F4_RTC",
+    "st,stm32-spi": "SPI.STM32SPI",
     "st,stm32-timers": "Timers.STM32_Timer",
     "st,stm32-uart": "UART.STM32_UART",
     "st,stm32-usart": "UART.STM32_UART",
