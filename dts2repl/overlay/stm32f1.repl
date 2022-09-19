@@ -1,7 +1,4 @@
 // stm32f1 overlay
-rtc: Timers.STM32F4_RTC @ sysbus 0x40002800
-    AlarmIRQ -> nvic@41
-
 sysbus:
     init:
         ApplySVD @https://dl.antmicro.com/projects/renode/svd/STM32F103.svd.gz
