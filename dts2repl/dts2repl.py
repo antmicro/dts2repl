@@ -105,7 +105,7 @@ def get_node_prop(node, prop):
         val = val.to_strings()
     elif prop in ('interrupts', 'reg', 'ranges'):
         val = val.to_nums()
-    elif prop in ('#address-cells', '#size-cells', 'cc-num'):
+    elif prop in ('#address-cells', '#size-cells', 'cc-num', 'clock-frequency'):
         val = val.to_num()
     else:
         val = val.to_string()
@@ -507,6 +507,34 @@ def get_mcu_compat(filename):
         mcu = get_node_prop(mcu, 'compatible')[0]
     return mcu
 
+def generate_cpu_freq(filename):
+    result = {}
+    par = ''
+    irq_nums = []
+    reg = None
+
+    dt = get_dt(filename)
+    if dt is None:
+        return ''
+
+    print(f"Checking for CPU Freq in {str(Path(filename).stem)}...")
+
+    for node in dt.node_iter():
+        if node.name == 'cpus':
+            par = node
+            break
+
+    for n in par.node_iter():
+        if n.parent == par:
+            if "clock-frequency" in n.props:
+                freq = get_node_prop(n, 'clock-frequency')
+                if freq < 1000:
+                    freq = freq * 1000000
+                print(f" * Found clock-frequency - {freq} Hz")
+                return freq
+    print(f" * Not found")
+    return None
+
 def generate_peripherals(filename, overlays, type):
     result = {}
     par = ''
@@ -527,6 +555,7 @@ def generate_peripherals(filename, overlays, type):
     for node in dt.node_iter():
         if node.name == 'soc':
             par = node
+            break
 
     for node in par.node_iter():
         compats = get_node_prop(node, 'compatible')
