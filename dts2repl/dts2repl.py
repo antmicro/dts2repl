@@ -203,6 +203,7 @@ def generate(args):
     mcu = next(filter(lambda x: 'cpu' in x.name and get_node_prop(x, 'compatible'), dt.node_iter()), None)
     if mcu is not None:
         mcu = get_node_prop(mcu, 'compatible')[0]
+    repl_cpu_name = None
 
     # get platform compat names
     platform = get_node_prop(dt.get_node('/'), 'compatible')
@@ -249,7 +250,9 @@ def generate(args):
         model, compat = renode_model_overlay(compat, mcu, models, args.overlays)
 
         address = ''
-        if not name.startswith('cpu'):
+        if name.startswith('cpu'):
+            repl_cpu_name = name
+        else:
             parent_node = node.parent
             addr = int(addr, 16)
             addr_offset = 0
@@ -418,7 +421,7 @@ def generate(args):
 
         # additional parameters for IRQ ctrls
         if compat.endswith('nvic'):
-            indent.append('-> cpu0@0')
+            indent.append(f'-> {repl_cpu_name}@0')
         if compat == 'gaisler,irqmp':
             indent.append('0 -> cpu0@0 | cpu0@1 | cpu0@2')
 
