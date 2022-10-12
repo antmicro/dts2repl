@@ -83,6 +83,7 @@
     "nxp,imx-sys-bus": "Memory.MappedMemory",
     "nxp,imx-uart": "UART.ImxUart",
     "nxp,imx-iuart": "UART.ImxUart",
+    "nxp,gpt-hw-timer": "Timers.IMX_GPTimer",
     "nxp,kinetis-lpuart": "UART.LowPower_UART",
     "nxp,kinetis-mcg": "Miscellaneous.K6xF_MCG",
     "nxp,kinetis-rnga": "Miscellaneous.K6xF_RNG",
