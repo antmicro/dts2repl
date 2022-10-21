@@ -1,0 +1,7 @@
+// efm32gg_slwstk6121a overlay
+sysbus:
+    init:
+        // We have to split emu peripheral into two tags as those two registers have to return different value
+        Tag <0x400E3024, 0x400E3028> "emu_if" 0xFFFFFFFF
+        Tag <0x400E3078, 0x400E3090> "emu_dcdcsync" 0x0
+        Tag <0x43C81200, 0x43C81204> "bit-band_region" 0xFFFFFFFF

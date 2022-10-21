@@ -1,0 +1,4 @@
+// efm32gg_stk3701a overlay
+sysbus:
+    init:
+        Tag <0x43C81200, 0x43C81224> "bit-band_region" 0xFFFFFFFF

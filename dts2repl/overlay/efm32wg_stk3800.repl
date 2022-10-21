@@ -1,0 +1,4 @@
+// efm32wg_stk3800 overlay
+sysbus:
+    init:
+        Tag <0x4390058C, 0x43900590> "peripherals_bit-band_region" 0xFFFFFFFF

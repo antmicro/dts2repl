@@ -1,0 +1,4 @@
+// efm32hg_slstk3400a overlay
+sysbus:
+    init:
+        Tag <0x400C8000, 0x400C8400> "cmu" 0xFFFFFFFF
