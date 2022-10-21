@@ -140,6 +140,6 @@
     "ti,omap2-uart": "UART.NS16550",
     "ti,omap4-i2c": "Python.PythonPeripheral",
 
-    "xlnx,xuartps": "UART.CadenceUart",
+    "xlnx,xuartps": "UART.Cadence_UART",
     "xlnx,zynq-slcr": "Python.PythonPeripheral"
 }
