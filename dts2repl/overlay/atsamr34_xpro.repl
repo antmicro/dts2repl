@@ -1,0 +1,5 @@
+// atsamr34_xpro overlay
+sysbus:
+    init:
+        Tag <0x40000C00, 0x40000C10> "rstc" 0xFFFFFFFF
+        Tag <0x40001000, 0x4000101C> "osc32kctrl" 0xFFFFFFFF
