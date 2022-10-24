@@ -132,6 +132,7 @@
     "starfive,rocket0": "CPU.RiscV64",
 
     "quicklogic,eos-s3-usbserial": "UART.USBSerialPort_S3B",
+    "quicklogic,usbserialport-s3b": "UART.USBSerialPort_S3B",
 
     "ti,am4372-i2c": "Python.PythonPeripheral",
     "ti,am335x-timer": "Timers.OMAP_Timer",
