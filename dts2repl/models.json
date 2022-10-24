@@ -14,6 +14,8 @@
     "arm,v7m-nvic": "IRQControllers.NVIC",
     "arm,v8m-nvic": "IRQControllers.NVIC",
 
+    "arm,cmsdk-uart": "UART.TrivialUart",
+
     "atmel,sam-usart": "UART.SAM_USART",
     "atmel,sam0-uart": "UART.SAMD5_UART",
 

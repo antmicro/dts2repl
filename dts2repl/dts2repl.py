@@ -279,7 +279,8 @@ def generate(args):
                     ['stm32-gpio', 'stm32-timers', 'silabs,gecko', 'gaisler,irqmp',
                      'gaisler,gptimer', 'gaisler,apbuart', 'arm,cortex-a9-twd-timer',
                      'xlnx,xuartps']))
-                or model == 'UART.STM32_UART'
+                or any(map(lambda x: x in model, 
+                    ['UART.STM32_UART', 'UART.TrivialUart']))
             ):
                 _, size = list(map(lambda x: hex(x), get_node_prop(node, 'reg')))
                 address = f'<{address}, +{size}>'
@@ -489,8 +490,8 @@ def generate(args):
             else:
                 irq_names = ['']
 
-            # assign IRQ signals
-            if irq_dest is not None:
+            # assign IRQ signals (but not when using TrivialUart)
+            if irq_dest is not None and model != 'UART.TrivialUart':
                 for name, irq in zip(irq_names, get_node_prop(node, 'interrupts')[::2]):
                     indent.append(f'{name}->{irq_dest}@{irq}')
 
