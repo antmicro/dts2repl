@@ -244,14 +244,14 @@ def generate(args):
         # make name a valid repl GeneralIdentifier
         name = re.sub('[^A-Za-z0-9_]', '_', name)
 
-        if name == 'cpu':
-            name += addr
-
         # decide which Renode model to use
         model, compat = renode_model_overlay(compat, mcu, models, args.overlays)
 
         address = ''
         if name.startswith('cpu'):
+            # Rename all cpus in order so we always have cpu0
+            name = f"cpu{name_counter['cpu']}"
+            name_counter['cpu'] += 1
             repl_cpu_name = name
         else:
             parent_node = node.parent
