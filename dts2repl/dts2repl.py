@@ -313,7 +313,7 @@ def generate(args):
         if model == 'Timers.OMAP_Timer':
             indent.append('frequency: 4000000')
         if model == 'Timers.IMX_GPTimer':
-            indent.append('frequency: 240000000')
+            indent.append('frequency: 32000')
         if model == 'Timers.Marvell_Armada_Timer':
             indent.append('frequency: 100000000')
 
