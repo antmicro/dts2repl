@@ -187,6 +187,12 @@ def get_ranges(node):
         yield child_addr, parent_addr, size
 
 
+def can_be_memory(node):
+    possible_names = ('ram', 'flash', 'partition')
+    return len(node.props) == 1 and 'reg' in node.props \
+        and any(x in node.name.lower() for x in possible_names)
+
+
 def generate(args):
     name_counter = Counter()
     dt = get_dt(args.filename)
@@ -210,14 +216,24 @@ def generate(args):
     platform = get_node_prop(dt.get_node('/'), 'compatible')
 
     for node in nodes:
+        # those memory peripherals sometimes require changing the sysbus address of this peripheral
+        is_heuristic_memory = False
         # filter out nodes without compat strings
         compatible = get_node_prop(node, 'compatible')
         if compatible is None:
             logging.debug(f'Node {node.name} has no compat string. Trying device_type...')
             compatible = get_node_prop(node, 'device_type')
             if compatible is None:
-                logging.debug(f'Node {node.name} has no compat string or device_type. Skipping...')
-                continue
+                # hack to generate entries for memory peripherals without a compat string on some platforms
+                # we only want to treat it as such when the node meets all of the requirements described in the
+                # 'can_be_memory' function
+                if can_be_memory(node):
+                    compatible = ['memory']
+                    is_heuristic_memory = True
+                    logging.debug(f'Node {node.name} will be treated as memory')
+                else:
+                    logging.debug(f'Node {node.name} has no compat string or device_type and cannot be treated as memory. Skipping...')
+                    continue
 
         # filter out nodes without a sysbus address
         if len(node.name.split('@')) < 2:
@@ -284,6 +300,10 @@ def generate(args):
             ):
                 _, size = list(map(lambda x: hex(x), get_node_prop(node, 'reg')))
                 address = f'<{address}, +{size}>'
+            
+            # check the registration point of guessed memory peripherals
+            if is_heuristic_memory:
+                address = f"0x{(get_node_prop(node, 'reg')[0]):X}"
 
         # "timer" becomes "timer1", "timer2", etc
         # if we have "timer" -> "timer1" but there was already a peripheral named "timer1",
