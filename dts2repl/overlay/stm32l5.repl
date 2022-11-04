@@ -1,3 +1,7 @@
 // stm32l5 overlay
 rcc:
     filename: "scripts/pydev/flipflop.py"
+
+sysbus:
+    init:
+        Tag <0x40007000, 0x400073FF> "pwr" 0xFFFFFFFF
