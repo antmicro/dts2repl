@@ -1,10 +1,4 @@
 // gr716a_mini overlay
-ram: Memory.MappedMemory @ sysbus 0x30000000
-    size: 0x10000
-
-sram: Memory.MappedMemory @ sysbus 0x31000000
-    size: 0x20000
-
 cpu0:
     cpuType: "gr716"
 
