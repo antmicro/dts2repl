@@ -657,7 +657,8 @@ def main():
         ret = subprocess.run(cmd, capture_output=True)
 
         # save partially flattened device tree
-        flat_dts = f'{os.path.splitext(args.output)[0]}.flat.dts'
+        base = os.path.splitext(args.output)[0]
+        flat_dts = f'{base}.flat.dts'
         with open(flat_dts, 'w') as f:
             f.write(ret.stdout.decode('utf-8'))
 
@@ -676,6 +677,9 @@ def main():
         includes = itertools.chain(includes, dts_includes)
         includes = map(lambda x: x.lstrip('. '), includes)
         includes = remove_duplicates(includes)
+        includes_file = f'{base}.includes'
+        with open(includes_file, 'w') as f:
+            f.writelines(f'{x}\n' for x in includes)
         includes = map(lambda x: os.path.basename(x), includes)
         includes = map(lambda x: os.path.splitext(x)[0], includes)
         includes = set(includes)
