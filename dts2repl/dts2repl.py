@@ -12,6 +12,7 @@ import json
 import tempfile
 import re
 from collections import Counter
+import itertools
 from dts2repl import dtlib
 
 
@@ -610,6 +611,35 @@ def generate_peripherals(filename, overlays, type):
 
     return result
 
+
+def remove_duplicates(xs):
+    """Remove duplicates while preserving element order"""
+    return list(dict.fromkeys(xs))
+
+
+def get_includes(dts_filename, dirs):
+    """Get the paths of all dts(i) files /include/d by the specified dts file"""
+    include_directive = "/include/"
+    # we use this dict as an ordered set of include names
+    includes = {}
+    with open(dts_filename) as dts_file:
+        for line in dts_file:
+            line = line.strip()
+            if line.startswith(include_directive):
+                quoted_name = line[len(include_directive):].strip()
+                name = quoted_name.strip('"')
+                # find the the include in one of the dirs from the provided list
+                for path in (Path(dir) / name for dir in dirs):
+                    if not path.is_file():
+                        continue
+                    # found, save its path and recurse into it
+                    includes[str(path)] = None
+                    for inc in get_includes(path, dirs):
+                        includes[inc] = None
+                    break
+    return list(includes)
+
+
 def main():
     args = parse_args()
 
@@ -622,6 +652,7 @@ def main():
 
     if args.automatch:
         board_name = os.path.splitext(os.path.basename(args.filename))[0]
+        # get list of #includes (C preprocessor)
         cmd = f'gcc -H -E -P -x assembler-with-cpp {incl_dirs} {args.filename}'.split()
         ret = subprocess.run(cmd, capture_output=True)
 
@@ -629,6 +660,9 @@ def main():
         flat_dts = f'{os.path.splitext(args.output)[0]}.flat.dts'
         with open(flat_dts, 'w') as f:
             f.write(ret.stdout.decode('utf-8'))
+
+        # get list of /include/s (device tree mechanism)
+        dts_includes = get_includes(flat_dts, dirs)
 
         # save fully flattened device tree (also /include/s)
         dts = dtlib.DT(flat_dts, dirs)
@@ -639,7 +673,9 @@ def main():
         # try to automatch overlays
         includes = ret.stderr.decode('utf-8').split('\n')
         includes = filter(lambda x: '.dtsi' in x, includes)
+        includes = itertools.chain(includes, dts_includes)
         includes = map(lambda x: x.lstrip('. '), includes)
+        includes = remove_duplicates(includes)
         includes = map(lambda x: os.path.basename(x), includes)
         includes = map(lambda x: os.path.splitext(x)[0], includes)
         includes = set(includes)
