@@ -19,6 +19,11 @@
 
     "fsl,imx6q-anatop": "Python.PythonPeripheral",
     "fsl,imx6sx-anatop": "Python.PythonPeripheral",
+    "fsl,imx6q-ccm": "Python.PythonPeripheral",
+    "fsl,imx6sl-ccm": "Python.PythonPeripheral",
+    "fsl,imx6sll-ccm": "Python.PythonPeripheral",
+    "fsl,imx6sx-ccm": "Python.PythonPeripheral",
+    "fsl,imx6ul-ccm": "Python.PythonPeripheral",
     "fsl,imx25-fec": "Python.PythonPeripheral",
     "fsl,imx6q-fec": "Python.PythonPeripheral",
     "fsl,imx6sl-fec": "Python.PythonPeripheral",

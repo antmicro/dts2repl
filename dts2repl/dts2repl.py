@@ -357,6 +357,13 @@ def generate(args):
             indent.append('initable: false')
             indent.append('// 0x4: ievent')
             indent.append('script: "request.value = {0x4: 0x800000}.get(request.offset, 0)"')
+        elif compat.startswith('fsl,imx') and compat.endswith('-ccm'):
+            indent.append('size: 0x4000')
+            indent.append('initable: false')
+            indent.append('// 0x14: cbcdr')
+            indent.append('// 0x18: cbcmr')
+            indent.append('// 0x1c: cscmr1')
+            indent.append('script: "request.value = {0x14: 3<<8 | 7<<10, 0x18: 2<<12, 0x1c: 0x3f}.get(request.offset, 0)"')
         elif compat == 'ti,am4-prcm':
             indent.append('size: 0x11000')
             indent.append('initable: true')
