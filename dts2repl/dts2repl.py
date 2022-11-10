@@ -342,9 +342,9 @@ def generate(args):
             indent.append('// 0x100: pfd_528')
             indent.append('// 0x150: ana_misc0')
             indent.append('// 0x180: tempsense0')
-            indent.append('// 0x260: digprog, report mx6ul')
-            indent.append('// 0x280: digprog_sololite, report mx6ul')
-            indent.append('script: "request.value = {0x10: 0x80000000, 0xe0: 0x80000000, 0x100: 0xffffffff, 0x150: 0x80, 0x180: 0x4, 0x260: 0x640000, 0x280: 0x640000}.get(request.offset, 0)"')
+            indent.append('// 0x260: digprog, report mx6sl (0x60)')
+            indent.append('// 0x280: digprog_sololite, report mx6sl (0x60)')
+            indent.append('script: "request.value = {0x10: 0x80000000, 0xe0: 0x80000000, 0x100: 0xffffffff, 0x150: 0x80, 0x180: 0x4, 0x260: 0x600000, 0x280: 0x600000}.get(request.offset, 0)"')
         elif compat == 'fsl,imx6q-mmdc':
             indent.append('size: 0x4000')
             indent.append('initable: false')
