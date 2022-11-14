@@ -135,7 +135,7 @@ def renode_model_overlay(compat, mcu, models, overlays):
             model = models[compat]
 
         if compat == "st,stm32-rcc":
-            if 'stm32l4' in overlays:
+            if any(map(lambda x: x in overlays, ('stm32l4', 'stm32g4'))):
                 model = 'Python.PythonPeripheral'
             elif 'stm32l0' in overlays:
                 model = 'Miscellaneous.STM32L0_RCC'
@@ -321,7 +321,7 @@ def generate(args):
         if compat.startswith("st,stm32") and compat.endswith("rcc") and model == "Python.PythonPeripheral":
             indent.append('size: 0x400')
             indent.append('initable: true')
-            if 'stm32l4' in args.overlays:
+            if any(map(lambda x: x in args.overlays, ('stm32l4', 'stm32g4'))):
                 indent.append('filename: "scripts/pydev/flipflop.py"')
             else:
                 indent.append('filename: "scripts/pydev/rolling-bit.py"')
