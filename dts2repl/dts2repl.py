@@ -32,6 +32,9 @@ def parse_args():
     parser.add_argument('--include',
                         default='',
                         help='Comma-separated dtsi include directories')
+    parser.add_argument('--preprocessor-args',
+                        default='',
+                        help='Extra arguments to pass to the C preprocessor')
     parser.add_argument('--automatch',
                         action='store_true',
                         help='Match overlays automatically. Only available when dtsi include dirs are provided')
@@ -681,7 +684,7 @@ def main():
     if args.automatch:
         board_name = os.path.splitext(os.path.basename(args.filename))[0]
         # get list of #includes (C preprocessor)
-        cmd = f'gcc -H -E -P -x assembler-with-cpp {incl_dirs} {args.filename}'.split()
+        cmd = f'gcc -H -E -P -x assembler-with-cpp {incl_dirs} {args.preprocessor_args} {args.filename}'.split()
         ret = subprocess.run(cmd, capture_output=True)
 
         # save partially flattened device tree
