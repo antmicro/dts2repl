@@ -316,7 +316,6 @@ def generate(args):
             name += str(name_counter[name] - 1)
         name_counter[name] += 1
 
-        repl.append(f'{name}: {model} @ sysbus {address}')
         indent = []
 
         # additional parameters for peripherals
@@ -458,14 +457,14 @@ def generate(args):
             indent.append('0 -> cpu0@0 | cpu0@1 | cpu0@2')
 
         # for some reason the only compat string that VexRiscv has is "riscv"
-        # check the board compat string and if doesn't match, remove last entry
+        # check the board compat string and if doesn't match, skip the node
         if compat == 'riscv':
             if get_node_prop(node.parent.parent, 'compatible')[0] == 'litex,vexriscv':
                 indent.append('cpuType: "rv32imac"')
             elif get_node_prop(node.parent.parent, 'compatible')[0] == 'kosagi,fomu':
                 indent.append('cpuType: "rv32im"')
             else:
-                repl.pop()
+                continue
 
         if model.startswith('Timers'):
             if 'cc-num' in node.props:
@@ -485,7 +484,7 @@ def generate(args):
                     indent.append(f'size: {hex(size)}')
                 else:
                     # do not generate memory regions of size 0
-                    repl.pop()
+                    continue
 
         if 'interrupts' in node.props and mcu is not None:
             # decide which IRQ destination to use in Renode model
@@ -518,6 +517,7 @@ def generate(args):
                 for irq_name, irq in zip(irq_names, get_node_prop(node, 'interrupts')[::2]):
                     indent.append(f'{irq_name}->{irq_dest}@{irq}')
 
+        repl.append(f'{name}: {model} @ sysbus {address}')
         repl.extend(map(lambda x: f'    {x}', indent))
         repl.append('')
 
