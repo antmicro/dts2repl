@@ -153,11 +153,6 @@ def renode_model_overlay(compat, mcu, models, overlays):
     if compat == "litex,timer0" and "fomu" in overlays:
         model = 'Timers.LiteX_Timer'
 
-    # compat-based mapping for MiV and PolarFire SoC is not enough, as one is 32-bit
-    # and the other 64-bit
-    if compat == "microsemi,miv" and 'mpfs_icicle' in overlays:
-        model = 'CPU.RiscV64'
-
     return model, compat
 
 
@@ -426,22 +421,24 @@ def generate(args):
                 cpu = cpu[:-1]
             indent.append(f'cpuType: "{cpu}"')
             indent.append('nvic: nvic')
-        if compat.startswith('riscv,sifive') or compat == 'sifive,e31':
-            indent.append('cpuType: "rv32imac"')
-            indent.append('privilegeArchitecture: PrivilegeArchitecture.Priv1_10')
-            indent.append('timeProvider: clint')
-        if compat.startswith('microsemi,miv'):
-            isa = get_node_prop(node, 'riscv,isa')
+        if model == 'CPU.RiscV32':  # We use CPU.RiscV32 as a generic model for all RV CPUs and fix it up here
+            isa = get_node_prop(node, 'riscv,isa', 'rv32imac')
             indent.append(f'cpuType: "{isa}"')
-            indent.append('privilegeArchitecture: PrivilegeArchitecture.Priv1_09')
+            if '64' in isa:
+                model = 'CPU.RiscV64'
             indent.append('timeProvider: clint')
+            indent.append(f'hartId: {node.name.split("@")[1]}')
+
+            if any(c.startswith('riscv,sifive') or
+                   c.startswith('starfive,rocket') or
+                   c == 'sifive,e31'
+                   for c in compatible):
+                indent.append('privilegeArchitecture: PrivilegeArchitecture.Priv1_10')
+            else:
+                indent.append('privilegeArchitecture: PrivilegeArchitecture.Priv1_09')
+
         if compat == 'gaisler,leon3':
             indent.append('cpuType: "leon3"')
-        if compat.startswith('starfive,rocket'):
-            indent.append('cpuType: "rv64gc"')
-            indent.append(f'hartId: {node.name.split("@")[1]}')
-            indent.append('privilegeArchitecture: PrivilegeArchitecture.Priv1_10')
-            indent.append('timeProvider: clint')
 
         if model == 'UART.STM32F7_USART' and compat != 'st,stm32-lpuart':
             indent.append('frequency: 200000000')
