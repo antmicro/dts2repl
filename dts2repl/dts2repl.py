@@ -100,9 +100,9 @@ def get_dt(filename):
         return dtlib.DT(f.name)
 
 
-def get_node_prop(node, prop):
+def get_node_prop(node, prop, default=None):
     if prop not in node.props:
-        return None
+        return default
 
     val = node.props[prop]
     if prop in ('compatible', 'device_type'):
