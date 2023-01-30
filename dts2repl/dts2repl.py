@@ -515,8 +515,8 @@ def generate(args):
 
             # assign IRQ signals (but not when using TrivialUart)
             if irq_dest is not None and model != 'UART.TrivialUart':
-                for name, irq in zip(irq_names, get_node_prop(node, 'interrupts')[::2]):
-                    indent.append(f'{name}->{irq_dest}@{irq}')
+                for irq_name, irq in zip(irq_names, get_node_prop(node, 'interrupts')[::2]):
+                    indent.append(f'{irq_name}->{irq_dest}@{irq}')
 
         repl.extend(map(lambda x: f'    {x}', indent))
         repl.append('')
