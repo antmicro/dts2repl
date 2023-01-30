@@ -426,7 +426,13 @@ def generate(args):
             indent.append(f'cpuType: "{isa}"')
             if '64' in isa:
                 model = 'CPU.RiscV64'
-            indent.append('timeProvider: clint')
+
+            # Use CPU.VexRiscv for LiteX and Fomu
+            if set(platform) & {'litex,vexriscv', 'kosagi,fomu'}:
+                model = 'CPU.VexRiscv'
+            else:
+                indent.append('timeProvider: clint')
+
             indent.append(f'hartId: {node.name.split("@")[1]}')
 
             if any(c.startswith('riscv,sifive') or
@@ -452,16 +458,6 @@ def generate(args):
             indent.append(f'-> {repl_cpu_name}@0')
         if compat == 'gaisler,irqmp':
             indent.append('0 -> cpu0@0 | cpu0@1 | cpu0@2')
-
-        # for some reason the only compat string that VexRiscv has is "riscv"
-        # check the board compat string and if doesn't match, skip the node
-        if compat == 'riscv':
-            if get_node_prop(node.parent.parent, 'compatible')[0] == 'litex,vexriscv':
-                indent.append('cpuType: "rv32imac"')
-            elif get_node_prop(node.parent.parent, 'compatible')[0] == 'kosagi,fomu':
-                indent.append('cpuType: "rv32im"')
-            else:
-                continue
 
         if model.startswith('Timers'):
             if 'cc-num' in node.props:
