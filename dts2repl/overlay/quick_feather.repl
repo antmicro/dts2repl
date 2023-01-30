@@ -1,4 +1,3 @@
-// quick_feather overlay
 spt: Timers.EOSS3_SimplePeriodicTimer @ sysbus 0x40005C00
 
 intrCtrl: IRQControllers.EOSS3_IntrCtrl @ {

@@ -1,4 +1,3 @@
-// hifive_unleashed overlay
 cpu0: CPU.RiscV64 @ sysbus
     cpuType: "rv64imac"
     hartId: 0

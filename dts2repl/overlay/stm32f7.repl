@@ -1,4 +1,3 @@
-// stm32f7 overlay
 pwrCsr1: Python.PythonPeripheral @ sysbus 0x40007004
     size: 0x4
     initable: true

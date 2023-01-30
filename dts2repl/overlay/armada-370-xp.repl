@@ -1,3 +1,2 @@
-// armada-370-xp overlay
 sdram: Memory.MappedMemory @ sysbus 0x0
     size: 0x10000000

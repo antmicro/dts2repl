@@ -1,3 +1,2 @@
-// imx6qdl-pico overlay
 dram: Memory.MappedMemory @ sysbus 0x10000000
     size: 0x10000000

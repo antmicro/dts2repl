@@ -1,4 +1,3 @@
-// stm32l476 overlay
 pwrCsr1: Python.PythonPeripheral @ sysbus 0x40007000
     size: 0x4
     initable: true

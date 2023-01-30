@@ -1,4 +1,3 @@
-// efm32gg_slwstk6121a overlay
 sysbus:
     init:
         // We have to split emu peripheral into two tags as those two registers have to return different value

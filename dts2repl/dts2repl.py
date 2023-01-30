@@ -520,6 +520,7 @@ def generate(args):
         overlay = f'{overlay_path}/{cpu}.repl'
         if os.path.exists(overlay):
             repl.append('')
+            repl.append(f'// {cpu} overlay')
             with open(overlay) as f:
                 repl.extend(map(lambda x: x.rstrip(), f.readlines()))
 

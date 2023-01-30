@@ -1,4 +1,3 @@
-// arduino_nano_33_ble overlay
 gpio0:                // PinName in ArduinoIDE
     23 -> camera@0    // D7
     24 -> led_red@0   // LED_RED

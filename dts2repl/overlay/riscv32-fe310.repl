@@ -1,4 +1,3 @@
-// riscv32-fe310 overlay
 clint:
     [0,1] -> cpu0@[3,7]
     frequency: 62000000

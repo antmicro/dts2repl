@@ -1,4 +1,3 @@
-// same70 overlay
 PMC_SR: Python.PythonPeripheral @ sysbus 0x400E0668
     size: 0x4
     initable: true

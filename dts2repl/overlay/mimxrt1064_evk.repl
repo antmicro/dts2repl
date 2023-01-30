@@ -1,4 +1,3 @@
-// mimxrt1064_evk overlay
 analog01: Python.PythonPeripheral @ sysbus 0x400D8000
     size: 0x30
     initable: true

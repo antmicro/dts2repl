@@ -1,4 +1,3 @@
-// gr716a_mini overlay
 cpu0:
     cpuType: "gr716"
 

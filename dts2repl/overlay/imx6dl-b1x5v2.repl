@@ -1,3 +1,2 @@
-// imx6dl-b1x5v2 overlay
 dram: Memory.MappedMemory @ sysbus 0x10000000
     size: 0x10000000

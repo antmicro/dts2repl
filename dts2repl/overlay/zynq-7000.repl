@@ -1,3 +1,2 @@
-// zynq-7000 overlay
 onChipMemory: Memory.MappedMemory @ sysbus 0xFFFC0000
     size: 0x40000

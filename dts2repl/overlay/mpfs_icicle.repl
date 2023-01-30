@@ -1,4 +1,3 @@
-// mpfs_icicle overlay
 clint:
     numberOfTargets: 2
     [0, 1] -> cpu0@[3, 7]

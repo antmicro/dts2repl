@@ -1,4 +1,3 @@
-// stm32f1 overlay
 sysbus:
     init:
         ApplySVD @https://dl.antmicro.com/projects/renode/svd/STM32F103.svd.gz

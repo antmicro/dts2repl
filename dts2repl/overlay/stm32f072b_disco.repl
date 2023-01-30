@@ -1,4 +1,3 @@
-// stm32f072b_disco overlay
 exti: IRQControllers.EXTI @ sysbus 0x40010400
     numberOfOutputLines: 32
     [0, 1] -> nvicInput5@[0, 1]

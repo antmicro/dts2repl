@@ -1,3 +1,2 @@
-// stm32l1 overlay
 rcc:
     filename: "scripts/pydev/flipflop.py"
