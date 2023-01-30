@@ -1,2 +1,1 @@
-sdram: Memory.MappedMemory @ sysbus 0x0
-    size: 0x10000000
+armada-370-xp.repl
