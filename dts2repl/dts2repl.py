@@ -216,7 +216,7 @@ def generate(args):
     repl_cpu_name = None
 
     # get platform compat names
-    platform = get_node_prop(dt.get_node('/'), 'compatible')
+    platform = get_node_prop(dt.get_node('/'), 'compatible', [])
 
     for node in nodes:
         # those memory peripherals sometimes require changing the sysbus address of this peripheral
@@ -478,7 +478,7 @@ def generate(args):
                 # actually have 0x40000 and the config headers reflect this, which
                 # would make the stack end up outside of memory if the size from
                 # the device tree was used
-                if platform and any('imx6' in p for p in platform):
+                if any('imx6' in p for p in platform):
                     if node.labels and 'ocram' in node.labels[0]:
                         size = 0x40000
                 if size != 0:
