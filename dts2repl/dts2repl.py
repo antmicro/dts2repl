@@ -192,6 +192,40 @@ def get_ranges(node):
         yield child_addr, parent_addr, size
 
 
+class NameMapper:
+    def __init__(self):
+        self._counter = Counter()
+        self._mapping = {}
+
+    def get_name(self, node):
+        if node.path in self._mapping:
+            return self._mapping[node.path]
+
+        # Allow getting the name of a node whose name doesn't contain a unit address
+        name, _, _ = node.name.partition('@')
+        if len(node.labels) > 0:
+            name = node.labels[0].lower().replace("_", "")
+
+        # make name a valid repl GeneralIdentifier
+        name = re.sub('[^A-Za-z0-9_]', '_', name)
+
+        if name.startswith('cpu'):
+            # Rename all cpus in order so we always have cpu0
+            name = f"cpu{self._counter['cpu']}"
+            self._counter['cpu'] += 1
+        else:
+            # "timer" becomes "timer1", "timer2", etc
+            # if we have "timer" -> "timer1" but there was already a peripheral named "timer1",
+            # we'll end up with "timer" -> "timer1" -> "timer11"
+            while name in self._counter:
+                self._counter[name] += 1
+                name += str(self._counter[name] - 1)
+            self._counter[name] += 1
+
+        self._mapping[node.path] = name
+        return name
+
+
 def can_be_memory(node):
     possible_names = ('ram', 'flash', 'partition')
     return len(node.props) == 1 and 'reg' in node.props \
@@ -199,7 +233,7 @@ def can_be_memory(node):
 
 
 def generate(args):
-    name_counter = Counter()
+    name_mapper = NameMapper()
     dt = get_dt(args.filename)
     if dt is None:
         return ''
@@ -215,7 +249,6 @@ def generate(args):
     mcu = next(filter(lambda x: 'cpu' in x.name and get_node_prop(x, 'compatible'), dt.node_iter()), None)
     if mcu is not None:
         mcu = get_node_prop(mcu, 'compatible')[0]
-    repl_cpu_name = None
 
     # get platform compat names
     platform = get_node_prop(dt.get_node('/'), 'compatible', [])
@@ -258,23 +291,14 @@ def generate(args):
             continue
 
         # get model name and addr
-        name, addr = node.name.split('@')
-        if len(node.labels) > 0:
-            name = node.labels[0].lower().replace("_", "")
-
-        # make name a valid repl GeneralIdentifier
-        name = re.sub('[^A-Za-z0-9_]', '_', name)
+        _, addr = node.name.split('@')
+        name = name_mapper.get_name(node)
 
         # decide which Renode model to use
         model, compat = renode_model_overlay(compat, mcu, models, args.overlays)
 
         address = ''
-        if name.startswith('cpu'):
-            # Rename all cpus in order so we always have cpu0
-            name = f"cpu{name_counter['cpu']}"
-            name_counter['cpu'] += 1
-            repl_cpu_name = name
-        else:
+        if not name.startswith('cpu'):
             parent_node = node.parent
             addr = int(addr, 16)
             addr_offset = 0
@@ -309,14 +333,6 @@ def generate(args):
             # check the registration point of guessed memory peripherals
             if is_heuristic_memory:
                 address = f"0x{(get_node_prop(node, 'reg')[0]):X}"
-
-        # "timer" becomes "timer1", "timer2", etc
-        # if we have "timer" -> "timer1" but there was already a peripheral named "timer1",
-        # we'll end up with "timer" -> "timer1" -> "timer11"
-        while name in name_counter:
-            name_counter[name] += 1
-            name += str(name_counter[name] - 1)
-        name_counter[name] += 1
 
         indent = []
 
