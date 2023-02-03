@@ -100,7 +100,14 @@ def get_dt(filename):
         return dtlib.DT(f.name)
 
 
-def get_node_prop(node, prop, default=None):
+def get_node_prop(node, prop, default=None, inherit=False):
+    # look up inherited properties
+    if inherit:
+        while node.parent is not None:
+            if prop in node.props:
+                break
+            node = node.parent
+
     if prop not in node.props:
         return default
 
