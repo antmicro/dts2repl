@@ -263,8 +263,9 @@ def generate(args):
 
     # get mcu compat name
     mcu = next(filter(lambda x: 'cpu' in x.name and get_node_prop(x, 'compatible'), dt.node_iter()), None)
+    mcu_compat = None
     if mcu is not None:
-        mcu = get_node_prop(mcu, 'compatible')[0]
+        mcu_compat = get_node_prop(mcu, 'compatible')[0]
 
     # get platform compat names
     platform = get_node_prop(dt.get_node('/'), 'compatible', [])
@@ -311,7 +312,7 @@ def generate(args):
         name = name_mapper.get_name(node)
 
         # decide which Renode model to use
-        model, compat = renode_model_overlay(compat, mcu, models, args.overlays)
+        model, compat = renode_model_overlay(compat, mcu_compat, models, args.overlays)
 
         address = ''
         if not name.startswith('cpu'):
