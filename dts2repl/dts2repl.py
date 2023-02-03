@@ -118,6 +118,8 @@ def get_node_prop(node, prop, default=None, inherit=False):
         val = val.to_nums()
     elif prop in ('#address-cells', '#size-cells', 'cc-num', 'clock-frequency'):
         val = val.to_num()
+    elif prop in ('interrupt-parent'):
+        val = val.to_node()
     else:
         val = val.to_string()
 
@@ -476,12 +478,6 @@ def generate(args):
         if model == 'Miscellaneous.STM32F4_RCC':
             indent.append('rtcPeripheral: rtc')
 
-        # additional parameters for IRQ ctrls
-        if compat.endswith('nvic'):
-            indent.append(f'-> {repl_cpu_name}@0')
-        if compat == 'gaisler,irqmp':
-            indent.append('0 -> cpu0@0 | cpu0@1 | cpu0@2')
-
         if model.startswith('Timers'):
             if 'cc-num' in node.props:
                 indent.append(f'numberOfEvents: {str(get_node_prop(node, "cc-num"))}')
@@ -502,20 +498,28 @@ def generate(args):
                     # do not generate memory regions of size 0
                     continue
 
-        if 'interrupts' in node.props and mcu is not None:
-            # decide which IRQ destination to use in Renode model
-            if any(map(lambda x: mcu.startswith(x), ['microsemi,miv', 'riscv,sifive', 'starfive', 'sifive,e'])):
-                irq_dest = 'plic'
-            elif mcu.startswith('riscv'):  # this is for LiteX!
-                irq_dest = 'cpu0'
-            elif mcu.startswith('gaisler'):
-                irq_dest = 'irqmp'
-            elif mcu.startswith('arm,cortex-m'):
-                irq_dest = 'nvic'
-            else:
-                irq_dest = None
-                logging.warning(f'Unknown IRQ destination for {node.name}')
+        irq_dest_nodes = []
+        irq_numbers = []
+        # decide which IRQ destinations to use in Renode model
+        # these IRQ ctrls get special treatment
+        if compat.endswith('nvic'):
+            indent.append('-> cpu0@0')
+        elif compat == 'gaisler,irqmp':
+            indent.append('0 -> cpu0@0 | cpu0@1 | cpu0@2')
+        elif 'interrupts' in node.props:
+            interrupt_parent = get_node_prop(node, 'interrupt-parent', inherit=True)
+            if interrupt_parent is not None:
+                # Note: this only works for #interrupt-cells = 2
+                irq_numbers = get_node_prop(node, 'interrupts')[::2]
+                irq_dest_nodes = [interrupt_parent] * len(irq_numbers)
 
+        # treat the RISC-V CPU interrupt controller as the CPU itself
+        for i, irq_dest_node in enumerate(irq_dest_nodes):
+            if 'riscv,cpu-intc' in get_node_prop(irq_dest_node, 'compatible'):
+                irq_dest_nodes[i] = irq_dest_node.parent
+
+        # assign IRQ signals (but not when using TrivialUart)
+        if irq_dest_nodes and model != 'UART.TrivialUart':
             # decide which IRQ names to use in Renode model
             if compat == 'st,stm32-rtc':
                 irq_names = ['AlarmIRQ']
@@ -526,12 +530,11 @@ def generate(args):
             elif compat in ['gaisler,gptimer']:
                 irq_names = ['0']
             else:
-                irq_names = ['']
+                irq_names = [str(n) for n in range(len(irq_dest_nodes))]
 
-            # assign IRQ signals (but not when using TrivialUart)
-            if irq_dest is not None and model != 'UART.TrivialUart':
-                for irq_name, irq in zip(irq_names, get_node_prop(node, 'interrupts')[::2]):
-                    indent.append(f'{irq_name}->{irq_dest}@{irq}')
+            for irq_name, irq_dest, irq in zip(irq_names, irq_dest_nodes, irq_numbers):
+                irq_dest_name = name_mapper.get_name(irq_dest)
+                indent.append(f'{irq_name}->{irq_dest_name}@{irq}')
 
         repl.append(f'{name}: {model} @ sysbus {address}')
         repl.extend(map(lambda x: f'    {x}', indent))
