@@ -228,6 +228,20 @@ class NameMapper:
         return name
 
 
+# This is similar to dtlib's to_nodes, but it only parses every second cell as a phandle
+# Note: this only works for #interrupt-cells = 2
+def get_interrupts_extended(node: dtlib.Node):
+    prop = node.props['interrupts-extended']
+    if prop.type != dtlib.Type.PHANDLES_AND_NUMS:
+        print('interrupts-extended property is incorrectly formatted')
+        return
+
+    for i in range(0, len(prop.value), 8):
+        phandle = int.from_bytes(prop.value[i:i + 4], 'big')
+        irq_num = int.from_bytes(prop.value[i + 4:i + 8], 'big')
+        yield (node.dt.phandle2node[phandle], irq_num)
+
+
 def can_be_memory(node):
     possible_names = ('ram', 'flash', 'partition')
     return len(node.props) == 1 and 'reg' in node.props \
@@ -512,6 +526,9 @@ def generate(args):
                 # Note: this only works for #interrupt-cells = 2
                 irq_numbers = get_node_prop(node, 'interrupts')[::2]
                 irq_dest_nodes = [interrupt_parent] * len(irq_numbers)
+        elif 'interrupts-extended' in node.props:
+            irq_dest_nodes, irq_numbers = zip(*get_interrupts_extended(node))
+            irq_dest_nodes = list(irq_dest_nodes)
 
         # treat the RISC-V CPU interrupt controller as the CPU itself
         for i, irq_dest_node in enumerate(irq_dest_nodes):
