@@ -531,10 +531,14 @@ def generate(args):
             irq_dest_nodes, irq_numbers = zip(*get_interrupts_extended(node))
             irq_dest_nodes = list(irq_dest_nodes)
 
-        # treat the RISC-V CPU interrupt controller as the CPU itself
         for i, irq_dest_node in enumerate(irq_dest_nodes):
-            if 'riscv,cpu-intc' in get_node_prop(irq_dest_node, 'compatible'):
+            irq_dest_compatible = get_node_prop(irq_dest_node, 'compatible', [])
+            # treat the RISC-V CPU interrupt controller as the CPU itself
+            if 'riscv,cpu-intc' in irq_dest_compatible:
                 irq_dest_nodes[i] = irq_dest_node.parent
+            # treat the VexRiscv intc as the CPU itself
+            if 'vexriscv-intc0' in irq_dest_compatible:
+                irq_dest_nodes[i] = mcu
 
         # assign IRQ signals (but not when using TrivialUart)
         if irq_dest_nodes and model != 'UART.TrivialUart':
