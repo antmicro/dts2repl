@@ -554,6 +554,11 @@ def generate(args):
             else:
                 irq_names = [str(n) for n in range(len(irq_dest_nodes))]
 
+                # use non-numbered GPIO output if we only have 1 GPIO
+                # and this node is not an interrupt controller
+                if irq_names == ['0'] and 'interrupt-controller' not in node.props:
+                    irq_names = ['']
+
             for irq_name, irq_dest, irq in zip(irq_names, irq_dest_nodes, irq_numbers):
                 irq_dest_name = name_mapper.get_name(irq_dest)
                 indent.append(f'{irq_name}->{irq_dest_name}@{irq}')
