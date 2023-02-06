@@ -577,7 +577,16 @@ def generate(args):
             with open(overlay) as f:
                 repl.extend(map(lambda x: x.rstrip(), f.readlines()))
 
-    return '\n'.join(repl)
+    # remove interrupts connected to nonexistent peripherals
+    # also consider peripherals and interrupts defined in overlays
+    repl_devices = [m.group() for m in [re.match(r"^\w+\s*(?=:)", line) for line in repl] if m]
+    filtered_repl = []
+    for line in repl:
+        irq_dest = re.search(r"->\s*(\w+)\s*@", line)
+        if irq_dest is None or irq_dest.group(1) in repl_devices:
+            filtered_repl.append(line)
+
+    return '\n'.join(filtered_repl)
 
 def get_mcu_compat(filename):
     dt = get_dt(filename)
