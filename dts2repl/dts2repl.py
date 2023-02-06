@@ -560,6 +560,9 @@ def generate(args):
                     irq_names = ['']
 
             for irq_name, irq_dest, irq in zip(irq_names, irq_dest_nodes, irq_numbers):
+                # assume very large IRQ numbers which have all bits set (i.e. 2^n - 1) are invalid
+                if irq >= 0xfff and (irq & (irq + 1)) == 0:
+                    continue
                 irq_dest_name = name_mapper.get_name(irq_dest)
                 indent.append(f'{irq_name}->{irq_dest_name}@{irq}')
 
