@@ -557,6 +557,9 @@ def generate(args):
                 irq_names = ['ReceiveIRQ', 'TransmitIRQ']
             elif compat in ['gaisler,gptimer']:
                 irq_names = ['0']
+            # the Renode model for these UARTs only has 1 IRQ
+            elif compat in ['arm,pl011', 'atmel,sam0-uart']:
+                irq_names = ['']
             else:
                 irq_names = [str(n) for n in range(len(irq_dest_nodes))]
 
