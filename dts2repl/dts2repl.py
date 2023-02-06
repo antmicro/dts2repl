@@ -116,7 +116,7 @@ def get_node_prop(node, prop, default=None, inherit=False):
         val = val.to_strings()
     elif prop in ('interrupts', 'reg', 'ranges'):
         val = val.to_nums()
-    elif prop in ('#address-cells', '#size-cells', 'cc-num', 'clock-frequency'):
+    elif prop in ('#address-cells', '#size-cells', 'cc-num', 'clock-frequency', 'riscv,ndev'):
         val = val.to_num()
     elif prop in ('interrupt-parent'):
         val = val.to_node()
@@ -375,6 +375,12 @@ def generate(args):
             indent.append('frequency: 32000')
         if model == 'Timers.Marvell_Armada_Timer':
             indent.append('frequency: 100000000')
+        if model == 'IRQControllers.PlatformLevelInterruptController':
+            # the default of 1023 matches the highest one seen in Zephyr's dts
+            ndev = get_node_prop(node, 'riscv,ndev', 1023)
+            indent.append(f'numberOfSources: {ndev}')
+            indent.append('numberOfContexts: 9')
+            indent.append('prioritiesEnabled: true')
 
         # additional parameters for python peripherals
         if compat.startswith("st,stm32") and compat.endswith("rcc") and model == "Python.PythonPeripheral":
