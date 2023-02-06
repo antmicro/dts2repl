@@ -1,13 +1,9 @@
 clint:
     numberOfTargets: 2
-    [0, 1] -> cpu0@[3, 7]
-    [2, 3] -> cpu1@[3, 7]
     frequency: 1000000
 
 plic:
-    0 -> cpu0@11
-    [1,2] -> cpu1@[11,9]
-    numberOfSources: 186
+    2 -> cpu1@9
     numberOfContexts: 3
     prioritiesEnabled: false
 

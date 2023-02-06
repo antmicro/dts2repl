@@ -1,10 +1,7 @@
 clint:
-    [0,1] -> cpu0@[3,7]
     frequency: 62000000
 
 plic:
-    [0] -> cpu0@[11]
-    numberOfSources: 52
     numberOfContexts: 1
 
 qspi0Xip: Memory.MappedMemory @ sysbus 0x20000000
