@@ -162,6 +162,11 @@ def renode_model_overlay(compat, mcu, models, overlays):
     if compat == "litex,timer0" and "fomu" in overlays:
         model = 'Timers.LiteX_Timer'
 
+    # EFR32xG22 USART uses different offsets, but the compatible is identical to EFR32xG12 USART
+    # The HAL uses compile-time defines to choose the right register layout
+    if compat == 'silabs,gecko-usart' and 'efr32bg22' in overlays:
+        model = 'UART.EFR32xG22_USART'
+
     return model, compat
 
 
