@@ -58,3 +58,29 @@ from argparse import Namespace
 print(dts2repl.generate(Namespace(overlays="riscv32-fe310",
                          filename="path/to/flattened_devicetree.dts")))
 ```
+
+## Development
+
+You can use the CI scripts locally to quickly verify your dts2repl changes. First, run [setup-env.sh](./ci/setup_env.sh)
+after sourcing [config.sh](./ci/config.sh)to prepare your environment:
+
+```sh
+source ./ci/config.sh
+./ci/setup_env.sh
+```
+
+Then, you can use:
+
+```sh
+(cd ci-output && ../ci/get_dashboard_replkit.sh)
+```
+
+to download all repls from the dashboard for comparison, and
+
+```sh
+./ci/entrypoint.sh
+```
+
+to build new repls for all platforms for which the dashboard has device trees and compare them against the downloaded
+ones. `entrypoint.sh` will download source code for the dashboard projects as necessary. The only step you need to
+re-run after making a new change to dts2repl is `entrypoint.sh`.
