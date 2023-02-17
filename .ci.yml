@@ -1,12 +1,6 @@
 image:
   name: debian:bullseye
 
-variables:
-  RENODE_VERSION: latest
-  ZEPHYR_SDK_VERSION: 0.15.2
-  WEST_VERSION: 0.14.0
-  DASHBOARD_URL: https://zephyr-dashboard.renode.io
-
 Compare repls:
   artifacts:
     paths:
@@ -14,6 +8,7 @@ Compare repls:
       - ci-output/robot-results
     when: always
   before_script:
+    - source ./ci/config.sh
     - ./ci/setup_env.sh
   script:
     # Get repl kit from dashboard
