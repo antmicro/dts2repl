@@ -1,0 +1,4 @@
+clk_lse: Python.PythonPeripheral @ sysbus 0x40007000
+    size: 0x4
+    initable: true
+    filename: "scripts/pydev/rolling-bit.py"
