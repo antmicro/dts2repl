@@ -88,6 +88,28 @@ def get_uart(dts_filename):
                     return uart
 
 
+def get_user_led0(dts_filename):
+    gpio = {'name': 'gpio0', 'pin': 0}
+
+    if os.path.exists(dts_filename):
+        with open(dts_filename, 'r') as dts_file:
+            dts = dts_file.read()
+    else:
+        return gpio
+
+    # find led0
+    ret = re.search(r'led0 = &(\w+);', dts);
+    if ret is None:
+        return gpio
+
+    ret = re.search(ret.group(1) + r':.+?gpios.+?=.+?<.+?&(\w+).+?(\w+).+?};', dts,
+                    flags=re.MULTILINE | re.DOTALL)
+    if ret is None:
+        return gpio
+    else:
+        return {'name': ret.group(1), 'pin': ret.group(2)}
+
+
 def get_dt(filename):
     with open(filename) as f:
         dts_file = f.readlines()
