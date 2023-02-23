@@ -314,6 +314,7 @@ def generate(args):
         # decide which Renode model to use
         model, compat = renode_model_overlay(compat, mcu_compat, models, args.overlays)
 
+        registration_point = 'sysbus'
         address = ''
         if addr and not name.startswith('cpu'):
             parent_node = node.parent
@@ -575,12 +576,12 @@ def generate(args):
                 irq_dest_name = name_mapper.get_name(irq_dest)
                 indent.append(f'{irq_name}->{irq_dest_name}@{irq}')
 
-        # devices other than CPUs require an address
-        if not address and not model.startswith('CPU.'):
+        # devices other than CPUs require an address to register on the sysbus
+        if registration_point == 'sysbus' and not address and not model.startswith('CPU.'):
             logging.info(f'Node {node} has sysbus registration without an address. Skipping...')
             continue
 
-        repl.append(f'{name}: {model} @ sysbus {address}')
+        repl.append(f'{name}: {model} @ {registration_point} {address}')
         repl.extend(map(lambda x: f'    {x}', indent))
         repl.append('')
 
