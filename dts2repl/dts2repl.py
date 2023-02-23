@@ -295,11 +295,6 @@ def generate(args):
                     logging.debug(f'Node {node.name} has no compat string or device_type and cannot be treated as memory. Skipping...')
                     continue
 
-        # filter out nodes without a sysbus address
-        if len(node.name.split('@')) < 2:
-            logging.info(f'Node {node.name} has no sysbus address. Skipping...')
-            continue
-
         # look at all compat strings and take the first one that has a Renode model
         # if none of them do, skip the node
         compat = next(filter(lambda x: x in models, compatible), None)
@@ -313,14 +308,14 @@ def generate(args):
             continue
 
         # get model name and addr
-        _, addr = node.name.split('@')
+        _, _, addr = node.name.partition('@')
         name = name_mapper.get_name(node)
 
         # decide which Renode model to use
         model, compat = renode_model_overlay(compat, mcu_compat, models, args.overlays)
 
         address = ''
-        if not name.startswith('cpu'):
+        if addr and not name.startswith('cpu'):
             parent_node = node.parent
             addr = int(addr, 16)
             addr_offset = 0
@@ -579,6 +574,11 @@ def generate(args):
                     continue
                 irq_dest_name = name_mapper.get_name(irq_dest)
                 indent.append(f'{irq_name}->{irq_dest_name}@{irq}')
+
+        # devices other than CPUs require an address
+        if not address and not model.startswith('CPU.'):
+            logging.info(f'Node {node} has sysbus registration without an address. Skipping...')
+            continue
 
         repl.append(f'{name}: {model} @ sysbus {address}')
         repl.extend(map(lambda x: f'    {x}', indent))
