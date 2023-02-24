@@ -233,18 +233,26 @@ class NameMapper:
         return name
 
 
-# This is similar to dtlib's to_nodes, but it only parses every second cell as a phandle
-# Note: this only works for #interrupt-cells = 2
-def get_interrupts_extended(node: dtlib.Node):
-    prop = node.props['interrupts-extended']
-    if prop.type != dtlib.Type.PHANDLES_AND_NUMS:
-        print('interrupts-extended property is incorrectly formatted')
-        return
+# Allowed characters in format string:
+#   p: phandle
+#   n: number
+def get_prop_value(prop: dtlib.Property, fmt: str):
+    node = prop.node
+    byte_count = len(fmt) * 4
 
-    for i in range(0, len(prop.value), 8):
-        phandle = int.from_bytes(prop.value[i:i + 4], 'big')
-        irq_num = int.from_bytes(prop.value[i + 4:i + 8], 'big')
-        yield (node.dt.phandle2node[phandle], irq_num)
+    for i in range(0, len(prop.value), byte_count):
+        values = []
+        for j, value_type in enumerate(fmt):
+            offset = j * 4
+            cell_value = int.from_bytes(prop.value[i + offset:i + offset + 4], 'big')
+            if value_type == 'p':
+                phandle_node = node.dt.phandle2node[cell_value]
+                values.append(phandle_node)
+            elif value_type == 'n':
+                values.append(cell_value)
+            else:
+                raise ValueError(f'Invalid character {value_type} in format string')
+        yield tuple(values)
 
 
 def can_be_memory(node):
@@ -535,7 +543,7 @@ def generate(args):
                 irq_numbers = get_node_prop(node, 'interrupts')[::2]
                 irq_dest_nodes = [interrupt_parent] * len(irq_numbers)
         elif 'interrupts-extended' in node.props:
-            irq_dest_nodes, irq_numbers = zip(*get_interrupts_extended(node))
+            irq_dest_nodes, irq_numbers = zip(*get_prop_value(node.props['interrupts-extended'], 'pn'))
             irq_dest_nodes = list(irq_dest_nodes)
 
         for i, irq_dest_node in enumerate(irq_dest_nodes):
