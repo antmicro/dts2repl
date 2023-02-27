@@ -118,7 +118,7 @@ def get_node_prop(node, prop, default=None, inherit=False):
         val = val.to_nums()
     elif prop in ('#address-cells', '#size-cells', 'cc-num', 'clock-frequency', 'riscv,ndev'):
         val = val.to_num()
-    elif prop in ('interrupt-parent'):
+    elif prop in ('interrupt-parent',):
         val = val.to_node()
     else:
         val = val.to_string()
