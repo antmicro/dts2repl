@@ -120,6 +120,8 @@ def get_node_prop(node, prop, default=None, inherit=False):
         val = val.to_num()
     elif prop in ('interrupt-parent',):
         val = val.to_node()
+    elif prop in ('interrupts-extended',):
+        val = get_prop_value(val, 'pn')
     else:
         val = val.to_string()
 
@@ -543,7 +545,7 @@ def generate(args):
                 irq_numbers = get_node_prop(node, 'interrupts')[::2]
                 irq_dest_nodes = [interrupt_parent] * len(irq_numbers)
         elif 'interrupts-extended' in node.props:
-            irq_dest_nodes, irq_numbers = zip(*get_prop_value(node.props['interrupts-extended'], 'pn'))
+            irq_dest_nodes, irq_numbers = zip(*get_node_prop(node, 'interrupts-extended'))
             irq_dest_nodes = list(irq_dest_nodes)
 
         for i, irq_dest_node in enumerate(irq_dest_nodes):
