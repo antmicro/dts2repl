@@ -627,6 +627,9 @@ def generate(args):
                 continue
 
             gpio, num, gpio_flags = gpios[0]
+            active_low = (gpio_flags & 1) == 1
+            if active_low:
+                indent.append('invert: true')
             gpio_name = name_mapper.get_name(gpio)
             registration_point = gpio_name
             address = str(num)
