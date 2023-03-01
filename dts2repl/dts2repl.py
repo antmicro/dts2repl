@@ -90,6 +90,37 @@ def get_uart(dts_filename):
                     return uart
 
 
+def get_user_led0(dts_filename):
+    try:
+        dt = dtlib.DT(dts_filename)
+    except Exception:
+        logging.exception('failed to load or parse dts')
+        return None
+
+    # we might come up with a different name for the LED here if we had duplicate
+    # labels while generating the repl, but the same is true for get_uart and it
+    # hasn't been an issue so far
+    name_mapper = NameMapper()
+
+    # find led0
+    try:
+        led0 = dt.get_node('led0')
+    except dtlib.DTError:
+        logging.exception('led0 not found')
+        return None
+
+    led_name = name_mapper.get_name(led0)
+
+    try:
+        gpio, num, gpio_flags = next(get_node_prop(led0, 'gpios'))
+        gpio_name = name_mapper.get_name(gpio)
+    except Exception:
+        logging.exception('failed to get led0 gpio name')
+        return None
+
+    return {'name': gpio_name, 'led_name': led_name}
+
+
 def get_dt(filename):
     with open(filename) as f:
         dts_file = f.readlines()
