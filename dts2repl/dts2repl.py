@@ -124,6 +124,8 @@ def get_node_prop(node, prop, default=None, inherit=False):
         val = val.to_node()
     elif prop in ('interrupts-extended',):
         val = get_prop_value(val, 'pn')
+    elif prop in ('gpios',):
+        val = get_prop_value(val, 'pnn')
     else:
         val = val.to_string()
 
