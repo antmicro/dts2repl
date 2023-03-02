@@ -386,6 +386,15 @@ def generate(args):
         is_heuristic_memory = False
         # filter out nodes without compat strings
         compatible = get_node_prop(node, 'compatible')
+        if compatible and 'gpio-leds' in compatible:
+            logging.debug(f'Skipping LED parent node {node.name}')
+            continue
+        else:
+            parent_compat = get_node_prop(node.parent, 'compatible', []) if node.parent else []
+            # if the paren't compat string is the one for LEDs, move it down to each individual LED
+            if 'gpio-leds' in parent_compat:
+                compatible = parent_compat
+
         if compatible is None:
             logging.debug(f'Node {node.name} has no compat string. Trying device_type...')
             compatible = get_node_prop(node, 'device_type')
@@ -610,6 +619,21 @@ def generate(args):
         if model == 'Miscellaneous.STM32F4_RCC':
             indent.append('rtcPeripheral: rtc')
             dependencies.add('rtc')
+
+        if model == 'Miscellaneous.LED':
+            gpios = list(get_node_prop(node, 'gpios'))
+            if not gpios:
+                logging.info(f'LED {node.name} has no gpios property, skipping...')
+                continue
+
+            gpio, num, gpio_flags = gpios[0]
+            gpio_name = name_mapper.get_name(gpio)
+            registration_point = gpio_name
+            address = str(num)
+
+            gpio_connection = ReplBlock({gpio_name, name}, set(),
+                                        [f'{gpio_name}:\n    {num} -> {name}@0'])
+            blocks.append(gpio_connection)
 
         if model.startswith('Timers'):
             if 'cc-num' in node.props:
