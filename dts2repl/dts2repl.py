@@ -293,6 +293,32 @@ def get_prop_value(prop: dtlib.Property, fmt: str):
         yield tuple(values)
 
 
+def parse_overlay(path):
+    with open(path) as f:
+        lines = [line.rstrip() for line in f.readlines()]
+
+    blocks = []
+    parts = [list(g) for k, g in itertools.groupby(lines, lambda x: x == "") if not k]
+    for part in parts:
+        depends = set()
+        provides = set()
+
+        registration_point = re.search(r":\s*[\w.]+\s*@\s*(\w+)", part[0])
+        if registration_point:
+            depends.add(registration_point.group(1))
+
+        # IRQ destinations are not treated as dependencies, see the comment starting with
+        # the same prefix in `generate` for reasoning
+        # properties (such as `timeProvider: clint`) could be used to derive additional
+        # dependency information here
+
+        node_name = part[0].split(':')[0].strip()
+        provides.add(node_name)
+        blocks.append(ReplBlock(depends, provides, part))
+
+    return blocks
+
+
 def can_be_memory(node):
     possible_names = ('ram', 'flash', 'partition')
     return len(node.props) == 1 and 'reg' in node.props \
@@ -654,11 +680,8 @@ def generate(args):
     for cpu in map(lambda x: x.split("/")[-1], args.overlays.split(",")[::-1]):
         overlay = f'{overlay_path}/{cpu}.repl'
         if os.path.exists(overlay):
-            overlay_block = []
-            overlay_block.append(f'// {cpu} overlay')
-            with open(overlay) as f:
-                overlay_block.extend(map(lambda x: x.rstrip(), f.readlines()))
-            overlay_blocks.append(ReplBlock(set(), set(), overlay_block))
+            overlay_blocks.append(ReplBlock(set(), set(), [f'// {cpu} overlay']))
+            overlay_blocks.extend(parse_overlay(overlay))
 
     # build the repl out of the dts + overlay blocks filtering out unavailable blocks
     available_blocks = filter_available_blocks(blocks + overlay_blocks)
