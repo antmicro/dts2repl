@@ -64,11 +64,13 @@
     "marvell,mv78230-a0-i2c": "Python.PythonPeripheral",
     "marvell,sheeva-v7": "CPU.Arm",
 
-    "microsemi,miv": "CPU.RiscV32",
+    "microchip,mpfs-gpio": "GPIOPort.MPFS_GPIO",
     "microsemi,coreuart": "UART.MiV_CoreUART",
+    "microsemi,miv": "CPU.RiscV32",
 
     "nordic,nrf-clock": "Miscellaneous.NRF52840_CLOCK",
     "nordic,nrf-ecb": "Miscellaneous.NRF52840_ECB",
+    "nordic,nrf-gpio": "GPIOPort.NRF52840_GPIO",
     "nordic,nrf-rng": "Miscellaneous.NRF52840_RNG",
     "nordic,nrf-rtc": "Timers.NRF52840_RTC",
     "nordic,nrf-spi": "SPI.NRF52840_SPI",
@@ -114,6 +116,7 @@
     "sifive,plic-1.0.0": "IRQControllers.PlatformLevelInterruptController",
     "sifive,rocket0": "CPU.RiscV32",
     "sifive,uart0": "UART.SiFive_UART",
+    "sifive,gpio0": "GPIOPort.SiFive_GPIO",
 
     "silabs,gecko-leuart": "UART.LEUART",
     "silabs,gecko-uart": "UART.EFM32_UART",
