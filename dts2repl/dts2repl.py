@@ -127,7 +127,9 @@ def get_dt(filename):
         dts_file = filter(lambda x: 'pinctrl-0;' not in x, dts_file)
         dts_file = ''.join(dts_file)
 
-    with tempfile.NamedTemporaryFile(mode='w', encoding='utf-8') as f:
+    temp = tempfile.NamedTemporaryFile()
+    temp.close()
+    with open(temp.name, mode='w', encoding='utf-8') as f:
         f.write(dts_file)
         f.flush()
         return dtlib.DT(f.name)
