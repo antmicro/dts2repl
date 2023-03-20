@@ -1,5 +1,5 @@
 {
-    "arm,cortex-a9": "CPU.Arm",
+    "arm,cortex-a9": "CPU.ARMv7A",
     "arm,cortex-a9-twd-timer": "Timers.CortexAPrivateTimer",
     "arm,cortex-m0": "CPU.CortexM",
     "arm,cortex-m0+": "CPU.CortexM",
@@ -62,7 +62,7 @@
     "marvell,mbus-controller": "Python.PythonPeripheral",
     "marvell,mv64xxx-i2c": "Python.PythonPeripheral",
     "marvell,mv78230-a0-i2c": "Python.PythonPeripheral",
-    "marvell,sheeva-v7": "CPU.Arm",
+    "marvell,sheeva-v7": "CPU.ARMv7A",
 
     "microsemi,miv": "CPU.RiscV32",
     "microsemi,coreuart": "UART.MiV_CoreUART",
