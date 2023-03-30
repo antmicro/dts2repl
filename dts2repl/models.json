@@ -130,6 +130,7 @@
     "sifive,e31": "CPU.RiscV32",
 
     "sifive,dtim0": "Memory.MappedMemory",
+    "sifive,gpio0": "GPIOPort.SiFive_GPIO",
     "sifive,maskrom0": "Memory.MappedMemory",
     "sifive,otp0": "Memory.MappedMemory",
     "sifive,plic-1.0.0": "IRQControllers.PlatformLevelInterruptController",
