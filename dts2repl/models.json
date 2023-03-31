@@ -49,6 +49,8 @@
 
     "gpio-leds": "Miscellaneous.LED",
 
+    "ingenic,jz4780-uart": "UART.NS16550",
+
     "litex,clk": "Miscellaneous.LiteX_MMCM_CSR32",
     "litex,timer0": "Timers.LiteX_Timer_CSR32",
     "litex,uart0": "UART.LiteX_UART",
@@ -84,6 +86,8 @@
 
     "ns16550": "UART.NS16550",
     "ns16550a": "UART.NS16550",
+
+    "nvidia,tegra20-uart": "UART.NS16550",
 
     "nxp,flexpwm": "Timers.IMXRT_PWM",
     "nxp,imx-code-bus": "Memory.MappedMemory",
