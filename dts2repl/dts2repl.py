@@ -213,6 +213,12 @@ def renode_model_overlay(compat, mcu, models, overlays):
     if compat == 'silabs,gecko-usart' and 'efr32bg22' in overlays:
         model = 'UART.EFR32xG22_USART'
 
+    # remap some core types to the closest supported equivalent
+    if compat in ('arm,armv8', 'arm,cortex-a57'):
+        compat = 'arm,cortex-a53'
+    elif compat == 'arm,cortex-a72':
+        compat = 'arm,cortex-a75'
+
     return model, compat
 
 
