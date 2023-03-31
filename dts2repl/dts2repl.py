@@ -252,6 +252,21 @@ def get_ranges(node):
         yield child_addr, parent_addr, size
 
 
+def get_reg(node):
+    if node.parent:
+        address_cells = get_node_prop(node.parent, '#address-cells', inherit=True)
+        size_cells = get_node_prop(node.parent, '#size-cells', inherit=True)
+    else:
+        address_cells = 1
+        size_cells = 1
+
+    reg = get_node_prop(node, 'reg')
+    while reg:
+        address, reg = get_cells(reg, address_cells)
+        size, reg = get_cells(reg, size_cells)
+        yield (address, size)
+
+
 class NameMapper:
     def __init__(self):
         self._counter = Counter()
@@ -479,12 +494,13 @@ def generate(args):
                 or any(map(lambda x: x in model, 
                     ['UART.STM32_UART', 'UART.TrivialUart']))
             ):
-                _, size = list(map(lambda x: hex(x), get_node_prop(node, 'reg')))
-                address = f'<{address}, +{size}>'
+                _, size = next(get_reg(node))
+                address = f'<{address}, +{size:#x}>'
             
             # check the registration point of guessed memory peripherals
             if is_heuristic_memory:
-                address = f"0x{(get_node_prop(node, 'reg')[0]):X}"
+                address, _ = next(get_reg(node))
+                address = hex(address)
 
         indent = []
 
@@ -666,7 +682,7 @@ def generate(args):
                 indent.append(f'numberOfEvents: {str(get_node_prop(node, "cc-num"))}')
         if model.startswith('Memory'):
             if 'reg' in node.props:
-                size = get_node_prop(node, "reg")[-1]
+                _, size = next(get_reg(node))
                 # increase OCRAM size for imx6 platforms
                 # the device trees in U-Boot all have 0x20000, but some platforms
                 # actually have 0x40000 and the config headers reflect this, which
@@ -862,16 +878,13 @@ def generate_peripherals(filename, overlays, type):
         else:
             model = ''
 
-        if 'reg' in node.props:
-            reg = get_node_prop(node, 'reg')
-            if len(reg) == 1:
-                reg = None
-                size = None
+        reg = list(get_reg(node))
+        if reg:
+            unit_addr = hex(reg[0][0])
+            size = sum(r[1] for r in reg)
+            if size == 0:
+                logging.info(f"Regs for node {node} have total size 0. Skipping...")
                 continue
-            else:
-                unit_addr = hex(reg[0]) if len(reg) > 0 else None
-                if len(reg) > 1:
-                    size = sum(reg[1::2])
         else:
             logging.info(f"No regs for node {node}. Skipping...")
             continue
