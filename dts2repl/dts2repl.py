@@ -226,7 +226,7 @@ def get_ranges(node):
     def get_cells(cells, n):
         current, rest = cells[:n], cells[n:]
         value = 0
-        for cell in current[::-1]:
+        for cell in current:
             value <<= 32
             value |= cell
         return value, rest
