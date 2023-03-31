@@ -94,6 +94,8 @@
     "ns16550a": "UART.NS16550",
 
     "nvidia,tegra20-uart": "UART.NS16550",
+    "nvidia,tegra210-mc": "Python.PythonPeripheral",
+    "nvidia,tegra210-i2c": "Python.PythonPeripheral",
 
     "nxp,flexpwm": "Timers.IMXRT_PWM",
     "nxp,imx-code-bus": "Memory.MappedMemory",

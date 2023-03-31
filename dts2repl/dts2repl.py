@@ -601,6 +601,14 @@ def generate(args):
             indent.append('size: 0x100')
             indent.append('initable: false')
             indent.append('script: "request.value = 0xf8"')
+        elif compat == 'nvidia,tegra210-mc':
+            indent.append('size: 0x1000')
+            indent.append('initable: false')
+            indent.append('script: "request.value = 0x400"')  # report 1024 MiB, 512 gets reserved as carveout
+        elif compat == 'nvidia,tegra210-i2c':
+            indent.append('size: 0x100')
+            indent.append('initable: false')
+            indent.append('script: "request.value = 8<<4 | 1"')
         elif model == 'Python.PythonPeripheral':
             indent.append('size: 0x1000')
             indent.append('initable: true')
