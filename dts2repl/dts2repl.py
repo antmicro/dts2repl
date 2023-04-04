@@ -127,10 +127,16 @@ def get_dt(filename):
         dts_file = filter(lambda x: 'pinctrl-0;' not in x, dts_file)
         dts_file = ''.join(dts_file)
 
-    with tempfile.NamedTemporaryFile(mode='w', encoding='utf-8') as f:
+    # Workaround for NamedTemporaryFile not being able to be opened for reading while
+    # it's open here. This can be simplified on Python 3.12 with `delete_on_close`,
+    # see https//github.com/python/cpython/pull/97015
+    try:
+        f = tempfile.NamedTemporaryFile(mode='w', encoding='utf-8', delete=False)
         f.write(dts_file)
-        f.flush()
+        f.close()
         return dtlib.DT(f.name)
+    finally:
+        os.remove(f.name)
 
 
 def get_node_prop(node, prop, default=None, inherit=False):
