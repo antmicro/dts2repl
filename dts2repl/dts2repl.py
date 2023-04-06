@@ -198,6 +198,9 @@ def renode_model_overlay(compat, mcu, models, overlays):
             else:
                 model = 'Miscellaneous.STM32F4_RCC'
 
+    if compat == 'st,stm32-gpio' and 'stm32f1' in overlays:
+        model = 'GPIOPort.STM32F1GPIOPort'
+
     if compat == "atmel,sam0-uart" and 'samd20' in overlays:
         model = 'UART.SAMD20_UART'
 
