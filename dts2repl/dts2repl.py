@@ -364,7 +364,8 @@ def parse_overlay(path):
 def can_be_memory(node):
     possible_names = ('ram', 'flash', 'partition', 'memory')
     return len(node.props) == 1 and 'reg' in node.props \
-        and any(x in node.name.lower() for x in possible_names)
+        and any(x in node.name.lower() for x in possible_names) \
+        and 'reserved-memory' not in node.path.split('/')
 
 
 def generate(args):
