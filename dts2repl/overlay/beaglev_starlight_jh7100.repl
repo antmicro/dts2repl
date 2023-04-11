@@ -106,6 +106,3 @@ sysbus:
         Tag <0x118D0000 0x10000> "TRNG"
         Tag <0x10480000 0x30000> "DOM_AUDIO"
         Tag <0x12240000 0x30000> "VOUT"
-
-ddr: Memory.MappedMemory @sysbus 0x80000000
-    size: 0x200000000
