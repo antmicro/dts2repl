@@ -222,15 +222,16 @@ def renode_model_overlay(compat, mcu, models, overlays):
     return model, compat
 
 
-def get_ranges(node):
-    def get_cells(cells, n):
-        current, rest = cells[:n], cells[n:]
-        value = 0
-        for cell in current:
-            value <<= 32
-            value |= cell
-        return value, rest
+def get_cells(cells, n):
+    current, rest = cells[:n], cells[n:]
+    value = 0
+    for cell in current:
+        value <<= 32
+        value |= cell
+    return value, rest
 
+
+def get_ranges(node):
     if not node.props['ranges'].value:  # ranges;
         return []
 
