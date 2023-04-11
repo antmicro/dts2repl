@@ -497,10 +497,11 @@ def generate(args):
                 _, size = next(get_reg(node))
                 address = f'<{address}, +{size:#x}>'
             
-            # check the registration point of guessed memory peripherals
-            if is_heuristic_memory:
-                address, _ = next(get_reg(node))
-                address = hex(address)
+        # check the registration point of guessed memory peripherals
+        if is_heuristic_memory:
+            node_reg = next(get_reg(node), None)
+            if node_reg:
+                address = hex(node_reg[0])
 
         indent = []
 
