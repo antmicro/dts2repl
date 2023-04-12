@@ -617,6 +617,12 @@ def generate(args):
                 indent.append('privilegeArchitecture: PrivilegeArchitecture.Priv1_10')
             else:
                 indent.append('privilegeArchitecture: PrivilegeArchitecture.Priv1_09')
+        if model == "CPU.ARMv8A":
+            # Each ARMv8A core has its own generic timer and they are not individually
+            # listed in device trees, so we add them here
+            timer_lines = [f'{name}_timer: Timers.ARM_GenericTimer @ {name}', '    frequency: 62500000']
+            generic_timer = ReplBlock({name}, {f'{name}_timer'}, timer_lines)
+            blocks.append(generic_timer)
 
         if compat == 'gaisler,leon3':
             indent.append('cpuType: "leon3"')

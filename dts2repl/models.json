@@ -1,5 +1,8 @@
 {
     "arm,cortex-a9": "CPU.ARMv7A",
+    "arm,cortex-a53": "CPU.ARMv8A",
+    "arm,cortex-a75": "CPU.ARMv8A",
+    "arm,cortex-a76": "CPU.ARMv8A",
     "arm,cortex-a9-twd-timer": "Timers.CortexAPrivateTimer",
     "arm,cortex-m0": "CPU.CortexM",
     "arm,cortex-m0+": "CPU.CortexM",
