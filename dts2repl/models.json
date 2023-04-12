@@ -171,5 +171,6 @@
 
     "xlnx,xuartps": "UART.Cadence_UART",
     "xlnx,zynq-slcr": "Python.PythonPeripheral",
+    "xlnx,zynqmp-ipi-mailbox": "Python.PythonPeripheral",
     "xlnx,zynqmp-uart": "UART.Cadence_UART"
 }

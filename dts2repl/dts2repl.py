@@ -610,6 +610,16 @@ def generate(args):
             indent.append('size: 0x100')
             indent.append('initable: false')
             indent.append('script: "request.value = 8<<4 | 1"')
+        elif compat == 'xlnx,zynqmp-ipi-mailbox':
+            # the address of the Xilinx ZynqMP IPI mailbox is defined in its child node
+            for child in node.nodes.values():
+                address = f'0x{child.unit_addr}'
+                break
+            else:
+                logging.info('ZynqMP mailbox has no children: {node}')
+            indent.append('size: 0x1000')
+            indent.append('initable: false')
+            indent.append('script: "request.value = {0x1e4: 0x10000}.get(request.offset, 0)"')
         elif model == 'Python.PythonPeripheral':
             indent.append('size: 0x1000')
             indent.append('initable: true')
