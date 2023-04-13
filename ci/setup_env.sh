@@ -5,7 +5,7 @@ apt-get -qqy update
 apt-get -qqy install git curl python3 python3-pip parallel xz-utils rename
 
 # Install dts2repl
-python3 setup.py develop
+pip3 install .
 
 # Install west
 pip3 install west=="$WEST_VERSION"

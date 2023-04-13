@@ -1,0 +1,13 @@
+[project]
+name="dts2repl"
+version="0.0.0"
+description="dts2repl"
+authors= [
+  {name = "Antmicro"}
+]
+
+[project.scripts]
+dts2repl = "dts2repl.dts2repl:main"
+
+[tool.setuptools.package-data]
+"*" = ["overlay/*.repl", "models.json"]
