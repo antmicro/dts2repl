@@ -556,6 +556,20 @@ def generate(args):
             # assume sysbus registration without address like for CPUs
             regions = [RegistrationRegion()]
             
+        # special multi-registration address for GIC
+        if model == 'IRQControllers.ARM_GenericInterruptController':
+            region_names = ('distributor', 'cpuInterface',)
+            if (compat == 'arm,gic-v3'
+                # temporary for Zephyr GICv3 platforms
+                or set(platform) & {'khadas,edgev', 'ti,am6234'}):
+                region_names = ('distributor', 'redistributor',)
+
+            regions = [
+                RegistrationRegion(region_addr, region_size, region_name)
+                for (region_addr, region_size), region_name
+                in zip(get_reg(node), region_names)
+            ]
+
         # check the registration point of guessed memory peripherals
         if is_heuristic_memory:
             node_reg = next(get_reg(node), None)
@@ -725,6 +739,9 @@ def generate(args):
             timer_lines = [f'{name}_timer: Timers.ARM_GenericTimer @ {name}', '    frequency: 62500000']
             generic_timer = ReplBlock({name}, {f'{name}_timer'}, timer_lines)
             blocks.append(generic_timer)
+        if model == "CPU.ARMv8A":
+            indent.append('genericInterruptController: gic')
+            dependencies.add('gic')
 
         if compat == 'gaisler,leon3':
             indent.append('cpuType: "leon3"')
@@ -780,6 +797,9 @@ def generate(args):
         # these IRQ ctrls get special treatment
         if compat.endswith('nvic'):
             indent.append('-> cpu0@0')
+            dependencies.add('cpu0')
+        elif model == 'IRQControllers.ARM_GenericInterruptController':
+            indent.append('0 -> cpu0@0')
             dependencies.add('cpu0')
         elif compat == 'gaisler,irqmp':
             indent.append('0 -> cpu0@0 | cpu0@1 | cpu0@2')
