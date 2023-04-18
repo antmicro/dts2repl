@@ -13,7 +13,7 @@ import tempfile
 import re
 from collections import Counter
 from dataclasses import dataclass
-from typing import List, Set
+from typing import List, Set, Optional
 import itertools
 from dts2repl import dtlib
 
@@ -354,6 +354,34 @@ def filter_available_blocks(blocks):
     return available_blocks
 
 
+@dataclass
+class RegistrationRegion:
+    address: Optional[int] = None
+    size: Optional[int] = None
+    region_name: Optional[str] = None
+    registration_point: str = "sysbus"
+
+    @staticmethod
+    def to_repl(regions):
+        if len(regions) == 0:
+            return ''
+        if len(regions) == 1:
+            region = regions[0]
+            if region.size is not None:
+                return f'{region.registration_point} <{region.address:#x}, +{region.size:#x}>'
+            registration = region.registration_point
+            if region.address is not None:
+                registration += f' {region.address:#x}'
+            return registration
+
+        # Multi-region registration
+        # We assume that each region will have an address, size and name in this case
+        parts = []
+        for r in regions:
+            parts.append(f'sysbus new Bus.BusMultiRegistration {{ address: {r.address:#x}; size: {r.size:#x}; region: "{r.region_name}" }}')
+        return "{\n" + ";\n".join(f'{" "*8}{p}' for p in parts) + "\n    }"
+
+
 # Allowed characters in format string:
 #   p: phandle
 #   n: number
@@ -487,10 +515,9 @@ def generate(args):
         # decide which Renode model to use
         model, compat = renode_model_overlay(compat, mcu_compat, models, args.overlays)
 
-        registration_point = 'sysbus'
         dependencies = set()
         provides = {name}
-        address = ''
+        regions = []
         if addr and not name.startswith('cpu'):
             parent_node = node.parent
             addr = int(addr, 16)
@@ -507,10 +534,9 @@ def generate(args):
                 logging.info(f'Node {node.name} has misaligned address {addr}. Skipping...')
                 continue
 
-            address = f'0x{addr:X}'
             if name == 'nvic':
                 # weird mismatch, need to investigate, manually patching for now
-                address = address[0:-3] + '0' + address[-2:]
+                addr &= ~0x100
 
             if (
                 any(map(lambda x: x in compat,
@@ -520,14 +546,21 @@ def generate(args):
                 or any(map(lambda x: x in model, 
                     ['UART.STM32_UART', 'UART.TrivialUart']))
             ):
+                # sized sysbus registration for peripherals that require an explicit size
                 _, size = next(get_reg(node))
-                address = f'<{address}, +{size:#x}>'
+                regions = [RegistrationRegion(addr, size)]
+            else:
+                # unsized sysbus registration
+                regions = [RegistrationRegion(addr)]
+        else:
+            # assume sysbus registration without address like for CPUs
+            regions = [RegistrationRegion()]
             
         # check the registration point of guessed memory peripherals
         if is_heuristic_memory:
             node_reg = next(get_reg(node), None)
-            if node_reg:
-                address = hex(node_reg[0])
+            if node_reg and regions:
+                regions[0].address = node_reg[0]
 
         indent = []
 
@@ -639,7 +672,7 @@ def generate(args):
         elif compat == 'xlnx,zynqmp-ipi-mailbox':
             # the address of the Xilinx ZynqMP IPI mailbox is defined in its child node
             for child in node.nodes.values():
-                address = f'0x{child.unit_addr}'
+                regions = [RegistrationRegion(int(child.unit_addr, 16))]
                 break
             else:
                 logging.info('ZynqMP mailbox has no children: {node}')
@@ -715,8 +748,7 @@ def generate(args):
             if active_low:
                 indent.append('invert: true')
             gpio_name = name_mapper.get_name(gpio)
-            registration_point = gpio_name
-            address = str(num)
+            regions = [RegistrationRegion(num, registration_point=gpio_name)]
 
             gpio_connection = ReplBlock({gpio_name, name}, set(),
                                         [f'{gpio_name}:\n    {num} -> {name}@0'])
@@ -807,14 +839,15 @@ def generate(args):
                 # than no peripheral at all
 
         # devices other than CPUs require an address to register on the sysbus
-        if registration_point == 'sysbus' and not address and not model.startswith('CPU.'):
+        if any(r.registration_point == 'sysbus' and r.address is None for r in regions) and not model.startswith('CPU.'):
             logging.info(f'Node {node} has sysbus registration without an address. Skipping...')
             continue
 
-        # the registration point itself is also a dependency
-        dependencies.add(registration_point)
+        # the registration points themselves are also dependencies
+        for r in regions:
+            dependencies.add(r.registration_point)
 
-        block_content = [f'{name}: {model} @ {registration_point} {address}']
+        block_content = [f'{name}: {model} @ {RegistrationRegion.to_repl(regions)}']
         block_content.extend(map(lambda x: f'    {x}', indent))
 
         block = ReplBlock(dependencies, provides, block_content)
