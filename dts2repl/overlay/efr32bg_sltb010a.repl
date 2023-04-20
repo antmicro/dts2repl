@@ -12,3 +12,8 @@ cmuSysClkStr: Python.PythonPeripheral @ sysbus 0x50008070
     size: 0x4
     initable: true
     script: "request.value = 0x1"
+
+emuVscaleEm: Python.PythonPeripheral @ sysbus 0x50004084
+    size: 0x4
+    initable: true
+    filename: "scripts/pydev/rolling-bit.py"
