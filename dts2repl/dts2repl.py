@@ -606,6 +606,8 @@ def generate(args):
             indent.append(f'numberOfSources: {ndev}')
             indent.append('numberOfContexts: 9')
             indent.append('prioritiesEnabled: true')
+        if model == 'Timers.ARM_GenericTimer':
+            indent.append('frequency: 62500000')
 
         # additional parameters for python peripherals
         if compat.startswith("st,stm32") and compat.endswith("rcc") and model == "Python.PythonPeripheral":
@@ -844,6 +846,8 @@ def generate(args):
                 irq_names = ['ReceiveIRQ', 'TransmitIRQ']
             elif compat in ['gaisler,gptimer']:
                 irq_names = ['0']
+            elif model == 'Timers.ARM_GenericTimer':
+                irq_names = ['HypervisorPhysicalTimerIRQ', 'PhysicalTimerIRQ', 'VirtualTimerIRQ', 'NonSecurePhysicalTimerIRQ']
             # the Renode model for these UARTs only has 1 IRQ
             elif (compat in ['arm,pl011', 'atmel,sam0-uart']
                   or model in ['UART.Cadence_UART', 'UART.NS16550']):
@@ -870,6 +874,12 @@ def generate(args):
                 # out IRQ connections to missing peripherals at the end because
                 # it is better to have a peripheral missing an interrupt connection
                 # than no peripheral at all
+
+        # the ARM generic timer is registered at cpu0 without an address
+        # for proper multi-CPU support we will need to generate one for
+        # each CPU with the proper interrupt connections
+        if model == "Timers.ARM_GenericTimer":
+            regions = [RegistrationRegion(address=None, registration_point="cpu0")]
 
         # devices other than CPUs require an address to register on the sysbus
         if any(r.registration_point == 'sysbus' and r.address is None for r in regions) and not model.startswith('CPU.'):

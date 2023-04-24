@@ -1,5 +1,6 @@
 {
     "arm,armv8": "CPU.ARMv8A",
+    "arm,armv8-timer": "Timers.ARM_GenericTimer",
     "arm,cortex-a9": "CPU.ARMv7A",
     "arm,cortex-a53": "CPU.ARMv8A",
     "arm,cortex-a57": "CPU.ARMv8A",
