@@ -906,7 +906,7 @@ def generate(args):
     # remove interrupts connected to nonexistent peripherals
     filtered_repl = []
     for line in repl:
-        irq_dest = re.search(r"->\s*(\w+)\s*@", line)
+        irq_dest = re.search(r"->\s*(\w+)(#\d+)?\s*@", line)
         if irq_dest is None or irq_dest.group(1) in repl_devices:
             filtered_repl.append(line)
 
