@@ -845,7 +845,8 @@ def generate(args):
             elif compat in ['gaisler,gptimer']:
                 irq_names = ['0']
             # the Renode model for these UARTs only has 1 IRQ
-            elif compat in ['arm,pl011', 'atmel,sam0-uart']:
+            elif (compat in ['arm,pl011', 'atmel,sam0-uart']
+                  or model in ['UART.Cadence_UART', 'UART.NS16550']):
                 irq_names = ['']
             else:
                 irq_names = [str(n) for n in range(len(irq_dest_nodes))]
