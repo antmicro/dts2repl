@@ -735,9 +735,10 @@ def generate(args):
                 indent.append('privilegeArchitecture: PrivilegeArchitecture.Priv1_10')
             else:
                 indent.append('privilegeArchitecture: PrivilegeArchitecture.Priv1_09')
-        if model == "CPU.ARMv8A":
-            # Each ARMv8A core has its own generic timer and they are not individually
-            # listed in device trees, so we add them here
+        if model in ("CPU.ARMv8A", "CPU.ARMv7A") and name != "cpu0":
+            # We generate the cpu0 timer along with correct interrupt connections
+            # while processing the timer node in the dts, and we generate 'fake'
+            # timers for other cores here for now
             timer_lines = [f'{name}_timer: Timers.ARM_GenericTimer @ {name}', '    frequency: 62500000']
             generic_timer = ReplBlock({name}, {f'{name}_timer'}, timer_lines)
             blocks.append(generic_timer)
