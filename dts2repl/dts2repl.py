@@ -852,6 +852,10 @@ def generate(args):
                 if irq >= 0xfff and (irq & (irq + 1)) == 0:
                     continue
                 irq_dest_name = name_mapper.get_name(irq_dest)
+                irq_dest_model = get_model(irq_dest)
+                if irq_dest_model == 'IRQControllers.ARM_GenericInterruptController':
+                    # We always route GIC-bound interrupts to local index (CPU 0) for now
+                    irq_dest_name += '#0'
                 indent.append(f'{irq_name}->{irq_dest_name}@{irq}')
                 # IRQ destinations are not treated as dependencies, we filter
                 # out IRQ connections to missing peripherals at the end because
