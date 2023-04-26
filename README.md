@@ -27,26 +27,16 @@ gcc -H -E -P -x assembler-with-cpp -I include/ -I dts/riscv -I dts/common boards
 ```
 
 Some boards need additional overlays located under ``dts2repl/overlay`` to be
-used to generate a proper repl file. Check the ``includes.txt`` output file
-from the command mentioned above to see if any files overlap listed there
-correspond to overlay files provided by this tool. For the previous command,
-the `includes.txt` file has the following content:
-
-```
-. dts/riscv/riscv32-fe310.dtsi
-.. include/dt-bindings/gpio/gpio.h
-Multiple include guards may be useful for:
-dts/riscv/riscv32-fe310.dtsi
-```
-
-This suggests that you should use the `riscv32-fe310` overlay by passing it through the `--overlay` option.
+used to generate a proper repl file. These overlays are matched automatically
+by using the platform-level compatible string from the ``/`` root node, and
+from the ``/soc`` node.
 
 ### Generating the repl file
 
 You can use this tool either directly from the commandline, i.e.:
 
 ```
-dts2repl --overlays riscv32-fe310 path/to/flattened_devicetree.dts
+dts2repl path/to/flattened_devicetree.dts
 ```
 
 or by importing and using it in your Python script:
@@ -55,8 +45,7 @@ or by importing and using it in your Python script:
 from dts2repl import dts2repl
 from argparse import Namespace
 
-print(dts2repl.generate(Namespace(overlays="riscv32-fe310",
-                         filename="path/to/flattened_devicetree.dts")))
+print(dts2repl.generate(Namespace(filename="path/to/flattened_devicetree.dts")))
 ```
 
 ## Development

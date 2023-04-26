@@ -25,9 +25,6 @@ def parse_args():
                         default='warning',
                         help='Provide logging level. Example --loglevel debug, default=warning',
                         choices=['info', 'warning', 'debug', 'error'])
-    parser.add_argument('--overlays',
-                        default='',
-                        help='Comma-separated CPU dependency chain. Can be omitted if top-level dts from board directory is provided')
     parser.add_argument('--output',
                         default='output.repl',
                         help='Output filename')
@@ -37,9 +34,9 @@ def parse_args():
     parser.add_argument('--preprocessor-args',
                         default='',
                         help='Extra arguments to pass to the C preprocessor')
-    parser.add_argument('--automatch',
+    parser.add_argument('--flatten',
                         action='store_true',
-                        help='Match overlays automatically. Only available when dtsi include dirs are provided')
+                        help='Flatten dtsi files to one dts automatically. Only available when dtsi include dirs are provided')
 
     args = parser.parse_args()
 
@@ -181,28 +178,28 @@ def renode_model_overlay(compat, mcu, models, overlays):
 
     # this hack is required for stm32f3, stm32g0 and stm32l0 based boards uarts
     # to work properly
-    if compat == 'st,stm32-usart' and any(map(lambda x: x in overlays, ('stm32f3', 'stm32g0', 'stm32l0'))):
+    if compat == 'st,stm32-usart' and any(map(lambda x: x in overlays, ('st,stm32f3', 'st,stm32g0', 'st,stm32l0'))):
         model = 'UART.STM32F7_USART'
 
     # compat-based mapping of peripheral models for the following SoCs is not enough
     # as there are ifdefs in the driver; adding a manual map for now as a workaround
-    if any(x in overlays for x in ('stm32g4', 'stm32l4', 'stm32wl', 'stm32l0')):
+    if any(x in overlays for x in ('st,stm32g4', 'st,stm32l4', 'st,stm32wl', 'st,stm32l0')):
         if compat == "st,stm32-usart":
             compat = "st,stm32-lpuart"
             model = models[compat]
 
         if compat == "st,stm32-rcc":
-            if any(map(lambda x: x in overlays, ('stm32l4', 'stm32g4'))):
+            if any(map(lambda x: x in overlays, ('st,stm32l4', 'st,stm32g4'))):
                 model = 'Python.PythonPeripheral'
-            elif 'stm32l0' in overlays:
+            elif 'st,stm32l0' in overlays:
                 model = 'Miscellaneous.STM32L0_RCC'
             else:
                 model = 'Miscellaneous.STM32F4_RCC'
 
-    if compat == 'st,stm32-gpio' and 'stm32f1' in overlays:
+    if compat == 'st,stm32-gpio' and 'st,stm32f1' in overlays:
         model = 'GPIOPort.STM32F1GPIOPort'
 
-    if compat == "atmel,sam0-uart" and 'samd20' in overlays:
+    if compat == "atmel,sam0-uart" and 'atmel,samd20' in overlays:
         model = 'UART.SAMD20_UART'
 
     # LiteX on Fomu is built in the 8-bit CSR data width configuration
@@ -211,7 +208,7 @@ def renode_model_overlay(compat, mcu, models, overlays):
 
     # EFR32xG22 USART uses different offsets, but the compatible is identical to EFR32xG12 USART
     # The HAL uses compile-time defines to choose the right register layout
-    if compat == 'silabs,gecko-usart' and 'efr32bg22' in overlays:
+    if compat == 'silabs,gecko-usart' and 'silabs,efr32bg22' in overlays:
         model = 'UART.EFR32xG22_USART'
 
     # remap some core types to the closest supported equivalent
@@ -441,7 +438,7 @@ def generate(args):
     def get_model(node):
         node_compatible = next(filter(lambda x: x in models, get_node_prop(node, 'compatible')), None)
         if node_compatible:
-            node_model, _ = renode_model_overlay(node_compatible, mcu, models, args.overlays)
+            node_model, _ = renode_model_overlay(node_compatible, mcu, models, overlays)
             return node_model
         return None
 
@@ -466,6 +463,14 @@ def generate(args):
 
     # get platform compat names
     platform = get_node_prop(dt.get_node('/'), 'compatible', [])
+
+    # get soc compat names
+    if dt.has_node('/soc'):
+        soc = get_node_prop(dt.get_node('/soc'), 'compatible', [])
+    else:
+        soc = []
+
+    overlays = set(soc + platform)
 
     for node in nodes:
         # those memory peripherals sometimes require changing the sysbus address of this peripheral
@@ -508,12 +513,13 @@ def generate(args):
             logging.info(f'Node {node.name} disabled. Skipping...')
             continue
 
+
         # get model name and addr
         _, _, addr = node.name.partition('@')
         name = name_mapper.get_name(node)
 
         # decide which Renode model to use
-        model, compat = renode_model_overlay(compat, mcu_compat, models, args.overlays)
+        model, compat = renode_model_overlay(compat, mcu_compat, models, overlays)
 
         dependencies = set()
         provides = {name}
@@ -592,7 +598,7 @@ def generate(args):
             indent.append('wideRegisters: true')
         if compat == 'st,stm32-watchdog':
             indent.append('frequency: 32000')
-        if compat == 'microsemi,coreuart':
+        if compat == 'microchip,coreuart':
             indent.append('clockFrequency: 66000000')
         if model == 'Timers.OMAP_Timer':
             indent.append('frequency: 4000000')
@@ -613,7 +619,7 @@ def generate(args):
         if compat.startswith("st,stm32") and compat.endswith("rcc") and model == "Python.PythonPeripheral":
             indent.append('size: 0x400')
             indent.append('initable: true')
-            if any(map(lambda x: x in args.overlays, ('stm32l4', 'stm32g4'))):
+            if any(map(lambda x: x in overlays, ('st,stm32l4', 'st,stm32g4'))):
                 indent.append('filename: "scripts/pydev/flipflop.py"')
             else:
                 indent.append('filename: "scripts/pydev/rolling-bit.py"')
@@ -713,6 +719,7 @@ def generate(args):
             indent.append(f'cpuType: "{cpu}"')
             indent.append('nvic: nvic')
             dependencies.add('nvic')
+            overlays.add('cortex-m')
         if model == 'CPU.RiscV32':  # We use CPU.RiscV32 as a generic model for all RV CPUs and fix it up here
             isa = get_node_prop(node, 'riscv,isa', 'rv32imac')
             indent.append(f'cpuType: "{isa}"')
@@ -900,10 +907,10 @@ def generate(args):
     # soc and board overlay
     overlay_path = f'{pathlib.Path(__file__).parent.resolve()}/overlay'
     overlay_blocks = []
-    for cpu in map(lambda x: x.split("/")[-1], args.overlays.split(",")[::-1]):
-        overlay = f'{overlay_path}/{cpu}.repl'
+    for compat in overlays:
+        overlay = f'{overlay_path}/{compat}.repl'
         if os.path.exists(overlay):
-            overlay_blocks.append(ReplBlock(set(), set(), [f'// {cpu} overlay']))
+            overlay_blocks.append(ReplBlock(set(), set(), [f'// {compat} overlay']))
             overlay_blocks.extend(parse_overlay(overlay))
 
     # build the repl out of the dts + overlay blocks filtering out unavailable blocks
@@ -1069,7 +1076,7 @@ def main():
 
     incl_dirs = ' '.join(f'-I {dir}' for dir in dirs)
 
-    if args.automatch:
+    if args.flatten:
         board_name = os.path.splitext(os.path.basename(args.filename))[0]
         # get list of #includes (C preprocessor)
         cmd = f'gcc -H -E -P -x assembler-with-cpp {incl_dirs} {args.preprocessor_args} {args.filename}'.split()
@@ -1090,7 +1097,7 @@ def main():
             f.write(str(dts))
         args.filename = flat_dts
 
-        # try to automatch overlays
+        # save info about dtsi includes
         includes = ret.stderr.decode('utf-8').split('\n')
         includes = filter(lambda x: '.dtsi' in x, includes)
         includes = itertools.chain(includes, dts_includes)
@@ -1099,11 +1106,6 @@ def main():
         includes_file = f'{base}.includes'
         with open(includes_file, 'w') as f:
             f.writelines(f'{x}\n' for x in includes)
-        includes = map(lambda x: os.path.basename(x), includes)
-        includes = map(lambda x: os.path.splitext(x)[0], includes)
-        includes = set(includes)
-        includes.add(board_name)
-        args.overlays = ','.join(includes)
 
     with open(args.output, 'w') as f:
         f.write(generate(args))

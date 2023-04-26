@@ -80,8 +80,8 @@
     "marvell,mv78230-a0-i2c": "Python.PythonPeripheral",
     "marvell,sheeva-v7": "CPU.ARMv7A",
 
-    "microsemi,miv": "CPU.RiscV32",
-    "microsemi,coreuart": "UART.MiV_CoreUART",
+    "microchip,miv": "CPU.RiscV32",
+    "microchip,coreuart": "UART.MiV_CoreUART",
 
     "nordic,nrf-clock": "Miscellaneous.NRF52840_CLOCK",
     "nordic,nrf-ecb": "Miscellaneous.NRF52840_ECB",
