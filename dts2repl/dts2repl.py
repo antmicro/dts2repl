@@ -752,8 +752,8 @@ def generate(args):
             if 'vexriscv-intc0' in irq_dest_compatible:
                 irq_dest_nodes[i] = mcu
 
-        # assign IRQ signals (but not when using TrivialUart)
-        if irq_dest_nodes and model != 'UART.TrivialUart':
+        # assign IRQ signals (but not when using TrivialUart or PythonPeripheral)
+        if irq_dest_nodes and model not in ('UART.TrivialUart', 'Python.PythonPeripheral'):
             # decide which IRQ names to use in Renode model
             if compat == 'st,stm32-rtc':
                 irq_names = ['AlarmIRQ']
