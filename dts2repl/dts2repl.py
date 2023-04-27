@@ -161,7 +161,7 @@ def get_node_prop(node, prop, default=None, inherit=False):
     elif prop in ('interrupt-parent',):
         val = val.to_node()
     elif prop in ('interrupts-extended',):
-        val = get_prop_value(val, 'pn')
+        val = get_interrupts_extended(val)
     elif prop in ('gpios',):
         val = get_prop_value(val, 'pnn')
     else:
@@ -266,6 +266,24 @@ def get_reg(node):
         address, reg = get_cells(reg, address_cells)
         size, reg = get_cells(reg, size_cells)
         yield (address, size)
+
+
+# interrupts-extended entries are of the form < &phandle nn nn >, < &phandle2 nn > etc
+# The number of numbers after each phandle is given by #interrupt-cells of the node
+# pointed to by that phandle
+def get_interrupts_extended(val):
+    node = val.node
+    phandle2node = node.dt.phandle2node
+    cells = dtlib.to_nums(val.value)
+    while cells:
+        dest = phandle2node[cells[0]]
+        interrupt_cells = get_node_prop(dest, '#interrupt-cells')
+        if not interrupt_cells:
+            logging.warn('Failed to parse interrupts_extended for {node.path}: {dest.path} has no #interrupt-cells')
+            return
+        params = cells[1:1 + interrupt_cells]
+        cells = cells[1 + interrupt_cells:]
+        yield (dest, params)
 
 
 class NameMapper:
@@ -741,9 +759,11 @@ def generate(args):
                 irq_numbers = get_node_prop(node, 'interrupts')[::2]
                 irq_dest_nodes = [interrupt_parent] * len(irq_numbers)
         elif 'interrupts-extended' in node.props:
-            irq_dest_nodes, irq_numbers = zip(*get_node_prop(node, 'interrupts-extended'))
-            irq_dest_nodes = list(irq_dest_nodes)
-
+            # For now we assume that there is only one parameter: the IRQ number, otherwise
+            # we skip the interrupt
+            irq_dests = [(d, ps) for d, ps in get_node_prop(node, 'interrupts-extended') if len(ps) == 1]
+            irq_dest_nodes = [d for d, _ in irq_dests]
+            irq_numbers = [ps[0] for _, ps in irq_dests]
         for i, irq_dest_node in enumerate(irq_dest_nodes):
             irq_dest_compatible = get_node_prop(irq_dest_node, 'compatible', [])
             # treat the RISC-V CPU interrupt controller as the CPU itself
