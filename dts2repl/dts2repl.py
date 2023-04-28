@@ -391,6 +391,13 @@ def can_be_memory(node):
 
 
 def generate(args):
+    def get_model(node):
+        node_compatible = next(filter(lambda x: x in models, get_node_prop(node, 'compatible')), None)
+        if node_compatible:
+            node_model, _ = renode_model_overlay(node_compatible, mcu, models, args.overlays)
+            return node_model
+        return None
+
     name_mapper = NameMapper()
     dt = get_dt(args.filename)
     if dt is None:
