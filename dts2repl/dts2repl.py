@@ -632,9 +632,7 @@ def generate(args):
         # special multi-registration address for GIC
         if model == 'IRQControllers.ARM_GenericInterruptController':
             region_names = ('distributor', 'cpuInterface',)
-            if (compat == 'arm,gic-v3'
-                # temporary for Zephyr GICv3 platforms
-                or set(platform) & {'khadas,edgev', 'ti,am6234'}):
+            if compat in ('arm,gic-v3',):
                 region_names = ('distributor', 'redistributor',)
 
             regions = [
