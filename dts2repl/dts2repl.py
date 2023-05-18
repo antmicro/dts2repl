@@ -773,6 +773,10 @@ def generate(args):
             timer_lines = [f'{timer_name}: Timers.ARM_GenericTimer @ {name}', '    frequency: 62500000']
             generic_timer = ReplBlock(timer_name, 'Timers.ARM_GenericTimer', {name}, {timer_name}, timer_lines)
             blocks.append(generic_timer)
+        if model in ("CPU.ARMv8A", "CPU.ARMv7A"):
+            # We use our CPU number as the CPU ID instead of the reg address
+            # This relies on the fact that the name will have been changed to "cpu{n}"
+            indent.append(f'cpuId: {name.replace("cpu", "")}')
         if model == "CPU.ARMv8A":
             indent.append('genericInterruptController: gic')
             dependencies.add('gic')
