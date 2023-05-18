@@ -339,6 +339,34 @@ class NameMapper:
 
 
 @dataclass
+class RegistrationRegion:
+    address: Optional[int] = None
+    size: Optional[int] = None
+    region_name: Optional[str] = None
+    registration_point: str = "sysbus"
+
+    @staticmethod
+    def to_repl(regions):
+        if len(regions) == 0:
+            return ''
+        if len(regions) == 1:
+            region = regions[0]
+            if region.size is not None:
+                return f'{region.registration_point} <{region.address:#x}, +{region.size:#x}>'
+            registration = region.registration_point
+            if region.address is not None:
+                registration += f' {region.address:#x}'
+            return registration
+
+        # Multi-region registration
+        # We assume that each region will have an address, size and name in this case
+        parts = []
+        for r in regions:
+            parts.append(f'sysbus new Bus.BusMultiRegistration {{ address: {r.address:#x}; size: {r.size:#x}; region: "{r.region_name}" }}')
+        return "{\n" + ";\n".join(f'{" "*8}{p}' for p in parts) + "\n    }"
+
+
+@dataclass
 class ReplBlock:
     depends: Set[str]
     provides: Set[str]
@@ -370,34 +398,6 @@ def filter_available_blocks(blocks):
             dfs(block)
 
     return available_blocks
-
-
-@dataclass
-class RegistrationRegion:
-    address: Optional[int] = None
-    size: Optional[int] = None
-    region_name: Optional[str] = None
-    registration_point: str = "sysbus"
-
-    @staticmethod
-    def to_repl(regions):
-        if len(regions) == 0:
-            return ''
-        if len(regions) == 1:
-            region = regions[0]
-            if region.size is not None:
-                return f'{region.registration_point} <{region.address:#x}, +{region.size:#x}>'
-            registration = region.registration_point
-            if region.address is not None:
-                registration += f' {region.address:#x}'
-            return registration
-
-        # Multi-region registration
-        # We assume that each region will have an address, size and name in this case
-        parts = []
-        for r in regions:
-            parts.append(f'sysbus new Bus.BusMultiRegistration {{ address: {r.address:#x}; size: {r.size:#x}; region: "{r.region_name}" }}')
-        return "{\n" + ";\n".join(f'{" "*8}{p}' for p in parts) + "\n    }"
 
 
 # Allowed characters in format string:
