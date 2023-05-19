@@ -796,7 +796,7 @@ def generate(args):
             regions = [RegistrationRegion(num, registration_point=gpio_name)]
 
             gpio_connection = ReplBlock({gpio_name, name}, set(),
-                                        [f'{gpio_name}:\n    {num} -> {name}@0'])
+                                        [f'{gpio_name}:', f'    {num} -> {name}@0'])
             blocks.append(gpio_connection)
 
         if model.startswith('Timers'):
