@@ -288,6 +288,14 @@ def get_interrupts_extended(val):
 
 
 class NameMapper:
+    OVERRIDES = {
+        "IRQControllers.ARM_GenericInterruptController": "gic",
+        "IRQControllers.CoreLevelInterruptor": "clint",
+        "IRQControllers.GaislerMIC": "irqmp",
+        "IRQControllers.NVIC": "nvic",
+        "IRQControllers.PlatformLevelInterruptController": "plic",
+    }
+
     def __init__(self):
         self._counter = Counter()
         self._mapping = {}
@@ -310,6 +318,13 @@ class NameMapper:
         if model.startswith('CPU.'):
             # Rename all cpus in order so we always have cpu0
             name = 'cpu'
+        elif model in NameMapper.OVERRIDES:
+            # Some models should always get the same name no matter what their dts node is called.
+            # There can only be one of each of these models, so this should only be used for
+            # peripherals like interrupt controllers
+            name = NameMapper.OVERRIDES[model]
+            if name in self._counter:
+                logging.warn(f'Node {node.path} had duplicate overridden name {name}')
 
         # "timer" becomes "timer1", "timer2", etc
         # if we have "timer" -> "timer1" but there was already a peripheral named "timer1",
