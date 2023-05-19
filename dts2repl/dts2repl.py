@@ -777,7 +777,6 @@ def generate(args):
             # We use our CPU number as the CPU ID instead of the reg address
             # This relies on the fact that the name will have been changed to "cpu{n}"
             indent.append(f'cpuId: {name.replace("cpu", "")}')
-        if model == "CPU.ARMv8A":
             indent.append('genericInterruptController: gic')
             dependencies.add('gic')
 
