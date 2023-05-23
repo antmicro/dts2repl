@@ -254,6 +254,20 @@ def get_ranges(node):
         yield child_addr, parent_addr, size
 
 
+# Returns the address in the root address space that corresponds to `addr`
+# in the address space of `node`
+def translate_address(addr, node):
+    addr_offset = 0
+    parent_node = node.parent
+    while parent_node is not None and 'ranges' in parent_node.props:
+        for child_addr, parent_addr, size in get_ranges(parent_node):
+            if child_addr <= addr + addr_offset < child_addr + size:
+                addr_offset += parent_addr - child_addr
+                break
+        parent_node = parent_node.parent
+    return addr + addr_offset
+
+
 def get_reg(node):
     if node.parent:
         address_cells = get_node_prop(node.parent, '#address-cells', inherit=True)
@@ -548,17 +562,8 @@ def generate(args):
         provides = {name}
         regions = []
         if addr and not name.startswith('cpu'):
-            parent_node = node.parent
             addr = int(addr, 16)
-            addr_offset = 0
-            while parent_node is not None and 'ranges' in parent_node.props:
-                for child_addr, parent_addr, size in get_ranges(parent_node):
-                    if child_addr <= addr + addr_offset < child_addr + size:
-                        addr_offset += parent_addr - child_addr
-                        break
-                parent_node = parent_node.parent
-
-            addr += addr_offset
+            addr = translate_address(addr, node)
             if addr % 4 != 0:
                 logging.info(f'Node {node.name} has misaligned address {addr}. Skipping...')
                 continue
