@@ -1,0 +1,60 @@
+cpu0: CPU.RiscV64 @ sysbus
+    cpuType: "rv64imac"
+    hartId: 0
+    privilegeArchitecture: PrivilegeArchitecture.Priv1_10
+    timeProvider: clint
+
+u74_1: CPU.RiscV64 @ sysbus
+    cpuType: "rv64imafdc"
+    hartId: 1
+    privilegeArchitecture: PrivilegeArchitecture.Priv1_10
+    timeProvider: clint
+
+u74_2: CPU.RiscV64 @ sysbus
+    cpuType: "rv64imafdc"
+    hartId: 2
+    privilegeArchitecture: PrivilegeArchitecture.Priv1_10
+    timeProvider: clint
+
+u74_3: CPU.RiscV64 @ sysbus
+    cpuType: "rv64imafdc"
+    hartId: 3
+    privilegeArchitecture: PrivilegeArchitecture.Priv1_10
+    timeProvider: clint
+
+u74_4: CPU.RiscV64 @ sysbus
+    cpuType: "rv64imafdc"
+    hartId: 4
+    privilegeArchitecture: PrivilegeArchitecture.Priv1_10
+    timeProvider: clint
+
+clint:
+    frequency: 1000000
+    numberOfTargets: 5
+    [2, 3] -> u74_1@[3, 7]
+    [4, 5] -> u74_2@[3, 7]
+    [6, 7] -> u74_3@[3, 7]
+    [8, 9] -> u74_4@[3, 7]
+
+plic:
+    [1,2] -> u74_1@[11,9]
+    [3,4] -> u74_2@[11,9]
+    [5,6] -> u74_3@[11,9]
+    [7,8] -> u74_4@[11,9]
+    prioritiesEnabled : false
+
+l2Cache: Memory.MappedMemory @ sysbus 0x8000000
+    size: 0x200000
+
+// memory size is temporarily reduced
+// to avoid problems when running Renode
+// on specific hardware targets
+ram0:
+    size: 0x40000000
+
+sysbus:
+    init:
+        Tag <0x10000004 0x4> "PRCI:core_pllcfg" 0xffffffff
+        Tag <0x1000000C 0x4> "PRCI:ddr_pllcfg" 0xffffffff
+        Tag <0x10000050 0x4> "PRCI:hfpclk_pllcfg" 0xffffffff
+
