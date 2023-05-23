@@ -268,6 +268,8 @@ def translate_address(addr, node):
     return addr + addr_offset
 
 
+# The returned addresses are in the root address space, that is they have all
+# `ranges` translations applied.
 def get_reg(node):
     if node.parent:
         address_cells = get_node_prop(node.parent, '#address-cells', inherit=True)
@@ -280,6 +282,7 @@ def get_reg(node):
     while reg:
         address, reg = get_cells(reg, address_cells)
         size, reg = get_cells(reg, size_cells)
+        address = translate_address(address, node)
         yield (address, size)
 
 
