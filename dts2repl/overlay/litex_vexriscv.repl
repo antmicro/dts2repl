@@ -1,10 +1,8 @@
 eth: Network.LiteX_Ethernet_CSR32 @ {
         sysbus 0x60009800;
         sysbus 0xE0009800; // shadow
-
         sysbus new Bus.BusMultiRegistration { address: 0x30000000; size: 0x2000; region: "buffer" };
         sysbus new Bus.BusMultiRegistration { address: 0xB0000000; size: 0x2000; region: "buffer" }; // shadow
-
         sysbus new Bus.BusMultiRegistration { address: 0x60009000; size: 0x800; region: "phy" };
         sysbus new Bus.BusMultiRegistration { address: 0xe0009000; size: 0x800; region: "phy" } // shadow
     }
