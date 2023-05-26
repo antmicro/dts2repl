@@ -438,14 +438,15 @@ def can_be_memory(node):
         and 'reserved-memory' not in node.path.split('/')
 
 
-def generate(args):
-    def get_model(node):
-        node_compatible = next(filter(lambda x: x in MODELS, get_node_prop(node, 'compatible')), None)
-        if node_compatible:
-            node_model, _ = renode_model_overlay(node_compatible, mcu, overlays)
-            return node_model
-        return None
+def get_model(node, mcu=None, overlays=tuple()):
+    node_compatible = next(filter(lambda x: x in MODELS, get_node_prop(node, 'compatible', [])), None)
+    if node_compatible:
+        node_model, _ = renode_model_overlay(node_compatible, mcu, overlays)
+        return node_model
+    return None
 
+
+def generate(args):
     name_mapper = NameMapper()
     dt = get_dt(args.filename)
     if dt is None:
@@ -822,7 +823,7 @@ def generate(args):
                 irq_dest_nodes = [interrupt_parent] * len(irq_numbers)
 
                 # Handle GIC IRQ number remapping
-                parent_model = get_model(interrupt_parent)
+                parent_model = get_model(interrupt_parent, mcu_compat, overlays)
                 if parent_model == 'IRQControllers.ARM_GenericInterruptController':
                     irq_types = get_node_prop(node, 'interrupts')[0::interrupt_cells]
                     irq_numbers = get_node_prop(node, 'interrupts')[1::interrupt_cells]
@@ -873,7 +874,7 @@ def generate(args):
                 if irq >= 0xfff and (irq & (irq + 1)) == 0:
                     continue
                 irq_dest_name = name_mapper.get_name(irq_dest)
-                irq_dest_model = get_model(irq_dest)
+                irq_dest_model = get_model(irq_dest, mcu_compat, overlays)
                 if irq_dest_model == 'IRQControllers.ARM_GenericInterruptController':
                     # We always route GIC-bound interrupts to local index (CPU 0) for now
                     irq_dest_name += '#0'
