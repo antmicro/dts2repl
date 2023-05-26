@@ -844,7 +844,14 @@ def generate(args):
             indent.append('-> cpu0@0')
             dependencies.add('cpu0')
         elif model == 'IRQControllers.ARM_GenericInterruptController':
-            indent.append('0 -> cpu0@0')
+            # We route both the GIC's IRQ and FIQ outputs to the CPU's IRQ input
+            # because FIQ support is not yet fully implemented in Renode
+            combiner_model = 'Miscellaneous.CombinedInput'
+            combiner_name = 'gicIrqCombiner'
+            combiner_lines = [f'{combiner_name}: {combiner_model} @ none', '    numberOfInputs: 2', '    -> cpu0@0']
+            combiner = ReplBlock(combiner_name, combiner_model, {'cpu0'}, {combiner_name}, combiner_lines)
+            blocks.append(combiner)
+            indent.append(f'[0, 1] -> {combiner_name}@[0, 1]')
             dependencies.add('cpu0')
         elif compat == 'gaisler,irqmp':
             indent.append('0 -> cpu0@0 | cpu0@1 | cpu0@2')
