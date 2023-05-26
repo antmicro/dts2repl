@@ -291,6 +291,8 @@ class NameMapper:
     def __init__(self):
         self._counter = Counter()
         self._mapping = {}
+        # Start with cpu0, not cpu
+        self._counter['cpu'] = 0
 
     def get_name(self, node):
         if node.path in self._mapping:
@@ -307,16 +309,15 @@ class NameMapper:
         model = get_model(node) or ''
         if model.startswith('CPU.'):
             # Rename all cpus in order so we always have cpu0
-            name = f"cpu{self._counter['cpu']}"
-            self._counter['cpu'] += 1
-        else:
-            # "timer" becomes "timer1", "timer2", etc
-            # if we have "timer" -> "timer1" but there was already a peripheral named "timer1",
-            # we'll end up with "timer" -> "timer1" -> "timer11"
-            while name in self._counter:
-                self._counter[name] += 1
-                name += str(self._counter[name] - 1)
+            name = 'cpu'
+
+        # "timer" becomes "timer1", "timer2", etc
+        # if we have "timer" -> "timer1" but there was already a peripheral named "timer1",
+        # we'll end up with "timer" -> "timer1" -> "timer11"
+        while name in self._counter:
             self._counter[name] += 1
+            name += str(self._counter[name] - 1)
+        self._counter[name] += 1
 
         self._mapping[node.path] = name
         return name
