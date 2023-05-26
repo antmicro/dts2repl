@@ -422,6 +422,9 @@ def get_prop_value(prop: dtlib.Property, fmt: str):
         yield tuple(values)
 
 
+OVERLAY_NODE = re.compile(r"^(?P<name>\w+):([^\S\n]*(?P<model>[\w.]+)\s*@\s*(?P<registration_point>\w+))?")
+
+
 def parse_overlay(path):
     with open(path) as f:
         lines = [line.rstrip() for line in f.readlines()]
@@ -432,17 +435,17 @@ def parse_overlay(path):
         depends = set()
         provides = set()
 
-        registration_point = re.search(r":\s*[\w.]+\s*@\s*(\w+)", part[0])
-        if registration_point:
-            depends.add(registration_point.group(1))
+        node = OVERLAY_NODE.search(part[0])
+        if not node:
+            continue
 
         # IRQ destinations are not treated as dependencies, see the comment starting with
         # the same prefix in `generate` for reasoning
         # properties (such as `timeProvider: clint`) could be used to derive additional
         # dependency information here
-
-        node_name = part[0].split(':')[0].strip()
-        provides.add(node_name)
+        provides.add(node.group('name'))
+        if node.group('registration_point'):
+            depends.add(node.group('registration_point'))
         blocks.append(ReplBlock(depends, provides, part))
 
     return blocks
