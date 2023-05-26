@@ -304,7 +304,8 @@ class NameMapper:
         # make name a valid repl GeneralIdentifier
         name = re.sub('[^A-Za-z0-9_]', '_', name)
 
-        if name.startswith('cpu'):
+        model = get_model(node) or ''
+        if model.startswith('CPU.'):
             # Rename all cpus in order so we always have cpu0
             name = f"cpu{self._counter['cpu']}"
             self._counter['cpu'] += 1
