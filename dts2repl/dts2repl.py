@@ -276,7 +276,7 @@ def get_interrupts_extended(val):
         dest = phandle2node[cells[0]]
         interrupt_cells = get_node_prop(dest, '#interrupt-cells')
         if not interrupt_cells:
-            logging.warn('Failed to parse interrupts_extended for {node.path}: {dest.path} has no #interrupt-cells')
+            logging.warn(f'Failed to parse interrupts_extended for {node.path}: {dest.path} has no #interrupt-cells')
             return
         params = cells[1:1 + interrupt_cells]
         cells = cells[1 + interrupt_cells:]
@@ -697,7 +697,7 @@ def generate(args):
                 regions = [RegistrationRegion(int(child.unit_addr, 16))]
                 break
             else:
-                logging.info('ZynqMP mailbox has no children: {node}')
+                logging.info(f'ZynqMP mailbox has no children: {node}')
             indent.append('size: 0x1000')
             indent.append('initable: false')
             indent.append('script: "request.value = {0x1e4: 0x10000}.get(request.offset, 0)"')
