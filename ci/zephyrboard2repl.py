@@ -8,9 +8,7 @@ from dts2repl import dts2repl
 
 def main(args):
     zephyr_dts_filename = args.board_dir / f"{args.board_name}.dts"
-    dts2repl_args = Namespace(
-        filename=args.flat_dts)
-    )
+    dts2repl_args = Namespace(filename=args.flat_dts)
     repl = dts2repl.generate(dts2repl_args)
     sys.stdout.write(repl)
 
