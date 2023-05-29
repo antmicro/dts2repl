@@ -1,0 +1,24 @@
+cpu0: CPU.IbexRiscV32 @ sysbus
+    hartId: 0
+    cpuType: "rv32imac"
+    timeProvider: empty
+
+uart0: UART.OpenTitan_UART @ sysbus 0x40000000
+    TxWatermarkIRQ -> plic@1
+    RxWatermarkIRQ -> plic@2
+    TxEmptyIRQ -> plic@3
+    RxOverflowIRQ -> plic@4
+    RxFrameErrorIRQ -> plic@5
+    RxBreakErrorIRQ -> plic@6
+    RxTimeoutIRQ -> plic@7
+    RxParityErrorIRQ -> plic@8
+    FatalAlert -> alert_handler@0
+
+gpio: GPIOPort.OpenTitan_GPIO @ sysbus 0x40040000
+    IRQ -> plic@33
+    FatalAlert -> alert_handler@4
+
+rv_timer: Timers.OpenTitan_Timer @ sysbus 0x40100000
+    IRQ -> cpu0@7
+    FatalAlert -> alert_handler@10
+
