@@ -454,7 +454,11 @@ def parse_overlay(path):
         depends = set()
         provides = set()
 
-        node = OVERLAY_NODE.search(part[0])
+        non_comment_lines = [l for l in part if not l.lstrip().startswith('//')]
+        if not non_comment_lines:
+            continue
+
+        node = OVERLAY_NODE.search(non_comment_lines[0])
         if not node:
             continue
 
