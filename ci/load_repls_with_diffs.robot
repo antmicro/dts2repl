@@ -29,7 +29,7 @@ Check If New Repl Has Not Regressed Loading
     ${new_repl_path}=         Set Variable  ${repls_path}/generated/${repl_name}
     ${old_result}=            Try Load Platform  ${old_repl_path}
     ${new_result}=            Try Load Platform  ${new_repl_path}
-    ${old_size}=              Evaluate  os.stat("${old_repl_path}").st_size
+    ${old_size}=              Evaluate  os.stat("${old_repl_path}").st_size if os.path.exists("${old_repl_path}") else 0
 
     # We use Log To Console for the messages to avoid "Message content over the limit has been removed"
     IF  ${old_size} == 0 and "${new_result[0]}" == "PASS"
