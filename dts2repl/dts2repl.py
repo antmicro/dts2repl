@@ -894,7 +894,8 @@ def generate(args):
             # decide which IRQ names to use in Renode model
             if compat == 'st,stm32-rtc':
                 irq_names = ['AlarmIRQ']
-            elif compat in ['nxp,kinetis-lpuart', 'nxp,kinetis-uart', 'silabs,gecko-leuart', 'sifive,uart0', 'st,stm32-adc']:
+            elif (compat in ['nxp,kinetis-lpuart', 'nxp,kinetis-uart', 'silabs,gecko-leuart', 'sifive,uart0', 'st,stm32-adc']
+                or model in ['UART.STM32F7_USART']):
                 irq_names = ['IRQ']
             elif compat in ['silabs,gecko-uart', 'silabs,gecko-usart']:
                 irq_names = ['ReceiveIRQ', 'TransmitIRQ']
