@@ -1022,7 +1022,7 @@ def generate_cpu_freq(filename):
     print(f" * Not found")
     return None
 
-def generate_peripherals(filename, overlays, type):
+def generate_peripherals(filename, overlays, type, get_snippets=False):
     result = {}
     par = ''
     irq_nums = []
@@ -1084,6 +1084,9 @@ def generate_peripherals(filename, overlays, type):
             result[node.name]["size"] = hex(size)
         if irq_nums != []:
             result[node.name]["irq_nums"] = irq_nums.copy()
+
+        if get_snippets:
+            result[node.name]['snippet'] = str(node)
 
     return result
 
