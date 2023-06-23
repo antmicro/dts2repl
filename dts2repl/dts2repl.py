@@ -803,6 +803,24 @@ def generate(args):
             indent.append('rtcPeripheral: rtc')
             dependencies.add('rtc')
 
+        if model == 'Sensors.TMP103' or model == 'Sensors.TMP108':
+            if len(node.parent.labels) == 0:
+                logging.warning(f"Node {node} has no labels! Dropping {model}")
+                continue
+
+            i2c_name = name_mapper.get_name(node.parent)
+            i2c_addr = int(node.unit_addr, 16)
+            regions = [RegistrationRegion(address=i2c_addr, registration_point=i2c_name)]
+
+        if model == 'Sensors.SI7210':
+            if len(node.parent.labels) == 0:
+                logging.warning(f"Node {node} has no labels! Dropping {model}")
+                continue
+
+            i2c_name = name_mapper.get_name(node.parent)
+            i2c_addr = int(node.unit_addr, 16)
+            regions = [RegistrationRegion(address=i2c_addr, registration_point=i2c_name)]
+
         if model == 'Miscellaneous.LED':
             gpios = list(get_node_prop(node, 'gpios'))
             if not gpios:
@@ -1089,6 +1107,140 @@ def generate_peripherals(filename, overlays, type, get_snippets=False):
 
         if get_snippets:
             result[node.name]['snippet'] = str(node)
+
+    return result
+
+
+def get_buses(dt: dtlib.DT) -> list:
+    '''
+        Find buses:
+        Iterate every node. Check for the following conditions:
+        - The node name matches our collection of interesting nodes.
+        - Check if the node is located somewhere in address space.
+
+        Retruns: list of string paths for buses
+    '''
+    buses_paths = []
+    for node in dt.node_iter():
+        node_name = node.name
+        if ('spi' in node_name or 'i2c' in node_name) and '@' in node_name:
+            buses_paths.append(node.path)
+
+    logging.debug(f'buses: {buses_paths}')
+    return buses_paths
+
+
+def generate_bus_sensors(filename, overlays, type):
+    result = {}
+    par = ''
+    irq_nums = []
+    reg = None
+
+    try:
+        dt = get_dt(filename)
+    except Exception:
+        logging.exception(f'Failed on {filename}')
+        return
+
+    for bus_path in get_buses(dt):
+        bus = dt.get_node(bus_path)    # bus node
+        nodes = bus.nodes              # bus sub-nodes
+
+        for node in nodes.values():
+            # Get node compats
+            compats = get_node_prop(node, 'compatible')
+
+            compat = compats[0]
+            if compat in MODELS:
+                mcu = get_mcu_compat(filename)
+                model, compat = renode_model_overlay(compat, mcu, overlays)
+            else:
+                model = ''
+
+            result[node.name] = {
+                "unit_addr": node.unit_addr,
+                "label": node.labels[0] if node.labels else '',
+                "model": model,
+                "compats": compats.copy(),
+                "bus": bus.name,
+                "snippet": str(node)
+            }
+
+    return result
+
+
+# dtlib does not support parsing props of type PHANDLES_AND_NUMS
+# XXX: this will not raise any errors upon failure
+def parse_phandles_and_nums(dt: dtlib.DT, node: dtlib.Node, prop: str, signed=False):
+    value = node.props[prop].value
+    return [int.from_bytes(value[i:i+4], "big", signed=signed) for i in range(0, len(value), 4)]
+
+
+def generate_gpio(filename, overlays, type):
+    result = {}
+    params = (filename, overlays, type)
+
+    KEYS_NODE = '/gpio_keys'
+    LEDS_NODE = '/leds'
+    LEDS_PWM_NODE = '/pwmleds'
+    try:
+        dt = get_dt(filename)
+    except Exception:
+        logging.exception(f'Failed on {filename}')
+        return
+
+    # Handle LEDS and Keys with the same flow, as they contain the same data
+    for type in [KEYS_NODE, LEDS_NODE]:
+        if dt.has_node(type):
+            parent = dt.get_node(type)
+            nodes = parent.nodes
+            for node in nodes.values():
+                gpio_info = parse_phandles_and_nums(dt, node, "gpios")
+                # Assumes that gpios property is formatted as follows:
+                # gpios = < &gpio_phandle 0xPin 0xMode >
+                # If len(gpios) == 2 assumes that:
+                # gpios = < &gpio_phandle 0xPin >
+                result[node.name] = {
+                    "label": node.labels[0] if node.labels else '',
+                    "gpio": dt.phandle2node[gpio_info[0]].name,
+                    "pin": gpio_info[1],
+                    "mode": gpio_info[2] if len(gpio_info) == 3 else '',
+                    "compats": get_node_prop(parent, 'compatible'),
+                    "model": "",
+                    "snippet": str(node)
+                }
+
+    if dt.has_node(LEDS_PWM_NODE):
+        leds_pwm = dt.get_node(LEDS_PWM_NODE)
+        nodes = leds_pwm.nodes
+        for node in nodes.values():
+            gpio_info = parse_phandles_and_nums(dt, node, "pwms")
+            # Some PWM LEDs are driven by non-standard PWM sources
+            # As a result of that, we implement alternative flows
+            # XXX: this assumes that phandle to PWM source is always
+            #      the first element in the properties list
+            pwm_source = dt.phandle2node[gpio_info[0]].name
+
+            result[node.name] = {
+                "label": node.labels[0] if node.labels else '',
+                "pwm": dt.phandle2node[gpio_info[0]].name,
+                "channel": gpio_info[1],
+                "period": gpio_info[2],
+                "compats": get_node_prop(leds_pwm, 'compatible'),
+                "model": "",
+                "snippet": str(node)
+            }
+
+            if 'tcc' in pwm_source:
+                # Atmel SAM0 TCC in PWM mode
+                # pwms = < &pwm_phandle 0xChannel 0xPeriod >
+                result[node.name]["flags"] = None
+            elif 'pwm' in pwm_source:
+                # "Standard" Zephyr PWM source
+                # pwms = < &pwm_phandle 0xChannel 0xPeriod 0xFlags >
+                # If len(gpio_info) == 3 assumes that:
+                # pwms = < &pwm_phandle 0xChannel 0xPeriod >
+                result[node.name]["flags"] = gpio_info[3] if len(gpio_info) == 4 else ''
 
     return result
 
