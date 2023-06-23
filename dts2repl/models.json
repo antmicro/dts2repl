@@ -181,5 +181,11 @@
     "xlnx,xuartps": "UART.Cadence_UART",
     "xlnx,zynq-slcr": "Python.PythonPeripheral",
     "xlnx,zynqmp-ipi-mailbox": "Python.PythonPeripheral",
-    "xlnx,zynqmp-uart": "UART.Cadence_UART"
+    "xlnx,zynqmp-uart": "UART.Cadence_UART",
+
+    "silabs,gecko-i2c": "I2C.EFR32xG2_I2CController",
+
+    "silabs,si7210": "Sensors.SI7210",
+    "ti,tmp108": "Sensors.TMP108",
+    "ti,tmp103": "Sensors.TMP103"
 }
