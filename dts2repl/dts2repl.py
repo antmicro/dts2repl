@@ -907,6 +907,8 @@ def generate(args):
             elif (compat in ['arm,pl011', 'atmel,sam0-uart']
                   or model in ['UART.Cadence_UART', 'UART.NS16550']):
                 irq_names = ['']
+            elif compat in ['st,stm32-i2c-v1', 'st,stm32-i2c-v2']:
+                irq_names = ['EventInterrupt', 'ErrorInterrupt']
             else:
                 irq_names = [str(n) for n in range(len(irq_dest_nodes))]
 
