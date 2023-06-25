@@ -18,14 +18,10 @@ ls -1 ../generated | parallel 'diff -u --new-file --ignore-blank-lines "../dashb
 # tail is used to prefix each file with its name, -n+3 will display the diff
 # skipping the ---/+++ header
 echo Listing repls with differences
-tail -n+3 -v * || {
-    echo No differences, not running Renode
-    exit
-}
-cd -
+tail -n+3 -v * && DIFF=1
+cd ../../
 
-# Download the Renode portable package and install its Python dependencies
-../ci/get_renode.sh
-
-# Try to load the repls that had differences in Renode
-./renode-portable/renode-test --results-dir robot-results "$PWD/../ci/load_repls_with_diffs.robot"
+if [ "${DIFF}" -eq 1 ] ; then
+    echo Found differences, running Renode
+    ../renode-portable/renode-test --results-dir robot-results "$PWD/../ci/load_repls_with_diffs.robot"
+fi
