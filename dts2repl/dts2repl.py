@@ -82,13 +82,50 @@ def get_cpu_dep_chain(arch, dts_filename, zephyr_path, chain):
 
 
 def get_uart(dts_filename):
-    uart = ''
-    if os.path.exists(dts_filename):
-        with open(dts_filename, "r") as dts_file:
-            for l in dts_file.readlines():
-                if 'zephyr,shell-uart' in l:
-                    uart = l[l.index('&')+1:l.index(';')].strip()
-                    return uart
+    try:
+        dt = dtlib.DT(dts_filename)
+    except FileNotFoundError:
+        logging.error(f'File not found: "{dts_filename}"')
+        return None
+    except Exception:
+        logging.exception('Error while parsing DT')
+        return None
+
+    # The same caveat as in get_user_led0 applies: if we end up with a duplicate uart
+    # name while generating the repl, all bets are off
+    name_mapper = NameMapper()
+
+    # First, try to use the chosen zephyr,shell-uart
+    try:
+        chosen = dt.get_node('/chosen')
+        return name_mapper.get_name(chosen.props['zephyr,shell-uart'].to_path())
+    except Exception:
+        pass
+
+    # Then, chosen stdout-path = &uart;
+    try:
+        chosen = dt.get_node('/chosen')
+        return name_mapper.get_name(chosen.props['stdout-path'].to_path())
+    except Exception:
+        pass
+
+    # Then, chosen stdout-path = "uart:115200n8"; (Linux style)
+    try:
+        chosen = dt.get_node('/chosen')
+        alias = chosen.props['stdout-path'].to_string().split(':')[0]
+        return name_mapper.get_name(dt.get_node(alias))
+    except Exception:
+        pass
+
+    # Finally, just return any non-disabled node that looks vaguely like a uart
+    for node in dt.node_iter():
+        if any(x in node.name.lower() for x in ('uart', 'usart', 'serial')):
+            if get_node_prop(node, 'status', default='okay') != 'disabled':
+                return name_mapper.get_name(node)
+
+    # No uart found
+    return None
+
 
 
 def get_user_led0(dts_filename):
