@@ -920,7 +920,7 @@ def generate(args):
             elif compat in ['gaisler,gptimer']:
                 irq_names = ['0']
             elif model == 'Timers.ARM_GenericTimer':
-                irq_names = ['HypervisorPhysicalTimerIRQ', 'PhysicalTimerIRQ', 'VirtualTimerIRQ', 'NonSecurePhysicalTimerIRQ']
+                irq_names = ['EL3PhysicalTimerIRQ', 'EL1PhysicalTimerIRQ', 'EL1VirtualTimerIRQ', 'NonSecureEL2PhysicalTimerIRQ']
             # the Renode model for these UARTs only has 1 IRQ
             elif (compat in ['arm,pl011', 'atmel,sam0-uart']
                   or model in ['UART.Cadence_UART', 'UART.NS16550']):
