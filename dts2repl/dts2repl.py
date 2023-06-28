@@ -182,7 +182,7 @@ def renode_model_overlay(compat, mcu, overlays):
 
     # this hack is required for stm32f3, stm32g0 and stm32l0 based boards uarts
     # to work properly
-    if compat == 'st,stm32-usart' and any(map(lambda x: x in overlays, ('st,stm32f302', 'st,stm32g0', 'st,stm32l0'))):
+    if compat == 'st,stm32-usart' and any(map(lambda x: x in overlays, ('st,stm32f3', 'st,stm32g0', 'st,stm32l0'))):
         model = 'UART.STM32F7_USART'
 
     # compat-based mapping of peripheral models for the following SoCs is not enough
