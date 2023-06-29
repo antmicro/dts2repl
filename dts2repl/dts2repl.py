@@ -180,20 +180,15 @@ def renode_model_overlay(compat, mcu, overlays):
         compat = "st,stm32-lpuart"
         model = MODELS[compat]
 
-    # this hack is required for stm32f3, stm32g0 and stm32l0 based boards uarts
-    # to work properly
-    if compat == 'st,stm32-usart' and any(map(lambda x: x in overlays, ('st,stm32f3', 'st,stm32g0', 'st,stm32l0'))):
-        model = 'UART.STM32F7_USART'
-
     # compat-based mapping of peripheral models for the following SoCs is not enough
     # as there are ifdefs in the driver; adding a manual map for now as a workaround
-    if any(x in overlays for x in ('st,stm32g4', 'st,stm32l4', 'st,stm32wl', 'st,stm32l0')):
+    if any(x in overlays for x in ('st,stm32f3', 'st,stm32g0', 'st,stm32g4', 'st,stm32l4', 'st,stm32wl', 'st,stm32l0')):
         if compat == "st,stm32-usart":
             compat = "st,stm32-lpuart"
             model = MODELS[compat]
 
         if compat == "st,stm32-rcc":
-            if any(map(lambda x: x in overlays, ('st,stm32l4', 'st,stm32g4'))):
+            if any(map(lambda x: x in overlays, ('st,stm32f3', 'st,stm32g0', 'st,stm32g4', 'st,stm32l4'))):
                 model = 'Python.PythonPeripheral'
             elif 'st,stm32l0' in overlays:
                 model = 'Miscellaneous.STM32L0_RCC'
