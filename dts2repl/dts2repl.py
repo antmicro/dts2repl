@@ -183,7 +183,7 @@ def renode_model_overlay(compat, mcu, overlays):
     # compat-based mapping of peripheral models for the following SoCs is not enough
     # as there are ifdefs in the driver; adding a manual map for now as a workaround
     if any(x in overlays for x in ('st,stm32f3', 'st,stm32g0', 'st,stm32g4', 'st,stm32l4', 'st,stm32wl', 'st,stm32l0')):
-        if compat == "st,stm32-usart":
+        if compat in ("st,stm32-uart", "st,stm32-usart"):
             compat = "st,stm32-lpuart"
             model = MODELS[compat]
 
