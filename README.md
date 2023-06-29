@@ -51,7 +51,7 @@ print(dts2repl.generate(Namespace(filename="path/to/flattened_devicetree.dts")))
 ## Development
 
 You can use the CI scripts locally to quickly verify your dts2repl changes. First, run [setup-env.sh](./ci/setup_env.sh)
-after sourcing [config.sh](./ci/config.sh)to prepare your environment:
+after sourcing [config.sh](./ci/config.sh) to prepare your environment:
 
 ```sh
 source ./ci/config.sh
