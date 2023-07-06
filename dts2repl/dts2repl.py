@@ -252,6 +252,8 @@ def renode_model_overlay(compat, mcu, overlays):
         compat = 'arm,cortex-a53'
     elif compat == 'arm,cortex-a72':
         compat = 'arm,cortex-a75'
+    elif compat == 'arm,cortex-r5':
+        compat = 'arm,cortex-r52'
 
     return model, compat
 
@@ -772,7 +774,7 @@ def generate(args):
             indent.append('filename: "scripts/pydev/flipflop.py"')
 
         # additional parameters for CPUs
-        if compat.startswith('arm,cortex-a') and compat.count('-') == 1:
+        if any(compat.startswith(x) for x in ('arm,cortex-a', 'arm,cortex-r')) and compat.count('-') == 1:
             cpu = compat.split(',')[1]
             indent.append(f'cpuType: "{cpu}"')
         if compat == 'marvell,sheeva-v7':
@@ -807,7 +809,7 @@ def generate(args):
                 indent.append('privilegeArchitecture: PrivilegeArchitecture.Priv1_10')
             else:
                 indent.append('privilegeArchitecture: PrivilegeArchitecture.Priv1_09')
-        if model in ("CPU.ARMv8A", "CPU.ARMv7A") and name != "cpu0":
+        if model in ("CPU.ARMv8A", "CPU.ARMv8R", "CPU.ARMv7A") and name != "cpu0":
             # We generate the cpu0 timer along with correct interrupt connections
             # while processing the timer node in the dts, and we generate 'fake'
             # timers for other cores here for now
@@ -815,7 +817,7 @@ def generate(args):
             timer_lines = [f'{timer_name}: Timers.ARM_GenericTimer @ {name}', '    frequency: 62500000']
             generic_timer = ReplBlock(timer_name, 'Timers.ARM_GenericTimer', {name}, {timer_name}, timer_lines)
             blocks.append(generic_timer)
-        if model in ("CPU.ARMv8A", "CPU.ARMv7A"):
+        if model in ("CPU.ARMv8A", "CPU.ARMv8R", "CPU.ARMv7A"):
             # We use our CPU number as the CPU ID instead of the reg address
             # This relies on the fact that the name will have been changed to "cpu{n}"
             indent.append(f'cpuId: {name.replace("cpu", "")}')
