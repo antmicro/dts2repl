@@ -120,7 +120,7 @@ def get_uart(dts_filename):
     # Finally, just return any non-disabled node that looks vaguely like a uart
     for node in dt.node_iter():
         if any(x in node.name.lower() for x in ('uart', 'usart', 'serial')):
-            if get_node_prop(node, 'status', default='okay') != 'disabled':
+            if get_node_prop(node, 'status', default='okay') != 'disabled' and 'reg' in node.props:
                 return name_mapper.get_name(node)
 
     # No uart found
