@@ -225,7 +225,7 @@ def renode_model_overlay(compat, mcu, overlays):
             model = MODELS[compat]
 
         if compat == "st,stm32-rcc":
-            if any(map(lambda x: x in overlays, ('st,stm32f3', 'st,stm32g0', 'st,stm32g4', 'st,stm32l4'))):
+            if any(map(lambda x: x in overlays, ('st,stm32g0', 'st,stm32g4', 'st,stm32l4'))):
                 model = 'Python.PythonPeripheral'
             elif 'st,stm32l0' in overlays:
                 model = 'Miscellaneous.STM32L0_RCC'
