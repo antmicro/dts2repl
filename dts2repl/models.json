@@ -160,6 +160,8 @@
     "st,stm32-usart": "UART.STM32_UART",
     "st,stm32-watchdog": "Timers.STM32_IndependentWatchdog",
     "st,stm32f0-rcc": "Python.PythonPeripheral",
+    "st,stm32f1-rcc": "Python.PythonPeripheral",
+    "st,stm32f3-rcc": "Python.PythonPeripheral",
     "st,stm32h7-rcc": "Miscellaneous.STM32H7_RCC",
     "st,stm32wl-rcc": "Python.PythonPeripheral",
     "st,stm32-ethernet": "Network.SynopsysEthernetMAC",
