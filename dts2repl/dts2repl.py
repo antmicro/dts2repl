@@ -768,6 +768,10 @@ def generate(args):
             indent.append('size: 0x1000')
             indent.append('initable: false')
             indent.append('script: "request.value = {0x1e4: 0x10000}.get(request.offset, 0)"')
+        elif compat == 'brcm,iproc-pcie-ep':
+            indent.append('size: 0x2100')
+            indent.append('initable: false')
+            indent.append('script: "request.value = 0x1"')
         elif model == 'Python.PythonPeripheral':
             indent.append('size: 0x1000')
             indent.append('initable: true')
