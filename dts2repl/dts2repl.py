@@ -963,6 +963,8 @@ def generate(args):
                 irq_names = ['']
             elif compat in ['st,stm32-i2c-v1', 'st,stm32-i2c-v2']:
                 irq_names = ['EventInterrupt', 'ErrorInterrupt']
+            elif compat in ['arm,cmsdk-uart']:
+                irq_names = ['TxInterrupt', 'RxInterrupt']
             else:
                 irq_names = [str(n) for n in range(len(irq_dest_nodes))]
 
