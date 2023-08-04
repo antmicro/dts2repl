@@ -87,9 +87,11 @@
 
     "microchip,miv": "CPU.RiscV32",
     "microchip,coreuart": "UART.MiV_CoreUART",
+    "microchip,mpfs-gpio": "GPIOPort.MPFS_GPIO",
 
     "nordic,nrf-clock": "Miscellaneous.NRF52840_CLOCK",
     "nordic,nrf-ecb": "Miscellaneous.NRF52840_ECB",
+    "nordic,nrf-gpio": "GPIOPort.NRF52840_GPIO",
     "nordic,nrf-rng": "Miscellaneous.NRF52840_RNG",
     "nordic,nrf-rtc": "Timers.NRF52840_RTC",
     "nordic,nrf-spi": "SPI.NRF52840_SPI",
@@ -144,6 +146,7 @@
     "silabs,gecko-leuart": "UART.LEUART",
     "silabs,gecko-uart": "UART.EFM32_UART",
     "silabs,gecko-usart": "UART.EFR32_USART",
+    "silabs,gecko-gpio-port": "GPIOPort.EFR32_GPIOPort",
 
     "snps,dw-apb-uart": "UART.NS16550",
 
