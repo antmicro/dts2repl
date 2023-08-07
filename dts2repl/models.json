@@ -151,6 +151,7 @@
     "silabs,gecko-uart": "UART.EFM32_UART",
     "silabs,gecko-usart": "UART.EFR32_USART",
     "silabs,gecko-gpio-port": "GPIOPort.EFR32_GPIOPort",
+    "silabs,gecko-burtc": "Timers.EFR32xG2_BURTC",
 
     "snps,dw-apb-uart": "UART.NS16550",
 
