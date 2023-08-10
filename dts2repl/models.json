@@ -1,4 +1,8 @@
 {
+    "ambiq,stimer": "Timers.AmbiqApollo4_SystemTimer",
+    "ambiq,counter": "Timers.AmbiqApollo4_Timer",
+    "ambiq,apollo4-pinctrl": "GPIOPort.AmbiqApollo4_GPIO",
+
     "arm,armv8": "CPU.ARMv8A",
     "arm,armv8-timer": "Timers.ARM_GenericTimer",
     "arm,cortex-a9": "CPU.ARMv7A",

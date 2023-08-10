@@ -953,7 +953,7 @@ def generate(args):
                 irq_names = ['IRQ']
             elif compat in ['silabs,gecko-uart', 'silabs,gecko-usart']:
                 irq_names = ['ReceiveIRQ', 'TransmitIRQ']
-            elif compat in ['gaisler,gptimer']:
+            elif compat in ['gaisler,gptimer', 'ambiq,counter']:
                 irq_names = ['0']
             elif model == 'Timers.ARM_GenericTimer':
                 irq_names = ['EL3PhysicalTimerIRQ', 'EL1PhysicalTimerIRQ', 'EL1VirtualTimerIRQ', 'NonSecureEL2PhysicalTimerIRQ']
@@ -965,6 +965,8 @@ def generate(args):
                 irq_names = ['EventInterrupt', 'ErrorInterrupt']
             elif compat in ['arm,cmsdk-uart']:
                 irq_names = ['TxInterrupt', 'RxInterrupt']
+            elif compat in ['ambiq,stimer']:
+                irq_names = ['IRQA', 'IRQB', 'IRQC', 'IRQD', 'IRQE', 'IRQF', 'IRQG', 'IRQH', 'IRQI']
             else:
                 irq_names = [str(n) for n in range(len(irq_dest_nodes))]
 
