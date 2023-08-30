@@ -1,0 +1,2 @@
+cpu0:
+    cpuType: "rv32imacb"
