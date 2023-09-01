@@ -201,5 +201,7 @@
 
     "silabs,si7210": "Sensors.SI7210",
     "ti,tmp108": "Sensors.TMP108",
-    "ti,tmp103": "Sensors.TMP103"
+    "ti,tmp103": "Sensors.TMP103",
+    "st,lis2ds12": "Sensors.LIS2DS12",
+    "st,lsm303dlhc-accel": "Sensors.LSM303DLHC_Accelerometer"
 }
