@@ -7,3 +7,7 @@ globalTimer: Timers.CortexAGlobalTimer @ sysbus 0xF8F00200
 
 gic:
     architectureVersion: IRQControllers.ARM_GenericInterruptControllerVersion.GICv1
+
+cpu1:
+    init:
+        IsHalted true
