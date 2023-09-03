@@ -161,6 +161,8 @@ def get_user_led0(dts_filename):
 
 def get_dt(filename):
     dts_file = []
+    if filename == '-':
+       filename = '/dev/stdin'
     if filename.startswith("https://") or filename.startswith("http://"):
        try:
           import requests
@@ -1362,6 +1364,8 @@ def main():
         with open(includes_file, 'w') as f:
             f.writelines(f'{x}\n' for x in includes)
 
+    if args.output == "-":
+       args.output = "/dev/stdout"
     with open(args.output, 'w') as f:
         f.write(generate(args))
 
