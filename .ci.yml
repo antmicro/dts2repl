@@ -17,6 +17,7 @@ Compare repls:
     - curl -Lsf "https://builds.renode.io/renode-${RENODE_VERSION}.linux-portable.tar.gz" | tar xz -C renode-portable --strip-components=1
     - pip3 install -r renode-portable/tests/requirements.txt > /dev/null 2> /dev/null
   script:
+    - python3 -m dts2repl
     - pip3 install .
     - mkdir -p ci-output/{repls/{dashboard,generated,diffs},dts}
     # Get repl kit from dashboard

@@ -15,7 +15,7 @@ from collections import Counter
 from dataclasses import dataclass
 from typing import List, Set, Optional
 import itertools
-from dts2repl import dtlib
+from dts2repl import dtlib, name
 
 
 with open(f'{pathlib.Path(__file__).parent.resolve()}/models.json') as f:
@@ -23,7 +23,7 @@ with open(f'{pathlib.Path(__file__).parent.resolve()}/models.json') as f:
 
 
 def parse_args():
-    parser = argparse.ArgumentParser()
+    parser = argparse.ArgumentParser(prog=name)
     parser.add_argument('filename')
     parser.add_argument('--loglevel',
                         default='warning',
@@ -160,10 +160,18 @@ def get_user_led0(dts_filename):
 
 
 def get_dt(filename):
-    with open(filename) as f:
-        dts_file = f.readlines()
-        dts_file = filter(lambda x: 'pinctrl-0;' not in x, dts_file)
-        dts_file = ''.join(dts_file)
+    dts_file = []
+    if filename.startswith("https://") or filename.startswith("http://"):
+       try:
+          import requests
+       except:
+          print("error: requests module is required to support remote files")
+          sys.exit(1)
+       dts_file = requests.get(filename).text
+    else:
+       dts_file = open(filename).readlines()
+    dts_file = filter(lambda x: 'pinctrl-0;' not in x, dts_file)
+    dts_file = ''.join(dts_file)
 
     # Workaround for NamedTemporaryFile not being able to be opened for reading while
     # it's open here. This can be simplified on Python 3.12 with `delete_on_close`,
