@@ -197,6 +197,7 @@
     "xlnx,zynq-slcr": "Python.PythonPeripheral",
     "xlnx,zynqmp-ipi-mailbox": "Python.PythonPeripheral",
     "xlnx,zynqmp-uart": "UART.Cadence_UART",
+    "xlnx,xps-uartlite-1.00.a": "UART.AxiUartLite",
 
     "silabs,gecko-i2c": "I2C.EFR32xG2_I2CController",
 
