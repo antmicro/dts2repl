@@ -1,0 +1,8 @@
+bitband: Miscellaneous.BitBanding @ sysbus <0x42000000, +0x2000000>
+    peripheralBase: 0x40000000
+
+cmu: Miscellaneous.EFR32_CMU @ sysbus 0x400e4000
+
+sysbus:
+    init add:
+        ApplySVD @https://dl.antmicro.com/projects/renode/svd/EFR32BG13P.svd.gz
