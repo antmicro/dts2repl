@@ -35,6 +35,7 @@
 
     "atmel,sam-usart": "UART.SAM_USART",
     "atmel,sam0-uart": "UART.SAMD5_UART",
+    "nuvoton,npcx-uart": "UART.NPCX_UART",
 
     "brcm,iproc-pcie-ep": "Python.PythonPeripheral",
 

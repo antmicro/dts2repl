@@ -1,0 +1,4 @@
+itim: Python.PythonPeripheral @ sysbus 0x400BE000
+    size: 0x1000
+    initable: true
+    script: "lastVal = 0 if request.isInit else lastVal + 1; request.value = int(lastVal / 4)"
