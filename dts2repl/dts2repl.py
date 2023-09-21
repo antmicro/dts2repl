@@ -262,8 +262,6 @@ def renode_model_overlay(compat, mcu, overlays):
         compat = 'arm,cortex-a53'
     elif compat == 'arm,cortex-a72':
         compat = 'arm,cortex-a75'
-    elif compat == 'arm,cortex-r5':
-        compat = 'arm,cortex-r52'
 
     return model, compat
 
