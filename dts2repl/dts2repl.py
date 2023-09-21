@@ -910,6 +910,20 @@ def generate(args):
             indent.append('-> cpu0@0')
             dependencies.add('cpu0')
         elif model == 'IRQControllers.ARM_GenericInterruptController':
+            # Select correct GIC version
+            gic_ver = compat.split(',')[-1]
+            gic_renode_ver = {
+                'gic-v1': 'GICv1',
+                'gic-v2': 'GICv2',
+                'gic-v3': 'GICv3',
+                'gic-v4': 'GICv4',
+            }.get(gic_ver)
+            if gic_renode_ver:
+                indent.append(f'architectureVersion: IRQControllers.ARM_GenericInterruptControllerVersion.{gic_renode_ver}')
+            else:
+                logging.warning(f'Unknown GIC version for compatible "{compat}"')
+
+
             # We route both the GIC's IRQ and FIQ outputs to the CPU's IRQ input
             # because FIQ support is not yet fully implemented in Renode
             combiner_model = 'Miscellaneous.CombinedInput'
