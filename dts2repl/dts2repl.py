@@ -624,8 +624,7 @@ def generate(args):
             if (
                 any(map(lambda x: x in compat,
                     ['stm32-gpio', 'stm32-timers', 'silabs,gecko', 'gaisler,irqmp',
-                     'gaisler,gptimer', 'gaisler,apbuart', 'arm,cortex-a9-twd-timer',
-                     'xlnx,xuartps']))
+                     'gaisler,gptimer', 'gaisler,apbuart', 'xlnx,xuartps']))
                 or any(map(lambda x: x in model, 
                     ['UART.STM32_UART', 'UART.TrivialUart']))
             ):
@@ -689,6 +688,8 @@ def generate(args):
             indent.append('prioritiesEnabled: true')
         if model == 'Timers.ARM_GenericTimer':
             indent.append('frequency: 62500000')
+        if model == 'Timers.ARM_PrivateTimer':
+            indent.append('frequency: 667000000')
 
         # additional parameters for python peripherals
         if compat.startswith("st,stm32") and compat.endswith("rcc") and model == "Python.PythonPeripheral":

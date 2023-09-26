@@ -12,7 +12,7 @@
     "arm,cortex-a75": "CPU.ARMv8A",
     "arm,cortex-a76": "CPU.ARMv8A",
     "arm,cortex-r52": "CPU.ARMv8R",
-    "arm,cortex-a9-twd-timer": "Timers.CortexAPrivateTimer",
+    "arm,cortex-a9-twd-timer": "Timers.ARM_PrivateTimer",
     "arm,cortex-m0": "CPU.CortexM",
     "arm,cortex-m0+": "CPU.CortexM",
     "arm,cortex-m3": "CPU.CortexM",
