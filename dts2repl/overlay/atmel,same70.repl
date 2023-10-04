@@ -3,6 +3,9 @@ PMC_SR: Python.PythonPeripheral @ sysbus 0x400E0668
     initable: true
     filename: "scripts/pydev/flipflop.py"
 
+cpu0:
+    numberOfMPURegions: 16
+
 sysbus:
     init:
         ApplySVD @https://dl.antmicro.com/projects/renode/svd/ATSAME70Q21.svd

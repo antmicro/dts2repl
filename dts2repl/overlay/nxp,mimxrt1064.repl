@@ -16,3 +16,6 @@ sysbus:
 
 flash_mem: Memory.MappedMemory @ sysbus 0x70000000
     size: 0x400000
+
+cpu0:
+    numberOfMPURegions: 16

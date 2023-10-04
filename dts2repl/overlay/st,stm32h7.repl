@@ -3,3 +3,6 @@ pwrVosRdy: Python.PythonPeripheral @ sysbus 0x58024818
     initable: false
     //  Bit 13 - D3CR.VOSRDY
     script: "request.value = 0x2000"
+
+cpu0:
+    numberOfMPURegions: 16
