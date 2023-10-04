@@ -161,6 +161,10 @@ def get_user_led0(dts_filename):
 
 def get_dt(filename):
     dts_file = []
+
+    # This cast is needed, as the `filename` might be of `Path` or `PosixPath` type
+    filename = str(filename)
+
     if filename == '-':
        filename = '/dev/stdin'
     if filename.startswith("https://") or filename.startswith("http://"):
