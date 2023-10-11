@@ -694,6 +694,9 @@ def generate(args):
             indent.append('frequency: 62500000')
         if model == 'Timers.ARM_PrivateTimer':
             indent.append('frequency: 667000000')
+        if model == 'Miscellaneous.STM32L0_RCC':
+            indent.append('systick: nvic')
+            dependencies.add('nvic')
 
         # additional parameters for python peripherals
         if compat.startswith("st,stm32") and compat.endswith("rcc") and model == "Python.PythonPeripheral":
