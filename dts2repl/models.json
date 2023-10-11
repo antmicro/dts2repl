@@ -52,6 +52,8 @@
     "cdns,uart-r1p8": "UART.Cadence_UART",
     "cdns,uart-r1p12": "UART.Cadence_UART",
 
+    "cfi-flash": "Memory.MappedMemory",
+
     "fsl,imx6q-anatop": "Python.PythonPeripheral",
     "fsl,imx6sx-anatop": "Python.PythonPeripheral",
     "fsl,imx6q-ccm": "Python.PythonPeripheral",
