@@ -669,6 +669,10 @@ def generate(args):
                 # weird mismatch, need to investigate, manually patching for now
                 addr &= ~0x100
 
+            if model == 'Timers.TegraUsecTimer':
+                # the microsecond timer is at offset 0x10 from the base of the timer block
+                addr += 0x10
+
             if (
                 any(map(lambda x: x in compat,
                     ['stm32-gpio', 'stm32-timers', 'silabs,gecko', 'gaisler,irqmp',
