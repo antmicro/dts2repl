@@ -912,6 +912,7 @@ def generate(args):
 
         irq_dest_nodes = []
         irq_numbers = []
+        irq_local_indices = {}
         # decide which IRQ destinations to use in Renode model
         # these IRQ ctrls get special treatment
         if compat.endswith('nvic'):
@@ -956,8 +957,11 @@ def generate(args):
                 if parent_model == 'IRQControllers.ARM_GenericInterruptController':
                     irq_types = get_node_prop(node, 'interrupts')[0::interrupt_cells]
                     irq_numbers = get_node_prop(node, 'interrupts')[1::interrupt_cells]
-                    # Add 16 for GIC_PPI
-                    irq_numbers = [n + (16 if t == 1 else 0) for n, t in zip(irq_numbers, irq_types)]
+                    # Add 16 and route to local receiver (currently always #0) for GIC_PPI
+                    for i, t in enumerate(irq_types):
+                        if t == 1:
+                            irq_numbers[i] += 16
+                            irq_local_indices[i] = 0
         elif 'interrupts-extended' in node.props:
             # For now we assume that there is only one parameter: the IRQ number, otherwise
             # we skip the interrupt
@@ -1005,15 +1009,13 @@ def generate(args):
                 if irq_names == ['0'] and 'interrupt-controller' not in node.props:
                     irq_names = ['']
 
-            for irq_name, irq_dest, irq in zip(irq_names, irq_dest_nodes, irq_numbers):
+            for i, (irq_name, irq_dest, irq) in enumerate(zip(irq_names, irq_dest_nodes, irq_numbers)):
                 # assume very large IRQ numbers which have all bits set (i.e. 2^n - 1) are invalid
                 if irq >= 0xfff and (irq & (irq + 1)) == 0:
                     continue
                 irq_dest_name = name_mapper.get_name(irq_dest)
-                irq_dest_model = get_model(irq_dest, mcu_compat, overlays)
-                if irq_dest_model == 'IRQControllers.ARM_GenericInterruptController':
-                    # We always route GIC-bound interrupts to local index (CPU 0) for now
-                    irq_dest_name += '#0'
+                if i in irq_local_indices:
+                    irq_dest_name += f'#{irq_local_indices[i]}'
                 indent.append(f'{irq_name}->{irq_dest_name}@{irq}')
                 # IRQ destinations are not treated as dependencies, we filter
                 # out IRQ connections to missing peripherals at the end because
