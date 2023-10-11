@@ -956,8 +956,8 @@ def generate(args):
                 if parent_model == 'IRQControllers.ARM_GenericInterruptController':
                     irq_types = get_node_prop(node, 'interrupts')[0::interrupt_cells]
                     irq_numbers = get_node_prop(node, 'interrupts')[1::interrupt_cells]
-                    # Add 32 for GIC_SPI, 16 for GIC_PPI
-                    irq_numbers = [n + (32 if t == 0 else 16) for n, t in zip(irq_numbers, irq_types)]
+                    # Add 16 for GIC_PPI
+                    irq_numbers = [n + (16 if t == 1 else 0) for n, t in zip(irq_numbers, irq_types)]
         elif 'interrupts-extended' in node.props:
             # For now we assume that there is only one parameter: the IRQ number, otherwise
             # we skip the interrupt
