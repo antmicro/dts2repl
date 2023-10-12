@@ -659,7 +659,7 @@ def generate(args):
         provides = {name}
         regions = []
         if addr and (not name.startswith('cpu') or name.endswith('tcm')):
-            addr = int(addr, 16)
+            addr = int(addr.split(',')[0], 16)
             addr = translate_address(addr, node)
             if addr % 4 != 0:
                 logging.info(f'Node {node.name} has misaligned address {addr}. Skipping...')
