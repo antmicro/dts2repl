@@ -1088,20 +1088,19 @@ def get_mcu_compat(filename):
 
 def generate_cpu_freq(filename):
     result = {}
-    par = ''
+    par = None
     irq_nums = []
     reg = None
 
     dt = get_dt(filename)
     if dt is None:
-        return ''
+        return None
 
     print(f"Checking for CPU Freq in {str(Path(filename).stem)}...")
 
-    for node in dt.node_iter():
-        if node.name == 'cpus':
-            par = node
-            break
+    par = next((n for n in dt.node_iter() if n.name == 'cpus'), None)
+    if not par:
+        return None
 
     for n in par.node_iter():
         if n.parent == par:
@@ -1122,15 +1121,14 @@ def generate_peripherals(filename, overlays, type, get_snippets=False):
 
     dt = get_dt(filename)
     if dt is None:
-        return ''
+        return None
 
     mcu = get_mcu_compat(filename)
 
     print(f"Generating {type} peripherals for {str(Path(filename).stem)}")
-    for node in dt.node_iter():
-        if node.name == 'soc':
-            par = node
-            break
+    par = next((n for n in dt.node_iter() if n.name == 'soc'), None)
+    if not par:
+        return None
 
     for node in par.node_iter():
         compats = get_node_prop(node, 'compatible')
