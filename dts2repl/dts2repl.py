@@ -1087,10 +1087,7 @@ def get_mcu_compat(filename):
     return mcu
 
 def generate_cpu_freq(filename):
-    result = {}
     par = None
-    irq_nums = []
-    reg = None
 
     dt = get_dt(filename)
     if dt is None:
@@ -1202,9 +1199,6 @@ def get_buses(dt: dtlib.DT) -> list:
 
 def generate_bus_sensors(filename, overlays, type):
     result = {}
-    par = ''
-    irq_nums = []
-    reg = None
 
     try:
         dt = get_dt(filename)
@@ -1248,7 +1242,6 @@ def parse_phandles_and_nums(dt: dtlib.DT, node: dtlib.Node, prop: str, signed=Fa
 
 def generate_gpio(filename, overlays, type):
     result = {}
-    params = (filename, overlays, type)
 
     KEYS_NODE = '/gpio_keys'
     LEDS_NODE = '/leds'
