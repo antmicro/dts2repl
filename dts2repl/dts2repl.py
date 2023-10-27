@@ -1052,13 +1052,6 @@ def generate(args):
             overlay_blocks.append(ReplBlock('', None, set(), set(), [f'// {compat} overlay']))
             overlay_blocks.extend(parse_overlay(overlay))
 
-    # give the number of CPUs to the GIC
-    num_cpus = sum(1 for b in blocks if b.model and b.model.startswith('CPU.') and 'gic' in b.depends)
-    for block in blocks:
-        if block.model == 'IRQControllers.ARM_GenericInterruptController':
-            block.content.append(f'    numberOfCPUs: {num_cpus}')
-            break
-
     # build the repl out of the dts + overlay blocks filtering out unavailable blocks
     available_blocks = filter_available_blocks(blocks + overlay_blocks)
     repl_devices = set.union(*[b.provides for b in available_blocks])
