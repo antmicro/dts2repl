@@ -1,9 +1,10 @@
 onChipMemory: Memory.MappedMemory @ sysbus 0xFFFC0000
     size: 0x40000
 
-globalTimer: Timers.CortexAGlobalTimer @ sysbus 0xF8F00200
+globalTimer: Timers.ARM_GlobalTimer @ sysbus 0xF8F00200
     -> gic#0@27
     frequency: 433333333
+    irqController: gic
 
 gic:
     architectureVersion: IRQControllers.ARM_GenericInterruptControllerVersion.GICv1
