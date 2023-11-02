@@ -691,7 +691,10 @@ def generate(args):
             indent.append('numberOfContexts: 9')
             indent.append('prioritiesEnabled: true')
         if model == 'Timers.ARM_GenericTimer':
-            indent.append('frequency: 62500000')
+            if 'renesas,rzt2m_starter_kit' in overlays:
+                indent.append('frequency: 20000000')
+            else:
+                indent.append('frequency: 62500000')
         if model == 'Timers.ARM_PrivateTimer':
             indent.append('frequency: 667000000')
         if model == 'Miscellaneous.STM32L0_RCC':
