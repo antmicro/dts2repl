@@ -1001,6 +1001,8 @@ def generate(args):
                 irq_names = ['TxInterrupt', 'RxInterrupt']
             elif compat in ['ambiq,stimer']:
                 irq_names = ['IRQA', 'IRQB', 'IRQC', 'IRQD', 'IRQE', 'IRQF', 'IRQG', 'IRQH', 'IRQI']
+            elif compat in ['renesas,rzt2m-uart']:
+                irq_names = ['// RxErrIRQ', 'RxIRQ', 'TxIRQ', 'TxEndIRQ']
             else:
                 irq_names = [str(n) for n in range(len(irq_dest_nodes))]
 

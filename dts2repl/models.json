@@ -142,6 +142,8 @@
     "nxp,kinetis-uart": "UART.K6xF_UART",
     "nxp,mcux-12b1msps-sar": "Analog.IMXRT_ADC",
 
+    "renesas,rzt2m-uart": "UART.Renesas_SCI",
+
     "riscv": "CPU.RiscV32",
     "riscv,plic1": "IRQControllers.PlatformLevelInterruptController",
     "sifive,clint0": "IRQControllers.CoreLevelInterruptor",
