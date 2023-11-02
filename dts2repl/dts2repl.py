@@ -614,7 +614,7 @@ def generate(args):
         dependencies = set()
         provides = {name}
         regions = []
-        if addr and not name.startswith('cpu'):
+        if addr and (not name.startswith('cpu') or name.endswith('tcm')):
             addr = int(addr, 16)
             addr = translate_address(addr, node)
             if addr % 4 != 0:
