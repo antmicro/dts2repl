@@ -945,6 +945,8 @@ def generate(args):
             blocks.append(combiner)
             indent.append(f'[0, 1] -> {combiner_name}@[0, 1]')
             dependencies.add('cpu0')
+            if 'renesas,rzt2m-soc' in overlays:
+                indent.append('supportsTwoSecurityStates: false')
         elif compat == 'gaisler,irqmp':
             indent.append('0 -> cpu0@0 | cpu0@1 | cpu0@2')
             dependencies.add('cpu0')
