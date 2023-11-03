@@ -47,6 +47,7 @@
     "brcm,iproc-pcie-ep": "Python.PythonPeripheral",
 
     "cdns,ttc": "Timers.Cadence_TTC",
+    "xlnx,ttcps": "Timers.Cadence_TTC",
     "cdns,uart-r1p8": "UART.Cadence_UART",
     "cdns,uart-r1p12": "UART.Cadence_UART",
 
