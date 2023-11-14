@@ -436,6 +436,7 @@ class ReplBlock:
     depends: Set[str]
     provides: Set[str]
     content: List[str]
+    region: Optional[RegistrationRegion] = None
 
     def __str__(self):
         return '\n'.join(self.content)
@@ -515,7 +516,7 @@ def parse_overlay(path):
         provides.add(node.group('name'))
         if node.group('registration_point'):
             depends.add(node.group('registration_point'))
-        blocks.append(ReplBlock(node.group('name'), node.group('model'), depends, provides, part))
+        blocks.append(ReplBlock(node.group('name'), node.group('model'), depends, provides, part, region=None))
 
     return blocks
 
@@ -1049,7 +1050,10 @@ def generate(args):
         block_content = [f'{name}: {model} @ {RegistrationRegion.to_repl(regions)}']
         block_content.extend(map(lambda x: f'    {x}', indent))
 
-        block = ReplBlock(name, model, dependencies, provides, block_content)
+        region = regions[0] if len(regions) == 1 else None # for now we store at most one for merging
+        if model.startswith('Memory'):
+            region.size = size
+        block = ReplBlock(name, model, dependencies, provides, block_content, region)
         blocks.append(block)
 
     # soc and board overlay
