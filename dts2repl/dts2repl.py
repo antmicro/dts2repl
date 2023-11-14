@@ -822,6 +822,7 @@ def generate(args):
             else:
                 indent.append('timeProvider: clint')
                 dependencies.add('clint')
+                indent.append('allowUnalignedAccesses: true')
 
             indent.append(f'hartId: {node.name.split("@")[1]}')
 
