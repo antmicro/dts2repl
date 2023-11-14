@@ -488,7 +488,23 @@ def get_prop_value(prop: dtlib.Property, fmt: str):
         yield tuple(values)
 
 
-OVERLAY_NODE = re.compile(r"^(?P<name>\w+):([^\S\n]*(?P<model>[\w.]+)\s*@\s*(?P<registration_point>\w+))?")
+OVERLAY_NODE = re.compile(
+    r"""
+    ^                                   # Start of a line
+    (?P<name>\w+):                      # Capture the name in `name:`
+    (                                   # Optional part: model name and registration point. This part won't
+     [^\S\n]*                           # be present on nodes that just override properties on existing ones
+     (?P<model>[\w.]+)                  # Capture the model name in `model @ registration_point`
+     \s*@\s*                            # Match the @ and whitespace
+     (?P<registration_point>\w+)        # Capture the registration point in `model @ registration_point`
+     (                                  # Optional: address
+      \s+                               # Skip whitespace
+      (?P<address>(0[xX])?[0-9a-fA-F]+) # Capture the address
+     )?                                 # End address optional part
+    )?                                  # Outer optional (model/registration point) end
+    """,
+    re.VERBOSE,
+)
 
 
 def parse_overlay(path):
@@ -514,9 +530,21 @@ def parse_overlay(path):
         # properties (such as `timeProvider: clint`) could be used to derive additional
         # dependency information here
         provides.add(node.group('name'))
-        if node.group('registration_point'):
-            depends.add(node.group('registration_point'))
-        blocks.append(ReplBlock(node.group('name'), node.group('model'), depends, provides, part, region=None))
+        registration_point = node.group('registration_point')
+        region = None
+        if registration_point:
+            depends.add(registration_point)
+            if node.group('address'):
+                address = node.group('address')
+                address = int(address, 16 if address.lower().startswith('0x') else 10)
+                region = RegistrationRegion(address=address, registration_point=registration_point)
+                for line in part:
+                    if 'size:' in line:
+                        region.size = int(line.split()[1], 16)
+                        break
+        blocks.append(
+            ReplBlock(node.group('name'), node.group('model'), depends, provides, part, region)
+        )
 
     return blocks
 
