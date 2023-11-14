@@ -408,6 +408,20 @@ class RegistrationRegion:
     region_name: Optional[str] = None
     registration_point: str = "sysbus"
 
+    @property
+    def has_address_and_size(self) -> bool:
+        return self.address is not None and self.size is not None
+
+    @property
+    def end(self) -> Optional[int]:
+        if not self.has_address_and_size:
+            return None
+        return self.address + self.size
+
+    @end.setter
+    def end(self, value: int) -> None:
+        self.size = value - self.address
+
     @staticmethod
     def to_repl(regions):
         if len(regions) == 0:
@@ -1093,8 +1107,30 @@ def generate(args):
             overlay_blocks.append(ReplBlock('', None, set(), set(), [f'// {compat} overlay']))
             overlay_blocks.extend(parse_overlay(overlay))
 
-    # build the repl out of the dts + overlay blocks filtering out unavailable blocks
+    # filter out unavailable blocks (with unsatisfied depends)
     available_blocks = filter_available_blocks(blocks + overlay_blocks)
+
+    # split into blocks of known and unknown size
+    sized = []
+    unsized = []
+    for block in available_blocks:
+        (unsized, sized)[block.region is not None and block.region.has_address_and_size].append(block)
+    # merge overlapping sized blocks
+    # NOTE: currently, the block region size is not actually used for anything, and
+    # overlapping blocks are simply removed (keeping the first) and not really merged
+    sized_merged = []
+    for block in sorted(sized, key=lambda b: (b.region.address, b.region.end)):
+        if (
+            sized_merged
+            and sized_merged[-1].model == block.model
+            and sized_merged[-1].region.end >= block.region.address + 1
+        ):
+            sized_merged[-1].region.end = max(sized_merged[-1].region.end, block.region.end)
+        else:
+            sized_merged.append(block)
+
+    # build the repl out of the filtered and merged blocks
+    available_blocks = sized_merged + unsized
     repl_devices = set.union(*[b.provides for b in available_blocks])
     repl = [str(b) + '\n' for b in available_blocks]
 
