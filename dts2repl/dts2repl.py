@@ -441,7 +441,7 @@ class ReplBlock:
         return '\n'.join(self.content)
 
 
-def filter_available_blocks(blocks):
+def filter_available_blocks(blocks) -> List[ReplBlock]:
     available_blocks = []
     visited_blocks = set()
 
