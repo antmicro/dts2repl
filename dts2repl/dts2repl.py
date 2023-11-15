@@ -258,7 +258,7 @@ def renode_model_overlay(compat, mcu, overlays):
 
     # EFR32xG22 USART uses different offsets, but the compatible is identical to EFR32xG12 USART
     # The HAL uses compile-time defines to choose the right register layout
-    if compat == 'silabs,gecko-usart' and 'silabs,efr32bg22' in overlays:
+    if compat == 'silabs,gecko-usart' and any(overlay in overlays for overlay in ['silabs,efr32bg22', 'silabs,efr32mg24']):
         model = 'UART.EFR32xG22_USART'
 
     # remap some core types to the closest supported equivalent
