@@ -1116,8 +1116,7 @@ def generate(args):
     for block in available_blocks:
         (unsized, sized)[block.region is not None and block.region.has_address_and_size].append(block)
     # merge overlapping sized blocks
-    # NOTE: currently, the block region size is not actually used for anything, and
-    # overlapping blocks are simply removed (keeping the first) and not really merged
+    # NOTE: currently, only memory blocks are merged, other overlapping blocks are removed
     sized_merged = []
     for block in sorted(sized, key=lambda b: (b.region.address, b.region.end)):
         if (
@@ -1125,7 +1124,16 @@ def generate(args):
             and sized_merged[-1].model == block.model
             and sized_merged[-1].region.end >= block.region.address + 1
         ):
-            sized_merged[-1].region.end = max(sized_merged[-1].region.end, block.region.end)
+            target = sized_merged[-1]
+            target.region.end = max(target.region.end, block.region.end)
+            # merge memory blocks by updating their name and size
+            if target.model.startswith('Memory'):
+                target.name += f'_{block.name}'
+                # for now we manually update the string representation
+                header = target.content[0].split(':')
+                target.content[0] = target.name + ':' + header[1]
+                target.content[1] = f'    size: {hex(target.region.size)}'
+
         else:
             sized_merged.append(block)
 
