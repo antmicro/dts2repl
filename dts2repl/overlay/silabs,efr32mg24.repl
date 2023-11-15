@@ -1,0 +1,22 @@
+flash: Memory.MappedMemory @ sysbus 0x08000000
+    size: 0x200000
+
+dcdcStatus: Python.PythonPeripheral @ sysbus 0x50094028
+    size: 0x4
+    initable: true
+    script: "request.value = 0xffffffff"
+
+hfxoStatus: Python.PythonPeripheral @ sysbus 0x5A004058
+    size: 0x4
+    initable: true
+    filename: "scripts/pydev/flipflop.py"
+
+cmuSysClkStr: Python.PythonPeripheral @ sysbus 0x50008070
+    size: 0x4
+    initable: true
+    script: "request.value = 0x1"
+
+emuVscaleEm: Python.PythonPeripheral @ sysbus 0x50004084
+    size: 0x4
+    initable: true
+    filename: "scripts/pydev/rolling-bit.py"
