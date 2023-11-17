@@ -343,7 +343,7 @@ class NameMapper:
         "IRQControllers.ARM_GenericInterruptController": "gic",
         "IRQControllers.CoreLevelInterruptor": "clint",
         "IRQControllers.GaislerMIC": "irqmp",
-        "IRQControllers.NVIC": "nvic",
+        "IRQControllers.NVIC": "nvic0",
         "IRQControllers.PlatformLevelInterruptController": "plic",
     }
 
@@ -673,10 +673,6 @@ def generate(filename, override_system_clock_frequency=None):
                 logging.info(f'Node {node.name} has misaligned address {addr}. Skipping...')
                 continue
 
-            if name == 'nvic':
-                # weird mismatch, need to investigate, manually patching for now
-                addr &= ~0x100
-
             # hack for x86/ioport
             if model == 'UART.NS16550' and addr == 0x3f8:
                 addr += 0xE0000000
@@ -695,6 +691,12 @@ def generate(filename, override_system_clock_frequency=None):
                 # sized sysbus registration for peripherals that require an explicit size
                 _, size = next(get_reg(node))
                 regions = [RegistrationRegion(addr, size)]
+            # All NVICs need to be per-core registered
+            # Only handle the first one here, all others will be "faked" later
+            elif name == 'nvic0':
+                # weird mismatch, need to investigate, manually patching for now
+                addr &= ~0x100
+                regions = [RegistrationRegion(addr, cpu='cpu0')]
             else:
                 # unsized sysbus registration
                 regions = [RegistrationRegion(addr)]
@@ -742,13 +744,13 @@ def generate(filename, override_system_clock_frequency=None):
             frequency = override_system_clock_frequency or 1000000
             indent.append(f'frequency: {frequency}')
         if model == 'Miscellaneous.STM32L0_RCC':
-            indent.append('systick: nvic')
-            dependencies.add('nvic')
+            indent.append('systick: nvic0')
+            dependencies.add('nvic0')
         if model == 'Network.SynopsysDWCEthernetQualityOfService':
             regions += [RegistrationRegion(addr + 0xC00, 0x200, 'mtl'), RegistrationRegion(addr + 0x1000, 0x200, 'dma')]
         if model == 'IRQControllers.RenesasRA_ICU':
-            indent.append('nvic: nvic')
-            dependencies.add('nvic')
+            indent.append('nvic: nvic0')
+            dependencies.add('nvic0')
 
         # additional parameters for python peripherals
         if compat.startswith('fsl,imx6') and compat.endswith('-anatop'):
@@ -791,8 +793,9 @@ def generate(filename, override_system_clock_frequency=None):
                 logging.info(f'ZynqMP mailbox has no children: {node}')
 
         if compat.startswith('arm,cortex-m'):
-            indent.append('nvic: nvic')
-            dependencies.add('nvic')
+            cpu_number = name[-1]
+            indent.append(f'nvic: nvic{cpu_number}')
+            dependencies.add(f'nvic{cpu_number}')
             overlays.add('cortex-m')
 
         if model == 'CPU.RiscV32':  # We use CPU.RiscV32 as a generic model for all RV CPUs and fix it up here
@@ -841,9 +844,23 @@ def generate(filename, override_system_clock_frequency=None):
             indent.append(f'cpuId: {name.replace("cpu", "")}')
             indent.append('genericInterruptController: gic')
             dependencies.add('gic')
+
         if model == "CPU.Sparc":
             sysbus_endianness = ReplBlock('sysbus', None, {'sysbus'}, set(), ['sysbus:', '    Endianess: Endianess.BigEndian'])
             blocks.append(sysbus_endianness)
+
+        # fake NVICs for multi-core ARM systems
+        if model in ("CPU.CortexM") and name != "cpu0":
+            # We generate the cpu0 nvic along with correct interrupt connections
+            # while processing the timer node in the dts, and we generate 'fake'
+            # nvics for other cores here for now
+            cpu_number = name[-1]
+            nvic_name = f'nvic{cpu_number}'
+            fake_nvic_region = RegistrationRegion.to_repl([RegistrationRegion(0xe000e000, cpu=f'cpu{cpu_number}')])
+            fake_nvic_block = f'{nvic_name}: IRQControllers.NVIC @ {fake_nvic_region}'
+
+            fake_nvic_repl_block = ReplBlock(nvic_name, 'IRQControllers.NVIC', {name}, {nvic_name}, [fake_nvic_block])
+            blocks.append(fake_nvic_repl_block)
 
         # additional parameters for STM32F4_RCC
         if model == 'Miscellaneous.STM32F4_RCC':
