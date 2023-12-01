@@ -146,6 +146,7 @@
     "nxp,kinetis-uart": "UART.K6xF_UART",
     "nxp,lpc-usart": "UART.LPC_USART",
     "nxp,mcux-12b1msps-sar": "Analog.IMXRT_ADC",
+    "nxp,lpc-syscon": "Python.PythonPeripheral",
 
     "renesas,rzt2m-uart": "UART.Renesas_SCI",
 
