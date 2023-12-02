@@ -144,6 +144,7 @@
     "nxp,kinetis-sim": "Miscellaneous.K6xF_SIM",
     "nxp,kinetis-trng": "Miscellaneous.IMX_TRNG",
     "nxp,kinetis-uart": "UART.K6xF_UART",
+    "nxp,lpc-usart": "UART.LPC_USART",
     "nxp,mcux-12b1msps-sar": "Analog.IMXRT_ADC",
 
     "renesas,rzt2m-uart": "UART.Renesas_SCI",
