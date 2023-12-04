@@ -42,6 +42,7 @@
     "arm,cmsdk-uart": "UART.CMSDK_APB_UART",
 
     "atmel,sam-usart": "UART.SAM_USART",
+    "atmel,sam-uart": "UART.SAM_USART",
     "atmel,sam0-uart": "UART.SAMD5_UART",
     "nuvoton,npcx-uart": "UART.NPCX_UART",
 
