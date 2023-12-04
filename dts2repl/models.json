@@ -145,6 +145,8 @@
     "nxp,kinetis-sim": "Miscellaneous.K6xF_SIM",
     "nxp,kinetis-trng": "Miscellaneous.IMX_TRNG",
     "nxp,kinetis-uart": "UART.K6xF_UART",
+    "nxp,lpc3220-timer": "Timers.LPC_CTimer",
+    "nxp,lpc-ctimer": "Timers.LPC_CTimer",
     "nxp,lpc-usart": "UART.LPC_USART",
     "nxp,mcux-12b1msps-sar": "Analog.IMXRT_ADC",
     "nxp,lpc-syscon": "Python.PythonPeripheral",
