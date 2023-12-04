@@ -861,12 +861,16 @@ def generate(args):
         if model == 'CPU.RiscV32':  # We use CPU.RiscV32 as a generic model for all RV CPUs and fix it up here
             isa = get_node_prop(node, 'riscv,isa', 'rv32imac')
             indent.append(f'cpuType: "{isa}"')
+
+            is_andes = '_xandes' in isa
             if '64' in isa:
                 model = 'CPU.RiscV64'
 
             # Use CPU.VexRiscv for LiteX and Fomu
             if set(platform) & {'litex,vexriscv', 'kosagi,fomu'}:
                 model = 'CPU.VexRiscv'
+            elif is_andes:
+                indent.append('timeProvider: empty')
             else:
                 indent.append('timeProvider: clint')
                 dependencies.add('clint')
@@ -877,7 +881,7 @@ def generate(args):
             if any(c.startswith('riscv,sifive') or
                    c.startswith('starfive,rocket') or
                    c == 'sifive,e31'
-                   for c in compatible):
+                   for c in compatible) or is_andes:
                 indent.append('privilegeArchitecture: PrivilegeArchitecture.Priv1_10')
             else:
                 indent.append('privilegeArchitecture: PrivilegeArchitecture.Priv1_09')
