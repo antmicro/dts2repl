@@ -1,4 +1,10 @@
+stages:
+  - Test
+  - Release
+  - TestRelease
+
 Compare repls:
+  stage: Test
   image:
     name: debian:bullseye
   variables:
@@ -32,3 +38,35 @@ Compare repls:
 
     # Generate and run tests
     - ./ci/test.sh
+
+Static release:
+  stage: Release
+  image:
+    name: debian:bullseye
+  before_script:
+    - apt -qqy update > /dev/null 2> /dev/null
+    - apt -qqy install patchelf build-essential python3-pip zlib1g-dev > /dev/null 2> /dev/null
+    - pip3 install pyinstaller staticx
+  script:
+    - pip3 install requests -t deps
+    - pyinstaller --onefile dts2repl/dts2repl.py --paths deps --add-data dts2repl/models.json:.
+    - staticx dist/dts2repl dts2repl-static
+    - chmod +x dts2repl-static
+  artifacts:
+    paths:
+      - dts2repl-static
+
+Test Static release:
+  stage: TestRelease
+  image:
+    name: debian:bullseye
+  dependencies: [Static release]    
+  script:
+    - ./dts2repl-static https://zephyr-samples-builder.storage.googleapis.com/zephyr/063ce9caf54fa656f02ae48f3c9d537659a10dec/96b_aerocore2/hello_world/hello_world.dts --output test.repl
+    - apt -qqy update > /dev/null 2> /dev/null
+    - apt -qqy --no-install-recommends install wget ca-certificates > /dev/null 2> /dev/null
+    - wget https://zephyr-samples-builder.storage.googleapis.com/zephyr/063ce9caf54fa656f02ae48f3c9d537659a10dec/96b_aerocore2/hello_world/hello_world.dts
+    - ./dts2repl-static hello_world.dts --output test2.repl
+    - diff test.repl test2.repl
+    - cat test.repl
+
