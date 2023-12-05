@@ -49,12 +49,15 @@ Static release:
     - pip3 install pyinstaller staticx
   script:
     - pip3 install requests -t deps
-    - pyinstaller --onefile dts2repl/dts2repl.py --paths deps --add-data dts2repl/models.json:.
+    - pyinstaller --onefile dts2repl/dts2repl.py --paths deps --add-data dts2repl/models.json:. --add-data dts2repl/overlay:overlay
     - staticx dist/dts2repl dts2repl-static
     - chmod +x dts2repl-static
+    - cp dist/dts2repl dts2repl-dynamic
+    - chmod +x dts2repl-dynamic    
   artifacts:
     paths:
       - dts2repl-static
+      - dts2repl-dynamic
 
 Test Static release:
   stage: TestRelease
