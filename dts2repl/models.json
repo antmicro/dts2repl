@@ -169,6 +169,8 @@
     "sifive,rocket0": "CPU.RiscV32",
     "sifive,uart0": "UART.SiFive_UART",
 
+    "sc,hrmem": "Memory.MappedMemory",
+
     "silabs,gecko-leuart": "UART.LEUART",
     "silabs,gecko-uart": "UART.EFM32_UART",
     "silabs,gecko-usart": "UART.EFR32_USART",
