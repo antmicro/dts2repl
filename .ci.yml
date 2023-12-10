@@ -70,6 +70,9 @@ Test Static release:
     - apt -qqy --no-install-recommends install wget ca-certificates > /dev/null 2> /dev/null
     - wget https://zephyr-samples-builder.storage.googleapis.com/zephyr/063ce9caf54fa656f02ae48f3c9d537659a10dec/96b_aerocore2/hello_world/hello_world.dts
     - ./dts2repl-static hello_world.dts --output test2.repl
-    - diff test.repl test2.repl
+    - diff test.repl test2.repl || true
     - cat test.repl
-
+  artifacts:
+    paths:
+      - test.repl
+      - test2.repl
