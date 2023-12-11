@@ -49,6 +49,7 @@
     "nuvoton,npcx-uart": "UART.NPCX_UART",
 
     "brcm,iproc-pcie-ep": "Python.PythonPeripheral",
+    "brcm,bcm2711-aux-uart": "UART.BCM2711_AUX_UART",
 
     "cdns,ttc": "Timers.Cadence_TTC",
     "xlnx,ttcps": "Timers.Cadence_TTC",
