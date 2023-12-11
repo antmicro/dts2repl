@@ -753,7 +753,7 @@ def generate(args):
         if compat.startswith("st,stm32") and compat.endswith("rcc") and model == "Python.PythonPeripheral":
             indent.append('size: 0x400')
             indent.append('initable: true')
-            if any(map(lambda x: x in overlays, ('st,stm32l4', 'st,stm32g4'))):
+            if any(map(lambda x: x in overlays, ('st,stm32l4', 'st,stm32g4', 'st,stm32wl'))):
                 indent.append('filename: "scripts/pydev/flipflop.py"')
             else:
                 indent.append('filename: "scripts/pydev/rolling-bit.py"')
