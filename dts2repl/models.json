@@ -138,7 +138,7 @@
     "nxp,imx-itcm": "Memory.MappedMemory",
     "nxp,imx-lpspi": "SPI.IMXRT_LPSPI",
     "nxp,imx-sys-bus": "Memory.MappedMemory",
-    "nxp,imx-uart": "UART.ImxUart",
+    "nxp,imx-uart": "UART.MxcUart",
     "nxp,imx-iuart": "UART.ImxUart",
     "nxp,gpt-hw-timer": "Timers.IMX_GPTimer",
     "nxp,kinetis-lpuart": "UART.LowPower_UART",
