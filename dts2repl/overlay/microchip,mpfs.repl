@@ -3,8 +3,6 @@ clint:
     frequency: 1000000
 
 plic:
-    2 -> cpu1@9
-    numberOfContexts: 3
     prioritiesEnabled: false
 
 mstimer: Timers.MPFS_Timer @ sysbus 0x20125000
