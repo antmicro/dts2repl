@@ -70,3 +70,4 @@ bootrom: Memory.MappedMemory @ sysbus 0x08000000
 sysbus:
     init:
         Tag <0x48000054,0x48000054> "DAXI_CONTROL" 0x4  // DAXIREADY set.
+        Tag <0x40021004,0x40021008> "DEVPWREN" 0xFFFFFFFF // All devices powered up.
