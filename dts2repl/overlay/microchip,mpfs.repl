@@ -11,8 +11,15 @@ mstimer: Timers.MPFS_Timer @ sysbus 0x20125000
 
 cpu0:
     privilegeArchitecture: PrivilegeArchitecture.Priv1_10
-    hartId: 0
 
 cpu1:
     privilegeArchitecture: PrivilegeArchitecture.Priv1_10
-    hartId: 1
+
+cpu2:
+    privilegeArchitecture: PrivilegeArchitecture.Priv1_10
+
+cpu3:
+    privilegeArchitecture: PrivilegeArchitecture.Priv1_10
+
+cpu4:
+    privilegeArchitecture: PrivilegeArchitecture.Priv1_10
