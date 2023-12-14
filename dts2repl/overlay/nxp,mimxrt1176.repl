@@ -25,7 +25,7 @@ ANADIG_MISC_VDDSOC2PLL_AI_CTRL_VIDEO: Python.PythonPeripheral @ sysbus 0x40C848B
 
 sysbus:
     init:
-        ApplySVD @https://dl.antmicro.com/projects/renode/svd/MIMXRT1176_CM4.svd
+        ApplySVD @https://dl.antmicro.com/projects/renode/svd/MIMXRT1176_CM4.svd.gz
         Tag <0x40CA8008 4> "DCDC_REG0" 0x84030511
         Tag <0x40C84560 4> "ANADIG_PMU_PMU_BIAS_CTRL2" 0xFFFFFFFF
         Tag <0x40C84020 4> "ANADIG_OSC_OSC_24M_CTRL" 0xF0000080
