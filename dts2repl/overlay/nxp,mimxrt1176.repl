@@ -1,0 +1,35 @@
+ANADIG_PLL_SYS_PLL2_PFD: Python.PythonPeripheral @ sysbus 0x40C84270
+    size: 0x4
+    initable: true
+    filename: "scripts/pydev/flipflop.py"
+
+ANADIG_PLL_SYS_PLL3_PFD: Python.PythonPeripheral @ sysbus 0x40C84230
+    size: 0x4
+    initable: true
+    filename: "scripts/pydev/flipflop.py"
+
+ANADIG_MISC_VDDLPSR_AI400M_CTRL: Python.PythonPeripheral @ sysbus 0x40C84920
+    size: 0x4
+    initable: true
+    filename: "scripts/pydev/flipflop.py"
+
+ANADIG_MISC_VDDSOC2PLL_AI_CTRL_1G: Python.PythonPeripheral @ sysbus 0x40C84850
+    size: 0x4
+    initable: true
+    filename: "scripts/pydev/flipflop.py"
+
+ANADIG_MISC_VDDSOC2PLL_AI_CTRL_VIDEO: Python.PythonPeripheral @ sysbus 0x40C848B0
+    size: 0x4
+    initable: true
+    filename: "scripts/pydev/flipflop.py"
+
+sysbus:
+    init:
+        ApplySVD @https://dl.antmicro.com/projects/renode/svd/MIMXRT1176_CM4.svd
+        Tag <0x40CA8008 4> "DCDC_REG0" 0x84030511
+        Tag <0x40C84560 4> "ANADIG_PMU_PMU_BIAS_CTRL2" 0xFFFFFFFF
+        Tag <0x40C84020 4> "ANADIG_OSC_OSC_24M_CTRL" 0xF0000080
+        Tag <0x40C84200 4> "ANADIG_PLL_ARM_PLL_CTRL" 0xF00000A6
+        Tag <0x40C84240 4> "ANADIG_PLL_SYS_PLL2_CTRL" 0xF0000000
+        Tag <0x40C84210 4> "ANADIG_PLL_SYS_PLL3_CTRL" 0xF0000003
+        Tag <0x40C84350 4> "ANADIG_PLL_PLL_VIDEO_CTRL" 0xF0004000
