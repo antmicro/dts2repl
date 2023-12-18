@@ -1,0 +1,3 @@
+sysbus:
+    init:
+        Tag <0x4004800C 4> "SYSCTL" 0xFFFFFFFF
