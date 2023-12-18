@@ -11,4 +11,4 @@ RCC_CFGR1: Python.PythonPeripheral @ sysbus 0x46020C1C
 sysbus:
     init:
         ApplySVD @https://dl.antmicro.com/projects/renode/svd/STM32U5XX.svd.gz
-        sysbus Tag <0x46020C00 4> "RCC_CR" 0xFFFFFFFF
+        Tag <0x46020C00 4> "RCC_CR" 0xFFFFFFFF
