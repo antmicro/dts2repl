@@ -155,6 +155,7 @@
     "nxp,mcux-12b1msps-sar": "Analog.IMXRT_ADC",
     "nxp,lpc-syscon": "Python.PythonPeripheral",
     "nxp,iap-fmc55": "Python.PythonPeripheral",
+    "nxp,lpc11u6x-uart": "UART.NS16550",
 
     "renesas,rzt2m-uart": "UART.Renesas_SCI",
 
