@@ -1,3 +1,0 @@
-sysbus:
-    init:
-        Tag <0x43C81200, 0x43C81228> "bit-band_region" 0xFFFFFFFF
