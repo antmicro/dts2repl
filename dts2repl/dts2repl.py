@@ -11,6 +11,7 @@ import sys
 import json
 import tempfile
 import re
+import copy
 from collections import Counter
 from dataclasses import dataclass
 from typing import List, Set, Optional
@@ -223,6 +224,12 @@ def get_node_prop(node, prop, default=None, inherit=False):
 
 def renode_model_overlay(compat, mcu, overlays):
     model = MODELS[compat]
+    attribs = {}
+    if not (isinstance(model, str)):
+        print(model)
+        model = MODELS[compat]["type"]
+        attribs = copy.deepcopy(MODELS[compat])
+        del attribs["type"]
 
     # this hack is needed for stm32f072b_disco, as needs UART.STM32F7_USART
     # model to work properly while using the same compat strings as boards
@@ -267,7 +274,7 @@ def renode_model_overlay(compat, mcu, overlays):
     elif compat == 'arm,cortex-a72':
         compat = 'arm,cortex-a75'
 
-    return model, compat
+    return model, compat, attribs
 
 
 def get_cells(cells, n):
@@ -574,7 +581,7 @@ def can_be_memory(node):
 def get_model(node, mcu=None, overlays=tuple()):
     node_compatible = next(filter(lambda x: x in MODELS, get_node_prop(node, 'compatible', [])), None)
     if node_compatible:
-        node_model, _ = renode_model_overlay(node_compatible, mcu, overlays)
+        node_model, _, _ = renode_model_overlay(node_compatible, mcu, overlays)
         return node_model
     return None
 
@@ -653,7 +660,7 @@ def generate(args):
         name = name_mapper.get_name(node)
 
         # decide which Renode model to use
-        model, compat = renode_model_overlay(compat, mcu_compat, overlays)
+        model, compat, attribs = renode_model_overlay(compat, mcu_compat, overlays)
 
         dependencies = set()
         provides = {name}
@@ -709,6 +716,9 @@ def generate(args):
                 regions[0].address = node_reg[0]
 
         indent = []
+
+        for attr in attribs:
+            indent.append("%s: %s" % (attr, str(attribs[attr])))
 
         # additional parameters for peripherals
         if compat == "nordic,nrf-uarte":
