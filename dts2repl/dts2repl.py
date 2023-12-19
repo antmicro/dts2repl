@@ -718,7 +718,10 @@ def generate(args):
         indent = []
 
         for attr in attribs:
-            indent.append("%s: %s" % (attr, str(attribs[attr])))
+            if (isinstance(attribs[attr], str)):
+                indent.append("%s: \"%s\"" % (attr, attribs[attr]))
+            else:
+                indent.append("%s: %s" % (attr, str(attribs[attr])))
 
         # additional parameters for peripherals
         if compat == "nordic,nrf-uarte":
