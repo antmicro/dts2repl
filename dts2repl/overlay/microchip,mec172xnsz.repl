@@ -1,0 +1,9 @@
+MCHP_TMR32_0: Python.PythonPeripheral @ sysbus 0x40000C80
+    size: 0x4
+    initable: true
+    filename: "scripts/pydev/counter.py"
+
+sysbus:
+    init:
+        Tag <0x4008010C 4> "OSC_ID" 0xFFFFFFFF
+        Tag <0x40007400 4> "MCHP_RTMR_BASE" 0xFFFFFFFF
