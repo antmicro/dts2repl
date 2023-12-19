@@ -87,6 +87,7 @@
     "gpio-leds": "Miscellaneous.LED",
 
     "ingenic,jz4780-uart": "UART.NS16550",
+    "microchip,xec-uart": "UART.NS16550",
 
     "litex,clk": "Miscellaneous.LiteX_MMCM_CSR32",
     "litex,timer0": "Timers.LiteX_Timer_CSR32",
