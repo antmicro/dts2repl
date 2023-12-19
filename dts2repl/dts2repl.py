@@ -720,6 +720,11 @@ def generate(args):
         for attr in attribs:
             if (isinstance(attribs[attr], str)):
                 indent.append("%s: \"%s\"" % (attr, attribs[attr]))
+            elif (isinstance(attribs[attr], bool)):
+                if attribs[attr]:
+                    indent.append("%s: true" % (attr))
+                else:
+                    indent.append("%s: false" % (attr))
             else:
                 indent.append("%s: %s" % (attr, str(attribs[attr])))
 
