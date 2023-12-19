@@ -1,6 +1,6 @@
 sysbus:
     init:
-        ApplySVD @https://dl.antmicro.com/projects/renode/svd//DA14699.svd.gz
+        ApplySVD @https://dl.antmicro.com/projects/renode/svd/DA14699.svd.gz
         Tag <0x50000028 4> "CRG_TOP_SYS_STAT_REG" 0xFFFFFFFF
         Tag <0x50010054 4> "CRG_XTAL_XTAL32M_STAT1" 0x8
         Tag <0x50000014 4> "CRG_TOP_CLK_CTRL_REG" 0xFFFFFFFF 
