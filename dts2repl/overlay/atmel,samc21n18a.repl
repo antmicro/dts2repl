@@ -1,4 +1,4 @@
 sysbus:
     init:
-        ApplySVD @https://dl.antmicro.com/projects/renode/svd/ATSAMC21N18A.svd
+        ApplySVD @https://dl.antmicro.com/projects/renode/svd/ATSAMC21N18A.svd.gz
         Tag <0x4000100C 4> "OSCCTRL_STATUS" 0xFFFFFFFF
