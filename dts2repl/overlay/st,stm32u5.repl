@@ -12,3 +12,5 @@ sysbus:
     init:
         ApplySVD @https://dl.antmicro.com/projects/renode/svd/STM32U5XX.svd.gz
         Tag <0x46020C00 4> "RCC_CR" 0xFFFFFFFF
+        Tag <0x46020CF0 4> "RCC_BDCR" 0xFFFFFFFF
+        Tag <0x46020828 4> "PWR_DBPR" 0xFFFFFFFF
