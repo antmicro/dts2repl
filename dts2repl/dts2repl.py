@@ -774,8 +774,6 @@ def generate(args):
         # additional parameters for peripherals
         if compat == "st,stm32-lpuart":
             indent.append('frequency: 200000000')
-        if model == 'Timers.IMX_GPTimer':
-            indent.append('frequency: 32000')
         if model == 'IRQControllers.PlatformLevelInterruptController':
             # the default of 1023 matches the highest one seen in Zephyr's dts
             ndev = get_node_prop(node, 'riscv,ndev', 1023)
@@ -873,10 +871,6 @@ def generate(args):
             indent.append('size: 0x2100')
             indent.append('initable: false')
             indent.append('script: "request.value = 0x1"')
-        elif model == 'Python.PythonPeripheral' and len(attribs) == 0:
-            indent.append('size: 0x1000')
-            indent.append('initable: true')
-            indent.append('filename: "scripts/pydev/flipflop.py"')
 
         # additional parameters for CPUs
         if any(compat.startswith(x) for x in ('arm,cortex-a', 'arm,cortex-r')) and compat.count('-') == 1:
