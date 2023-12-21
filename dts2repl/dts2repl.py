@@ -226,7 +226,6 @@ def renode_model_overlay(compat, mcu, overlays):
     model = MODELS[compat]
     attribs = {}
     if not (isinstance(model, str)):
-        print(model)
         model = MODELS[compat]["type"]
         attribs = copy.deepcopy(MODELS[compat])
         del attribs["type"]
