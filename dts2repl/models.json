@@ -79,6 +79,7 @@
     "fsl,imx6q-mmdc": "Python.PythonPeripheral",
     "fsl,imx6q-uart": "UART.MxcUart",
     "fsl,imx21-uart": "UART.MxcUart",
+    "infineon,xmc4xxx-uart": "UART.XMC4XXX_UART",
 
     "gaisler,apbuart": "UART.GaislerUART",
     "gaisler,gptimer": "Timers.GaislerGPTimer",
@@ -145,7 +146,7 @@
     "nxp,imx-uart": "UART.MxcUart",
     "nxp,imx-iuart": "UART.ImxUart",
     "nxp,gpt-hw-timer": "Timers.IMX_GPTimer",
-    "nxp,kinetis-lpuart": "UART.LowPower_UART",
+    "nxp,kinetis-lpuart": "UART.Kinetis_LPUART",
     "nxp,kinetis-mcg": "Miscellaneous.K6xF_MCG",
     "nxp,kinetis-rnga": "Miscellaneous.K6xF_RNG",
     "nxp,kinetis-sim": "Miscellaneous.K6xF_SIM",
