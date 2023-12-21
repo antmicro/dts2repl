@@ -84,7 +84,7 @@
     "gaisler,apbuart": "UART.GaislerUART",
     "gaisler,gptimer": "Timers.GaislerGPTimer",
     "gaisler,irqmp": "IRQControllers.GaislerMIC",
-    "gaisler,leon3": "CPU.Sparc",
+    "gaisler,leon3": { "type": "CPU.Sparc", "cpuType": "leon3" },
 
     "gpio-leds": "Miscellaneous.LED",
 
@@ -92,7 +92,7 @@
     "microchip,xec-uart": "UART.NS16550",
 
     "litex,clk": "Miscellaneous.LiteX_MMCM_CSR32",
-    "litex,timer0": "Timers.LiteX_Timer_CSR32",
+    "litex,timer0": { "type": "Timers.LiteX_Timer_CSR32", "frequency": 100000000 },
     "litex,uart0": "UART.LiteX_UART",
 
     "memory": "Memory.MappedMemory",
@@ -122,12 +122,12 @@
     "nordic,nrf-timer": "Timers.NRF52840_Timer",
     "nordic,nrf-twi": "I2C.NRF52840_I2C",
     "nordic,nrf-uart": "UART.NRF52840_UART",
-    "nordic,nrf-uarte": "UART.NRF52840_UART",
+    "nordic,nrf-uarte": { "type": "UART.NRF52840_UART", "easyDMA": true },
     "nordic,nrf-watchdog": "Timers.NRF52840_Watchdog",
-    "nordic,nrf91-flash-controller": "Python.PythonPeripheral",
+    "nordic,nrf91-flash-controller": { "type": "Python.PythonPeripheral", "initable": true, "size": 0x1000, "filename": "scripts/pydev/rolling-bit.py" },
 
-    "ns16550": "UART.NS16550",
-    "ns16550a": "UART.NS16550",
+    "ns16550": { "type": "UART.NS16550", "wideRegisters": true },
+    "ns16550a": { "type": "UART.NS16550", "wideRegisters": true },
 
     "nvidia,tegra20-timer": "Timers.TegraUsecTimer",
     "nvidia,tegra30-timer": "Timers.TegraUsecTimer",
@@ -200,7 +200,7 @@
     "st,stm32-timers": "Timers.STM32_Timer",
     "st,stm32-uart": "UART.STM32_UART",
     "st,stm32-usart": "UART.STM32_UART",
-    "st,stm32-watchdog": "Timers.STM32_IndependentWatchdog",
+    "st,stm32-watchdog": { "type": "Timers.STM32_IndependentWatchdog", "frequency": 32000 },
     "st,stm32f0-rcc": "Python.PythonPeripheral",
     "st,stm32f1-rcc": "Python.PythonPeripheral",
     "st,stm32f3-rcc": "Python.PythonPeripheral",
@@ -220,7 +220,7 @@
     "ti,am4372-i2c": "Python.PythonPeripheral",
     "ti,am335x-timer": "Timers.OMAP_Timer",
     "ti,am4372-timer": "Timers.OMAP_Timer",
-    "ti,am4-prcm": "Python.PythonPeripheral",
+    "ti,am4-prcm": { "type": "Python.PythonPeripheral", "initable": true, "size": 0x11000, "filename": "scripts/pydev/rolling-bit.py" },
     "ti,cc13xx-cc26xx-uart": "UART.PL011",
     "ti,omap2-uart": "UART.NS16550",
     "ti,omap4-i2c": "Python.PythonPeripheral",
