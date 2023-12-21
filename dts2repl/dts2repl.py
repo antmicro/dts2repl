@@ -841,7 +841,7 @@ def generate(args):
             indent.append('size: 0x2100')
             indent.append('initable: false')
             indent.append('script: "request.value = 0x1"')
-        elif model == 'Python.PythonPeripheral':
+        elif model == 'Python.PythonPeripheral' and len(attribs) == 0:
             indent.append('size: 0x1000')
             indent.append('initable: true')
             indent.append('filename: "scripts/pydev/flipflop.py"')
