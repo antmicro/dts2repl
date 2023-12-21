@@ -729,19 +729,11 @@ def generate(args):
                 indent.append("%s: %s" % (attr, str(attribs[attr])))
 
         # additional parameters for peripherals
-        if compat == "nordic,nrf-uarte":
-            indent.append('easyDMA: true')
         if compat == "st,stm32-timers":
             indent.append('frequency: 10000000')
             indent.append('initialLimit: 0xFFFFFFFF')
         if compat == "st,stm32-lpuart":
             indent.append('frequency: 200000000')
-        if compat.startswith('litex,timer'):
-            indent.append('frequency: 100000000')
-        if compat == 'ns16550':
-            indent.append('wideRegisters: true')
-        if compat == 'st,stm32-watchdog':
-            indent.append('frequency: 32000')
         if compat == 'microchip,coreuart':
             indent.append('clockFrequency: 66000000')
         if model == 'Timers.OMAP_Timer':
@@ -775,10 +767,6 @@ def generate(args):
                 indent.append('filename: "scripts/pydev/flipflop.py"')
             else:
                 indent.append('filename: "scripts/pydev/rolling-bit.py"')
-        elif compat == 'nordic,nrf91-flash-controller':
-            indent.append('initable: true')
-            indent.append('filename: "scripts/pydev/rolling-bit.py"')
-            indent.append('size: 0x1000')
         elif compat == 'xlnx,zynq-slcr':
             indent.append('size: 0x200')
             indent.append('initable: false')
@@ -813,10 +801,6 @@ def generate(args):
             indent.append('// 0x18: cbcmr')
             indent.append('// 0x1c: cscmr1')
             indent.append('script: "request.value = {0x14: 3<<8 | 7<<10, 0x18: 2<<12, 0x1c: 0x3f}.get(request.offset, 0)"')
-        elif compat == 'ti,am4-prcm':
-            indent.append('size: 0x11000')
-            indent.append('initable: true')
-            indent.append('filename: "scripts/pydev/rolling-bit.py"')
         elif compat in ('ti,am4372-i2c', 'ti,omap4-i2c'):
             indent.append('size: 0x1000')
             indent.append('initable: false')
@@ -917,9 +901,6 @@ def generate(args):
             indent.append(f'cpuId: {name.replace("cpu", "")}')
             indent.append('genericInterruptController: gic')
             dependencies.add('gic')
-
-        if compat == 'gaisler,leon3':
-            indent.append('cpuType: "leon3"')
 
         if model == 'UART.STM32F7_USART' and compat != 'st,stm32-lpuart':
             indent.append('frequency: 200000000')
