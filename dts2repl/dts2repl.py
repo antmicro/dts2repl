@@ -1075,6 +1075,8 @@ def generate(args):
                 irq_names = ['EventInterrupt', 'ErrorInterrupt']
             elif compat in ['arm,cmsdk-uart']:
                 irq_names = ['TxInterrupt', 'RxInterrupt']
+            elif compat in ['infineon,xmc4xxx-uart']:
+                irq_names = ['TxInterrupt', 'RxInterrupt']
             elif compat in ['ambiq,stimer']:
                 irq_names = ['IRQA', 'IRQB', 'IRQC', 'IRQD', 'IRQE', 'IRQF', 'IRQG', 'IRQH', 'IRQI']
             elif compat in ['renesas,rzt2m-uart']:
