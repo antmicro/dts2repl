@@ -772,19 +772,10 @@ def generate(args):
                 indent.append("%s: %s" % (attr, str(attribs[attr])))
 
         # additional parameters for peripherals
-        if compat == "st,stm32-timers":
-            indent.append('frequency: 10000000')
-            indent.append('initialLimit: 0xFFFFFFFF')
         if compat == "st,stm32-lpuart":
             indent.append('frequency: 200000000')
-        if compat == 'microchip,coreuart':
-            indent.append('clockFrequency: 66000000')
-        if model == 'Timers.OMAP_Timer':
-            indent.append('frequency: 4000000')
         if model == 'Timers.IMX_GPTimer':
             indent.append('frequency: 32000')
-        if model == 'Timers.Marvell_Armada_Timer':
-            indent.append('frequency: 100000000')
         if model == 'IRQControllers.PlatformLevelInterruptController':
             # the default of 1023 matches the highest one seen in Zephyr's dts
             ndev = get_node_prop(node, 'riscv,ndev', 1023)
@@ -796,8 +787,6 @@ def generate(args):
                 indent.append('frequency: 20000000')
             else:
                 indent.append('frequency: 62500000')
-        if model == 'Timers.ARM_PrivateTimer':
-            indent.append('frequency: 667000000')
         if model == 'Miscellaneous.STM32L0_RCC':
             indent.append('systick: nvic')
             dependencies.add('nvic')
