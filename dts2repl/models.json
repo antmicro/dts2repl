@@ -22,6 +22,7 @@
     "arm,cortex-m0+": "CPU.CortexM",
     "arm,cortex-m1": "CPU.CortexM",
     "arm,cortex-m3": "CPU.CortexM",
+    "arm,cortex-m55": "CPU.CortexM",    
     "arm,cortex-m33": "CPU.CortexM",
     "arm,cortex-m33f": "CPU.CortexM",
     "arm,cortex-m4": "CPU.CortexM",
