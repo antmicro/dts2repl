@@ -1,5 +1,6 @@
 {
     "zephyr,memory-region": "Memory.MappedMemory",
+    "serial-flash": "Memory.MappedMemory",
 
     "ambiq,stimer": "Timers.AmbiqApollo4_SystemTimer",
     "ambiq,counter": "Timers.AmbiqApollo4_Timer",
