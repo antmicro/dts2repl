@@ -187,6 +187,7 @@
     "silabs,gecko-burtc": "Timers.EFR32xG2_BURTC",
 
     "snps,dw-apb-uart": "UART.NS16550",
+    "nuvoton,numaker-uart": "UART.NS16550",
 
     "soc-nv-flash": "Memory.MappedMemory",
 
