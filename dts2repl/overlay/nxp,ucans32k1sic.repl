@@ -1,0 +1,8 @@
+clock: Python.PythonPeripheral @ sysbus 0x40064000
+    size: 0x1000
+    initable: true
+    filename: "scripts/pydev/flipflop.py"
+
+sysbus:
+    init:
+        Tag <0x40052000 0x4> "wdog" 0xffffffff
