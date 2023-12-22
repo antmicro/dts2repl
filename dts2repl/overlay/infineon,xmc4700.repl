@@ -3,6 +3,11 @@ SCU_PLL_PLLSTAT: Python.PythonPeripheral @ sysbus 0x50004710
     initable: true
     filename: "scripts/pydev/flipflop.py"
 
+SCU_RESET_PRSTAT0: Python.PythonPeripheral @ sysbus 0x5000440C
+    size: 0x4
+    initable: true
+    filename: "scripts/pydev/flipflop.py"
+
 sysbus:
     init:
         ApplySVD @https://dl.antmicro.com/projects/renode/svd/XMC4700.svd.gz
