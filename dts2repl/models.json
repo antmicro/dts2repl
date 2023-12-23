@@ -219,6 +219,8 @@
 
     "quicklogic,eos-s3-usbserial": "UART.USBSerialPort_S3B",
     "quicklogic,usbserialport-s3b": "UART.USBSerialPort_S3B",
+    
+    "renesas,rcar-scif": "UART.RCAR_UART",
 
     "ti,am4372-i2c": "Python.PythonPeripheral",
     "ti,am335x-timer": { "type": "Timers.OMAP_Timer", "frequency": 4000000 },
