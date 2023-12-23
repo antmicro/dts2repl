@@ -8,18 +8,12 @@ hfxoStatus: Python.PythonPeripheral @ sysbus 0x5000c058
     initable: true
     filename: "scripts/pydev/flipflop.py"
 
-cmuSysClkStr: Python.PythonPeripheral @ sysbus 0x50008070
-    size: 0x4
-    initable: true
-    script: "request.value = 0x1"
-
 emuVscaleEm: Python.PythonPeripheral @ sysbus 0x50004084
     size: 0x4
     initable: true
     filename: "scripts/pydev/rolling-bit.py"
 
-cmuEm4GrpAClkCtrl: Python.PythonPeripheral @ sysbus 0x50008160
-    size: 0x4
-    initable: true
-    script: "request.value = 0x2"
-
+sysbus:
+    init:
+        Tag <0x50008070 4> "cmuSysClkStr" 0x1
+        Tag <0x50008160 4> "cmuEm4GrpAClkCtrl" 0x2
