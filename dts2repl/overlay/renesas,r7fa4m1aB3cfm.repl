@@ -1,4 +1,4 @@
-uart: SCI.RenesasRA6M5_SCI @ sysbus 0x40070040
+uart2: SCI.RenesasRA6M5_SCI @ sysbus 0x40070040
     frequency: 10000000
     enableManchesterMode: false
     enableFIFO: false
