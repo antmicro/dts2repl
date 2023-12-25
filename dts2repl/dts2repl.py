@@ -976,7 +976,11 @@ def generate(args):
 
         if model.startswith('Timers'):
             if 'cc-num' in node.props:
-                indent.append(f'numberOfEvents: {str(get_node_prop(node, "cc-num"))}')
+                count = str(get_node_prop(node, "cc-num"))
+                # hack for NRF52840
+                if count == "8" and model == "Timers.NRF52840_Timer":
+                    count = "6"
+                indent.append(f'numberOfEvents: {count}')
         if model.startswith('Memory'):
             if 'reg' in node.props:
                 _, size = next(get_reg(node))
