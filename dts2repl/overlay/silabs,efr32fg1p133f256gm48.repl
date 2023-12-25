@@ -1,0 +1,10 @@
+CMU_STATUS: Python.PythonPeripheral @ sysbus 0x400E4090
+    size: 4
+    initable: true
+    filename: "scripts/pydev/flipflop.py"
+
+sysbus:
+    init:
+        Tag <0x43C81208 4> "CMU_OSC_UNKNOWN" 0xFFFFFFFF
+        Tag <0x43C8120C 4> "CMU_OSC_UNKNOWN2" 0xFFFFFFFF
+#        ApplySVD @https://github.com/smile-e3/mcu_cmsis_svd/raw/main/SiliconLabs/Series1/EFR32FG1P/EFR32FG1P133F256GM48.svd
