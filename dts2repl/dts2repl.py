@@ -880,7 +880,10 @@ def generate(args):
             indent.append('cpuType: "cortex-a9"')
         if compat.startswith('arm,cortex-m'):
             cpu = compat.split(',')[1]
-            if cpu == 'cortex-m33f':
+            # temporary hack for cortex-m55
+            if cpu == 'cortex-m55':
+                cpu = "cortex-m33"
+            elif cpu == 'cortex-m33f':
                 cpu = cpu[:-1]
             indent.append(f'cpuType: "{cpu}"')
             indent.append('nvic: nvic')
