@@ -12,8 +12,7 @@ sysbus:
         WriteDoubleWord 0x2014000 0x4770 # bx lr
         WriteDoubleWord 0x2015000 0x4770 # bx lr
         Machine CreateVirtualConsole "uart"
-        // python "def putc(cpu,_): monitor.Machine['sysbus.uart'].DisplayChar(cpu.GetRegisterUnsafe(1).RawValue)"
-        // python "cpu=monitor.Machine['sysbus.cpu0'];cpu.AddHook(0x2014000,putc)"
-        // GetCPUs[0] AddHook 0x2014000 "console = monitor.Machine['sysbus.uart'];cpu.GetRegisterUnsafe(1).RawValue"
 
-              
+cpu0:
+    init:
+        AddHook 0x2014000 "console = monitor.Machine['sysbus.uart'];cpu.GetRegisterUnsafe(1).RawValue"
