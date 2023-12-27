@@ -11,7 +11,7 @@ sysbus:
         WriteDoubleWord 0x2013000 0x4770 # bx lr
         WriteDoubleWord 0x2014000 0x4770 # bx lr
         WriteDoubleWord 0x2015000 0x4770 # bx lr
-        Machine CreateVirtualConsole "uart"
+        Machine CreateVirtualConsole "uart0"
 
 cpu0:
     init:
