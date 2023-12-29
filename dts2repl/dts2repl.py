@@ -253,7 +253,7 @@ def get_node_prop(node, prop, default=None, inherit=False):
     elif prop in ('interrupts', 'reg', 'ranges'):
         val = val.to_nums()
     elif prop in ('#address-cells', '#size-cells', '#interrupt-cells', 'cc-num', 'clock-frequency',
-                  'riscv,ndev'):
+                  'riscv,ndev', 'vref-mv'):
         val = val.to_num()
     elif prop in ('interrupt-parent',):
         val = val.to_node()
@@ -295,6 +295,16 @@ def renode_model_overlay(compat, mcu, overlays):
                 model = 'Miscellaneous.STM32L0_RCC'
             else:
                 model = 'Miscellaneous.STM32F4_RCC'
+
+    if compat == 'st,stm32-adc':
+        if 'st,stm32c0' in overlays:
+            model = 'Analog.STM32C0_ADC'
+        if 'st,stm32f0' in overlays:
+            model = 'Analog.STM32F0_ADC'
+        if 'st,stm32g0' in overlays:
+            model = 'Analog.STM32G0_ADC'
+        if 'st,stm32l0' in overlays:
+            model = 'Analog.STM32L0_ADC'
 
     if compat == 'st,stm32-gpio' and 'st,stm32f1' in overlays:
         model = 'GPIOPort.STM32F1GPIOPort'
@@ -772,6 +782,10 @@ def generate(args):
                 indent.append("%s: %s" % (attr, str(attribs[attr])))
 
         # additional parameters for peripherals
+        if model in ['Analog.STM32C0_ADC', 'Analog.STM32F0_ADC', 'Analog.STM32G0_ADC', 'Analog.STM32L0_ADC']:
+            vref = get_node_prop(node, 'vref-mv', 3300) / 1000
+            indent.append(f'referenceVoltage: {vref}')
+            indent.append('externalEventFrequency: 1000')
         if compat == "st,stm32-lpuart":
             indent.append('frequency: 200000000')
         if model == 'IRQControllers.PlatformLevelInterruptController':
