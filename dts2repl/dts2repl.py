@@ -715,7 +715,7 @@ def generate(args):
                     ['stm32-gpio', 'stm32-timers', 'silabs,gecko', 'gaisler,irqmp',
                      'gaisler,gptimer', 'gaisler,apbuart', 'xlnx,xuartps']))
                 or any(map(lambda x: x in model, 
-                    ['UART.STM32_UART', 'UART.TrivialUart']))
+                    ['UART.STM32_UART']))
             ):
                 # sized sysbus registration for peripherals that require an explicit size
                 _, size = next(get_reg(node))
@@ -989,7 +989,7 @@ def generate(args):
                 irq_dest_nodes[i] = mcu
 
         # assign IRQ signals (but not when using TrivialUart or PythonPeripheral)
-        if irq_dest_nodes and model not in ('UART.TrivialUart', 'Python.PythonPeripheral'):
+        if irq_dest_nodes and model != 'Python.PythonPeripheral':
             # decide which IRQ names to use in Renode model
             if compat == 'st,stm32-rtc':
                 irq_names = ['AlarmIRQ']
