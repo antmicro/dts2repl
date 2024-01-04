@@ -281,14 +281,12 @@ def renode_model_overlay(compat, mcu, overlays):
 
     if model is None:
         if "type" in MODELS[compat].keys():
-            print("Detected types in ", MODELS[compat])
             model = MODELS[compat]["type"]
             attribs = copy.deepcopy(MODELS[compat])
             del attribs["type"]
         else:
             for entry in MODELS[compat]:
                 for subentry in entry.split("|"):
-                    print("iterating over subentry ", subentry)
                     if subentry == "_" or subentry in overlays:
                         if model is None:
                             if isinstance(MODELS[compat][entry], str):
@@ -299,7 +297,6 @@ def renode_model_overlay(compat, mcu, overlays):
                                 del attribs["type"]
                             else:
                                 model = MODELS[compat][entry]
-                            print("setting model to ",model, " subentry was ", subentry)
                         break
     
     return model, compat, attribs
@@ -688,10 +685,8 @@ def generate(args):
         name = name_mapper.get_name(node)
 
         # decide which Renode model to use
-        print("overlays = ", overlays, " compat = ", compat," mcu_compat = ", mcu_compat)
         model, compat, attribs = renode_model_overlay(compat, mcu_compat, overlays)
         model = str(model)
-        print("model = ", model, " compat = ", compat, " attribs = ", attribs);
 
         dependencies = set()
         provides = {name}
