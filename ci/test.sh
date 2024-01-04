@@ -13,7 +13,7 @@ cd ci-output
 # diff returns 0 on no difference which we use to delete diff files if the
 # generated repl is identical (+/- blank lines) to the dashboard one
 cd repls/diffs
-ls -1 ../generated | parallel 'diff -u --new-file --ignore-blank-lines "../dashboard/{}" "../generated/{}" > "{}" && rm "{}" || true'
+ls -1 ../generated | parallel 'diff -u --new-file --ignore-blank-lines "../dashboard/{}" "../generated/{}" > "{}.diff" && rm "{}.diff" || true'
 # Print diffs to job output
 # tail is used to prefix each file with its name, -n+3 will display the diff
 # skipping the ---/+++ header

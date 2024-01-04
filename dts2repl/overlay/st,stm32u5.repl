@@ -3,14 +3,11 @@ PWR_VOSR: Python.PythonPeripheral @ sysbus 0x4602080C
     initable: true
     filename: "scripts/pydev/flipflop.py"
 
-RCC_CFGR1: Python.PythonPeripheral @ sysbus 0x46020C1C
-    size: 0x4
-    initable: true
-    filename: "scripts/pydev/flipflop.py"
-
 sysbus:
     init:
         ApplySVD @https://dl.antmicro.com/projects/renode/svd/STM32U5XX.svd.gz
+        Unregister "sysbus.rcc"
+        Machine PyDevFromFile @scripts/pydev/flipflop.py 0x46020C1C 0x4 True "RCC_CFGR1"
         Tag <0x46020C00 4> "RCC_CR" 0xFFFFFFFF
         Tag <0x46020CF0 4> "RCC_BDCR" 0xFFFFFFFF
         Tag <0x46020828 4> "PWR_DBPR" 0xFFFFFFFF

@@ -18,6 +18,12 @@ from typing import List, Set, Optional
 import itertools
 from dts2repl import dtlib, name
 
+class hexnum:
+    def __init__(self, value):
+        self.value = value
+    def __str__(self):
+        return hex(self.value)
+
 # code from json module, modified to support hexadecimal values
 # license: MIT
 class ImprovedJsonDecoder(json.JSONDecoder):
@@ -57,7 +63,7 @@ class ImprovedJsonDecoder(json.JSONDecoder):
                 if (string[idx:idx+2]  == "0x"):
                    m = self.HEX_RE.match(string, idx)
                    integer = m.groups()[0]
-                   res = self.parse_int(integer, 16)
+                   res = hexnum(self.parse_int(integer, 16))
                 else:  
                    res = self.parse_int(integer)
             return res, m.end()
@@ -267,56 +273,35 @@ def get_node_prop(node, prop, default=None, inherit=False):
     return val
 
 def renode_model_overlay(compat, mcu, overlays):
-    model = MODELS[compat]
-    attribs = {}
-    if not (isinstance(model, str)):
-        model = MODELS[compat]["type"]
-        attribs = copy.deepcopy(MODELS[compat])
-        del attribs["type"]
-
-    # this hack is needed for stm32f072b_disco, as needs UART.STM32F7_USART
-    # model to work properly while using the same compat strings as boards
-    # which require UART.STM32_UART model
-    if compat == "st,stm32-usart" and mcu in ("arm,cortex-m0", "arm,cortex-m7", "arm,cortex-m33"):
-        compat = "st,stm32-lpuart"
+    model = None
+    if isinstance(MODELS[compat], str):
         model = MODELS[compat]
 
-    # compat-based mapping of peripheral models for the following SoCs is not enough
-    # as there are ifdefs in the driver; adding a manual map for now as a workaround
-    if any(x in overlays for x in ('st,stm32f3', 'st,stm32g0', 'st,stm32g4', 'st,stm32l4', 'st,stm32wl', 'st,stm32l0')):
-        if compat in ("st,stm32-uart", "st,stm32-usart"):
-            compat = "st,stm32-lpuart"
-            model = MODELS[compat]
+    attribs = {}
 
-        if compat == "st,stm32-rcc":
-            if any(map(lambda x: x in overlays, ('st,stm32g0', 'st,stm32g4', 'st,stm32l4'))):
-                model = 'Python.PythonPeripheral'
-            elif 'st,stm32l0' in overlays:
-                model = 'Miscellaneous.STM32L0_RCC'
-            else:
-                model = 'Miscellaneous.STM32F4_RCC'
-
-    if compat == 'st,stm32-gpio' and 'st,stm32f1' in overlays:
-        model = 'GPIOPort.STM32F1GPIOPort'
-
-    if compat == "atmel,sam0-uart" and 'atmel,samd20' in overlays:
-        model = 'UART.SAMD20_UART'
-
-    # LiteX on Fomu is built in the 8-bit CSR data width configuration
-    if compat == "litex,timer0" and "fomu" in overlays:
-        model = 'Timers.LiteX_Timer'
-
-    # EFR32xG22 USART uses different offsets, but the compatible is identical to EFR32xG12 USART
-    # The HAL uses compile-time defines to choose the right register layout
-    if compat == 'silabs,gecko-usart' and any(overlay in overlays for overlay in ['silabs,efr32bg22', 'silabs,efr32mg24', 'silabs,efr32mg21', 'silabs,efr32bg27']):
-        model = 'UART.EFR32xG22_USART'
-
-    # remap some core types to the closest supported equivalent
-    if compat in ('arm,armv8', 'arm,cortex-a57'):
-        compat = 'arm,cortex-a53'
-    elif compat == 'arm,cortex-a72':
-        compat = 'arm,cortex-a75'
-
+    if model is None:
+        if "type" in MODELS[compat].keys():
+            print("Detected types in ", MODELS[compat])
+            model = MODELS[compat]["type"]
+            attribs = copy.deepcopy(MODELS[compat])
+            del attribs["type"]
+        else:
+            for entry in MODELS[compat]:
+                for subentry in entry.split("|"):
+                    print("iterating over subentry ", subentry)
+                    if subentry == "_" or subentry in overlays:
+                        if model is None:
+                            if isinstance(MODELS[compat][entry], str):
+                                model = MODELS[compat][entry]
+                            elif "type" in MODELS[compat][entry].keys():
+                                model = MODELS[compat][entry]["type"]
+                                attribs = copy.deepcopy(MODELS[compat][entry])
+                                del attribs["type"]
+                            else:
+                                model = MODELS[compat][entry]
+                            print("setting model to ",model, " subentry was ", subentry)
+                        break
+    
     return model, compat, attribs
 
 
@@ -703,7 +688,10 @@ def generate(args):
         name = name_mapper.get_name(node)
 
         # decide which Renode model to use
+        print("overlays = ", overlays, " compat = ", compat," mcu_compat = ", mcu_compat)
         model, compat, attribs = renode_model_overlay(compat, mcu_compat, overlays)
+        model = str(model)
+        print("model = ", model, " compat = ", compat, " attribs = ", attribs);
 
         dependencies = set()
         provides = {name}
@@ -719,6 +707,10 @@ def generate(args):
                 # weird mismatch, need to investigate, manually patching for now
                 addr &= ~0x100
 
+            # hack for x86/ioport
+            if model == 'UART.NS16550' and addr == 0x3f8:
+                addr += 0xE0000000
+                
             if model == 'Timers.TegraUsecTimer':
                 # the microsecond timer is at offset 0x10 from the base of the timer block
                 addr += 0x10
@@ -772,36 +764,16 @@ def generate(args):
                 indent.append("%s: %s" % (attr, str(attribs[attr])))
 
         # additional parameters for peripherals
-        if compat == "st,stm32-lpuart":
-            indent.append('frequency: 200000000')
         if model == 'IRQControllers.PlatformLevelInterruptController':
             # the default of 1023 matches the highest one seen in Zephyr's dts
             ndev = get_node_prop(node, 'riscv,ndev', 1023)
             indent.append(f'numberOfSources: {ndev}')
-            indent.append('numberOfContexts: 9')
-            indent.append('prioritiesEnabled: true')
-        if model == 'Timers.ARM_GenericTimer':
-            if 'renesas,rzt2m_starter_kit' in overlays:
-                indent.append('frequency: 20000000')
-            else:
-                indent.append('frequency: 62500000')
         if model == 'Miscellaneous.STM32L0_RCC':
             indent.append('systick: nvic')
             dependencies.add('nvic')
 
         # additional parameters for python peripherals
-        if compat.startswith("st,stm32") and compat.endswith("rcc") and model == "Python.PythonPeripheral":
-            indent.append('size: 0x400')
-            indent.append('initable: true')
-            if any(map(lambda x: x in overlays, ('st,stm32l4', 'st,stm32g4', 'st,stm32wl'))):
-                indent.append('filename: "scripts/pydev/flipflop.py"')
-            else:
-                indent.append('filename: "scripts/pydev/rolling-bit.py"')
-        elif compat == 'xlnx,zynq-slcr':
-            indent.append('size: 0x200')
-            indent.append('initable: false')
-            indent.append('script: "request.value = {0x100: 0x0001A008, 0x120: 0x1F000400, 0x124: 0x18400003}.get(request.offset, 0)"')
-        elif compat.startswith('fsl,imx6') and compat.endswith('-anatop'):
+        if compat.startswith('fsl,imx6') and compat.endswith('-anatop'):
             indent.append('size: 0x1000')
             indent.append('initable: false')
             indent.append('// 0x10: usb1_pll_480_ctrl')
@@ -819,11 +791,6 @@ def generate(args):
             indent.append('// 0x18: misc')
             indent.append('// these settings mean 256 MB of DRAM')
             indent.append('script: "request.value = {0x0: 0x4000000, 0x18: 0x0}.get(request.offset, 0)"')
-        elif compat.startswith('fsl,imx') and compat.endswith('-fec'):
-            indent.append('size: 0x4000')
-            indent.append('initable: false')
-            indent.append('// 0x4: ievent')
-            indent.append('script: "request.value = {0x4: 0x800000}.get(request.offset, 0)"')
         elif compat.startswith('fsl,imx') and compat.endswith('-ccm'):
             indent.append('size: 0x4000')
             indent.append('initable: false')
@@ -831,32 +798,12 @@ def generate(args):
             indent.append('// 0x18: cbcmr')
             indent.append('// 0x1c: cscmr1')
             indent.append('script: "request.value = {0x14: 3<<8 | 7<<10, 0x18: 2<<12, 0x1c: 0x3f}.get(request.offset, 0)"')
-        elif compat in ('ti,am4372-i2c', 'ti,omap4-i2c'):
-            indent.append('size: 0x1000')
-            indent.append('initable: false')
-            indent.append('script: "request.value = 1"')
         elif compat == 'marvell,mbus-controller':
             indent.append('size: 0x200')
             indent.append('initable: false')
             indent.append('// 0x180: win_bar')
             indent.append('// 0x184: win_sz')
             indent.append('script: "request.value = {0x180: 0x0, 0x184: 0xf000001}.get(request.offset, 0)"')
-        elif compat.startswith('marvell,armada') and compat.endswith('-nand-controller'):
-            indent.append('size: 0x100')
-            indent.append('initable: false')
-            indent.append('script: "request.value = 0xffffffe1"')
-        elif compat.startswith('marvell,mv') and compat.endswith('-i2c'):
-            indent.append('size: 0x100')
-            indent.append('initable: false')
-            indent.append('script: "request.value = 0xf8"')
-        elif compat == 'nvidia,tegra210-mc':
-            indent.append('size: 0x1000')
-            indent.append('initable: false')
-            indent.append('script: "request.value = 0x400"')  # report 1024 MiB, 512 gets reserved as carveout
-        elif compat == 'nvidia,tegra210-i2c':
-            indent.append('size: 0x100')
-            indent.append('initable: false')
-            indent.append('script: "request.value = 8<<4 | 1"')
         elif compat == 'xlnx,zynqmp-ipi-mailbox':
             # the address of the Xilinx ZynqMP IPI mailbox is defined in its child node
             for child in node.nodes.values():
@@ -867,28 +814,12 @@ def generate(args):
             indent.append('size: 0x1000')
             indent.append('initable: false')
             indent.append('script: "request.value = {0x24: 0x10000, 0x1e4: 0x10000}.get(request.offset, 0)"')
-        elif compat == 'brcm,iproc-pcie-ep':
-            indent.append('size: 0x2100')
-            indent.append('initable: false')
-            indent.append('script: "request.value = 0x1"')
 
-        # additional parameters for CPUs
-        if any(compat.startswith(x) for x in ('arm,cortex-a', 'arm,cortex-r')) and compat.count('-') == 1:
-            cpu = compat.split(',')[1]
-            indent.append(f'cpuType: "{cpu}"')
-        if compat == 'marvell,sheeva-v7':
-            indent.append('cpuType: "cortex-a9"')
         if compat.startswith('arm,cortex-m'):
-            cpu = compat.split(',')[1]
-            # temporary hack for cortex-m55
-            if cpu == 'cortex-m55':
-                cpu = "cortex-m33"
-            elif cpu == 'cortex-m33f':
-                cpu = cpu[:-1]
-            indent.append(f'cpuType: "{cpu}"')
             indent.append('nvic: nvic')
             dependencies.add('nvic')
             overlays.add('cortex-m')
+        
         if model == 'CPU.RiscV32':  # We use CPU.RiscV32 as a generic model for all RV CPUs and fix it up here
             isa = get_node_prop(node, 'riscv,isa', 'rv32imac')
             indent.append(f'cpuType: "{isa}"')
@@ -930,9 +861,6 @@ def generate(args):
             indent.append(f'cpuId: {name.replace("cpu", "")}')
             indent.append('genericInterruptController: gic')
             dependencies.add('gic')
-
-        if model == 'UART.STM32F7_USART' and compat != 'st,stm32-lpuart':
-            indent.append('frequency: 200000000')
 
         # additional parameters for STM32F4_RCC
         if model == 'Miscellaneous.STM32F4_RCC':
@@ -1030,8 +958,6 @@ def generate(args):
             blocks.append(combiner)
             indent.append(f'[0, 1] -> {combiner_name}@[0, 1]')
             dependencies.add('cpu0')
-            if 'renesas,rzt2m-soc' in overlays:
-                indent.append('supportsTwoSecurityStates: false')
         elif compat == 'gaisler,irqmp':
             indent.append('0 -> cpu0@0 | cpu0@1 | cpu0@2')
             dependencies.add('cpu0')
