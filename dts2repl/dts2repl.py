@@ -996,6 +996,8 @@ def generate(args):
             elif (compat in ['nxp,kinetis-lpuart', 'nxp,kinetis-uart', 'silabs,gecko-leuart', 'sifive,uart0', 'st,stm32-adc']
                 or model in ['UART.STM32F7_USART', 'SPI.STM32SPI']):
                 irq_names = ['IRQ']
+            elif (compat in ['nuvoton,npcx-uart']):
+                irq_names = ['IRQ', 'DMAReceive']
             elif compat in ['silabs,gecko-uart', 'silabs,gecko-usart']:
                 irq_names = ['ReceiveIRQ', 'TransmitIRQ']
             elif compat in ['gaisler,gptimer', 'ambiq,counter']:
