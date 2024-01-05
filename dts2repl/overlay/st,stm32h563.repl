@@ -1,0 +1,4 @@
+sysbus:
+    init:
+        ApplyVD @https://dl.antmicro.com/projects/renode/svd/STM32H563.svd.gz
+        Tag <0x44020824 4> "PWR_DBPCR" 0xFFFFFFFF
