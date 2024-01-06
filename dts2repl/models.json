@@ -156,7 +156,7 @@
     "nxp,imx-uart": "UART.MxcUart",
     "nxp,imx-iuart": "UART.MxcUart",
     "nxp,gpt-hw-timer": "Timers.IMX_GPTimer",
-    "nxp,kinetis-lpuart": { "nxp,k6x": { "type": "UART.Kinetis_LPUART", "hasGlobalRegisters": false }, "_" : "UART.Kinetis_LPUART" },
+    "nxp,kinetis-lpuart": { "nxp,k6x|nxp,k8x": { "type": "UART.Kinetis_LPUART", "hasGlobalRegisters": false }, "_" : "UART.Kinetis_LPUART" },
     "nxp,kinetis-mcg": "Miscellaneous.K6xF_MCG",
     "nxp,kinetis-rnga": "Miscellaneous.K6xF_RNG",
     "nxp,kinetis-sim": "Miscellaneous.K6xF_SIM",
