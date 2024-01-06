@@ -181,6 +181,7 @@
     "starfive,jh7100-clint": "IRQControllers.CoreLevelInterruptor",
     "riscv,sifive-e31": "CPU.RiscV32",
     "sifive,e31": "CPU.RiscV32",
+    "neorv32-cpu": "CPU.RiscV32",
 
     "sifive,dtim0": "Memory.MappedMemory",
     "sifive,gpio0": "GPIOPort.SiFive_GPIO",
