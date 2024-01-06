@@ -5,5 +5,5 @@ CMU_STATUS: Python.PythonPeripheral @ sysbus 0x400E4090
 
 sysbus:
     init:
-        ApplySVD @https://dl.antmicro.com/projects/renode/svd/EFM32PG1B200F256GM48.svd
+        ApplySVD @https://dl.antmicro.com/projects/renode/svd/EFM32PG1B200F256GM48.svd.gz
         Tag <0x43C81200 0x30> "CMU_UNKNOWN1" 0xFFFFFFFF
