@@ -155,6 +155,7 @@
     "nxp,imx-sys-bus": "Memory.MappedMemory",
     "nxp,imx-uart": "UART.MxcUart",
     "nxp,imx-iuart": "UART.MxcUart",
+    "nxp,kinetis-lpsci": "UART.ImxUart",
     "nxp,gpt-hw-timer": "Timers.IMX_GPTimer",
     "nxp,kinetis-lpuart": { "nxp,k6x|nxp,k8x": { "type": "UART.Kinetis_LPUART", "hasGlobalRegisters": false }, "_" : "UART.Kinetis_LPUART" },
     "nxp,kinetis-mcg": "Miscellaneous.K6xF_MCG",
