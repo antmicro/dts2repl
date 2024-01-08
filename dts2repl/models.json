@@ -144,7 +144,7 @@
     "nvidia,tegra20-uart": "UART.NS16550",
     "nvidia,tegra210-mc": { "type": "Python.PythonPeripheral", "size": 0x1000, "initable": false, "script": "request.value = 0x400" },
     "nvidia,tegra210-i2c": { "type": "Python.PythonPeripheral", "size": 0x100, "initable": false, "script": "request.value = 8<<4 | 1" },
-    
+
     "renesas,smartbond-uart": "UART.SmartbondUART",
 
     "nxp,flexpwm": "Timers.IMXRT_PWM",
@@ -239,7 +239,7 @@
 
     "quicklogic,eos-s3-usbserial": "UART.USBSerialPort_S3B",
     "quicklogic,usbserialport-s3b": "UART.USBSerialPort_S3B",
-    
+
     "renesas,rcar-scif": "UART.RCAR_UART",
 
     "ti,am4372-i2c": { "type": "Python.PythonPeripheral", "size": 0x1000, "initable": false, "script": "request.value = 0x1" },
