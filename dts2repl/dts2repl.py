@@ -826,7 +826,7 @@ def generate(args):
             # Use CPU.VexRiscv for LiteX and Fomu
             if set(platform) & {'litex,vexriscv', 'kosagi,fomu'}:
                 model = 'CPU.VexRiscv'
-            elif is_andes:
+            elif is_andes or compat == "nuclei,bumblebee" or compat == "neorv32-cpu":
                 indent.append('timeProvider: empty')
             else:
                 indent.append('timeProvider: clint')
