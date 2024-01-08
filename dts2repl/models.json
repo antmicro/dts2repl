@@ -121,6 +121,8 @@
     "microchip,coreuart": { "type": "UART.MiV_CoreUART", "clockFrequency": 66000000 },
     "microchip,mpfs-gpio": "GPIOPort.MPFS_GPIO",
 
+    "nuclei,bumblebee": "CPU.RiscV32",
+
     "nordic,nrf-clock": "Miscellaneous.NRF52840_CLOCK",
     "nordic,nrf-ecb": "Miscellaneous.NRF52840_ECB",
     "nordic,nrf-gpio": "GPIOPort.NRF52840_GPIO",
