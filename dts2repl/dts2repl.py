@@ -755,9 +755,6 @@ def generate(args):
                 break
             else:
                 logging.info(f'ZynqMP mailbox has no children: {node}')
-            indent.append('size: 0x1000')
-            indent.append('initable: false')
-            indent.append('script: "request.value = {0x24: 0x10000, 0x1e4: 0x10000}.get(request.offset, 0)"')
 
         if compat.startswith('arm,cortex-m'):
             indent.append('nvic: nvic')
