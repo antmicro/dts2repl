@@ -1185,7 +1185,7 @@ def generate_peripherals(filename, overlays, type, get_snippets=False):
         compat = get_node_prop(node, 'compatible')[0]
 
         if compat in MODELS:
-            model, compat = renode_model_overlay(compat, mcu, overlays)
+            model, compat, _ = renode_model_overlay(compat, mcu, overlays)
         else:
             model = ''
 
@@ -1260,7 +1260,7 @@ def generate_bus_sensors(filename, overlays, type):
             compat = compats[0]
             if compat in MODELS:
                 mcu = get_mcu_compat(filename)
-                model, compat = renode_model_overlay(compat, mcu, overlays)
+                model, compat, _ = renode_model_overlay(compat, mcu, overlays)
             else:
                 model = ''
 
