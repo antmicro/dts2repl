@@ -3,8 +3,10 @@ CMU_STATUS: Python.PythonPeripheral @ sysbus 0x400E4090
     initable: true
     filename: "scripts/pydev/flipflop.py"
 
+bitband_peripherals: Miscellaneous.BitBanding @ sysbus <0x42000000, +0x2000000>
+    peripheralBase: 0x40000000
+
 sysbus:
     init:
         ApplySVD @https://dl.antmicro.com/projects/renode/svd/EFR32FG1P133F256GM48.svd.gz
-        Tag <0x43C81208 4> "CMU_OSC_UNKNOWN" 0xFFFFFFFF
-        Tag <0x43C8120C 4> "CMU_OSC_UNKNOWN2" 0xFFFFFFFF
+
