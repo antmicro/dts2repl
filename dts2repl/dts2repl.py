@@ -19,7 +19,10 @@ import itertools
 from dts2repl import dtlib, name
 from dts2repl.improved_json_decoder import ImprovedJsonDecoder
 
-with open(f'{pathlib.Path(__file__).parent.resolve()}/models.json') as f:
+def get_models_path() -> Path:
+    return pathlib.Path(__file__).parent.resolve() / "models.json"
+
+with open(get_models_path()) as f:
     MODELS = json.load(f, cls=ImprovedJsonDecoder)
 
 def parse_args():
