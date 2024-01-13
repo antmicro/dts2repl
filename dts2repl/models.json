@@ -129,6 +129,7 @@
     "microchip,mpfs-gpio": "GPIOPort.MPFS_GPIO",
 
     "nuclei,bumblebee": "CPU.RiscV32",
+    "espressif,riscv": "CPU.RiscV32",
     
     "neorv-sysinfo": { "type": "Python.PythonPeripheral", "size": 0x20, "initable": false, "script": "request.value = 0xFFFFFFFF" },
 
