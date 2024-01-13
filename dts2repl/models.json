@@ -32,6 +32,7 @@
     "arm,cortex-m7": { "type": "CPU.CortexM", "cpuType": "cortex-m7" },
     "arm,cortex-r5": { "type": "CPU.ARMv7R", "cpuType": "cortex-r5" },
     "arm,cortex-r5f": { "type": "CPU.ARMv7R", "cpuType": "cortex-r5f" },
+    "arm,cortex-r7": { "type": "CPU.ARMv7R", "cpuType": "cortex-r8" },
     "arm,cortex-r8": { "type": "CPU.ARMv7R", "cpuType": "cortex-r8" },
 
     "arm,cortex-a9-twd-timer": { "type": "Timers.ARM_PrivateTimer", "frequency": 667000000 },
@@ -128,6 +129,8 @@
     "microchip,mpfs-gpio": "GPIOPort.MPFS_GPIO",
 
     "nuclei,bumblebee": "CPU.RiscV32",
+    
+    "neorv-sysinfo": { "type": "Python.PythonPeripheral", "size": 0x20, "initable": false, "script": "request.value = 0xFFFFFFFF" },
 
     "nordic,nrf-clock": "Miscellaneous.NRF52840_CLOCK",
     "nordic,nrf-ecb": "Miscellaneous.NRF52840_ECB",
