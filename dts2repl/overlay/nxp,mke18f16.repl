@@ -1,4 +1,5 @@
-SCG_CSR: Python.PythonPeripheral @ sysbus <0x40064010,+0x4>
+SCG_CSR: Python.PythonPeripheral @ sysbus 0x40064010
+    size: 0x4
     initable: true
     script: '''
 if request.isInit: lastVal = None
