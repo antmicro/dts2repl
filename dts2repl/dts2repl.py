@@ -948,6 +948,8 @@ def generate(args):
                 irq_names = ['ReceiveIRQ', 'TransmitIRQ']
             elif compat in ['gaisler,gptimer', 'ambiq,counter']:
                 irq_names = ['0']
+            elif model == 'Timers.IMXRT_PWM':
+                irq_names = ['0', '1', '2']
             elif model == 'Timers.ARM_GenericTimer':
                 irq_names = ['EL3PhysicalTimerIRQ', 'EL1PhysicalTimerIRQ', 'EL1VirtualTimerIRQ', 'NonSecureEL2PhysicalTimerIRQ']
             # the Renode model for these UARTs only has 1 IRQ
