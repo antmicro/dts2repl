@@ -1,0 +1,7 @@
+sysbus:
+    init:
+        Tag <0x40080000 4> "dcdc" 0xFFFFFFFF
+        Tag <0x400D8000 4> "analog" 0xFFFFFFFF
+
+flash: Memory.MappedMemory @ sysbus 0x60000000
+    size: 0x400000
