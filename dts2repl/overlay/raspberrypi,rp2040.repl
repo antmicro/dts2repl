@@ -9,9 +9,3 @@ sysbus:
         Machine PyDevFromFile @scripts/pydev/rolling-bit.py 0x40008044 4 True "CLK_SYS_SELECTED"
         Tag <0x40008048 4> "CLK_PERI_CTRL" 0x880
 
-cpu0
-    init:
-        VectorTableOffset 0x10000100
-cpu1:
-    init:
-        IsHalted True
