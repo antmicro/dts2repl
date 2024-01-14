@@ -1,0 +1,4 @@
+sysbus:
+    init:
+        ApplySVD @https://dl.antmicro.com/projects/renode/svd/RV32M1_RI5CY.svd.gz
+        Tag <0x4002C200 4> "SCG_SIRCCSR" 0xFFFFFFFF
