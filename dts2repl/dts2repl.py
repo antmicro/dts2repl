@@ -765,14 +765,13 @@ def generate(args):
             isa = get_node_prop(node, 'riscv,isa', 'rv32imac')
             indent.append(f'cpuType: "{isa}"')
 
-            is_andes = '_xandes' in isa
             if '64' in isa:
                 model = 'CPU.RiscV64'
 
             # Use CPU.VexRiscv for LiteX and Fomu
             if set(platform) & {'litex,vexriscv', 'kosagi,fomu'}:
                 model = 'CPU.VexRiscv'
-            elif "openisa,rv32m1" in platform or "telink,tlsr9518adk80d" in platform is_andes or compat == "nuclei,bumblebee" or compat == "neorv32-cpu" or compat == "espressif,riscv":
+            elif "openisa,rv32m1" in platform or "telink,tlsr9518adk80d" in platform or "_xandes" in isa or compat == "nuclei,bumblebee" or compat == "neorv32-cpu" or compat == "espressif,riscv":
                 indent.append('timeProvider: empty')
             else:
                 indent.append('timeProvider: clint')
@@ -784,7 +783,7 @@ def generate(args):
             if any(c.startswith('riscv,sifive') or
                    c.startswith('starfive,rocket') or
                    c == 'sifive,e31'
-                   for c in compatible) or is_andes:
+                   for c in compatible) or "_xandes" in isa:
                 indent.append('privilegeArchitecture: PrivilegeArchitecture.Priv1_10')
             else:
                 indent.append('privilegeArchitecture: PrivilegeArchitecture.Priv1_09')
