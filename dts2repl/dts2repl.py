@@ -772,7 +772,7 @@ def generate(args):
             # Use CPU.VexRiscv for LiteX and Fomu
             if set(platform) & {'litex,vexriscv', 'kosagi,fomu'}:
                 model = 'CPU.VexRiscv'
-            elif 'openisa,rv32m1' in platform or is_andes or compat == "nuclei,bumblebee" or compat == "neorv32-cpu" or compat == "espressif,riscv":
+            elif "openisa,rv32m1" in platform or "telink,tlsr9518adk80d" in platform is_andes or compat == "nuclei,bumblebee" or compat == "neorv32-cpu" or compat == "espressif,riscv":
                 indent.append('timeProvider: empty')
             else:
                 indent.append('timeProvider: clint')
