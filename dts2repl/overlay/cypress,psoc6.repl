@@ -1,0 +1,3 @@
+cpu1:
+    init:
+        IsHalted True
