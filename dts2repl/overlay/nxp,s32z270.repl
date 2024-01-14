@@ -1,0 +1,24 @@
+cpu1:
+    init:
+        IsHalted True
+cpu2:
+    init:
+        IsHalted True
+cpu3:
+    init:
+        IsHalted: True
+sysbus:
+    init:
+        Tag <0x40200004 4> "s32-clock" 0xFFFFFFFF
+        Tag <0x40210004 4> "s32-clock" 0xFFFFFFFF
+        Tag <0x40220004 4> "s32-clock" 0xFFFFFFFF
+        Tag <0x440A0004 4> "s32-clock" 0xFFFFFFFF
+        Machine PyDevFromFile @scripts/pydev/rolling-bit.py 0x40030584 4 True "s32-clock-unknown-1"
+        Machine PyDevFromFile @scripts/pydev/rolling-bit.py 0x408304c4 4 True "s32-clock-unknown-2"
+        Machine PyDevFromFile @scripts/pydev/rolling-bit.py 0x40830544 4 True "s32-clock-unknown-3"
+        Machine PyDevFromFile @scripts/pydev/rolling-bit.py 0x40830584 4 True "s32-clock-unknown-4"
+        Machine PyDevFromFile @scripts/pydev/rolling-bit.py 0x408305C4 4 True "s32-clock-unknown-5"
+        Machine PyDevFromFile @scripts/pydev/rolling-bit.py 0x40830604 4 True "s32-clock-unknown-6"
+        Machine PyDevFromFile @scripts/pydev/rolling-bit.py 0x41830404 4 True "s32-clock-unknown-7"
+        Machine PyDevFromFile @scripts/pydev/rolling-bit.py 0x42030484 4 True "s32-clock-unknown-8"
+        Machine PyDevFromFile @scripts/pydev/rolling-bit.py 0x42830404 4 True "s32-clock-unknown-9"
