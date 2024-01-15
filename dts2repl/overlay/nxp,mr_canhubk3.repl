@@ -1,6 +1,2 @@
-cpu1:
-    init:
-        IsHalted True
-
 flash: Memory.MappedMemory @ sysbus 0x400000
     size: 0x400000
