@@ -90,7 +90,9 @@
     "fsl,imx6q-mmdc": "Python.PythonPeripheral",
     "fsl,imx6q-uart": "UART.MxcUart",
     "fsl,imx21-uart": "UART.MxcUart",
+
     "infineon,xmc4xxx-uart": "UART.XMC4XXX_UART",
+    "infineon,cat1-uart": "UART.Infineon_SCBUART",
 
     "gaisler,apbuart": "UART.GaislerUART",
     "gaisler,gptimer": "Timers.GaislerGPTimer",
