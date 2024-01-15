@@ -1,0 +1,3 @@
+sysbus:
+    init:
+        ApplySVD @https://dl.antmicro.com/projects/renode/svd/Infineon_PSoC6_04.svd.gz
