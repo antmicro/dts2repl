@@ -160,6 +160,8 @@
     "nvidia,tegra210-i2c": { "type": "Python.PythonPeripheral", "size": 0x100, "initable": false, "script": "request.value = 8<<4 | 1" },
 
     "renesas,smartbond-uart": "UART.SmartbondUART",
+    "renesas,rzt2m-uart": "UART.Renesas_SCI", 
+    "renesas,rcar-scif": "UART.RCAR_UART",    
 
     "nxp,flexpwm": "Timers.IMXRT_PWM",
     "nxp,imx-code-bus": "Memory.MappedMemory",
@@ -187,8 +189,7 @@
     "nxp,lpc11u6x-syscon": { "type": "Python.PythonPeripheral", "size": 0x400, "initable": true, "filename": "scripts/pydev/flipflop.py" },
     "nxp,iap-fmc55": { "type": "Python.PythonPeripheral", "size": 0x1000, "initable": true, "filename": "scripts/pydev/flipflop.py" },
     "nxp,lpc11u6x-uart": "UART.NS16550",
-
-    "renesas,rzt2m-uart": "UART.Renesas_SCI",
+    "nxp,s32-linflexd": "UART.LINFlexD_UART",
 
     "riscv": "CPU.RiscV32",
     "riscv,plic1": { "type": "IRQControllers.PlatformLevelInterruptController", "numberOfContexts": 9, "prioritiesEnabled": true },
@@ -252,8 +253,6 @@
 
     "quicklogic,eos-s3-usbserial": "UART.USBSerialPort_S3B",
     "quicklogic,usbserialport-s3b": "UART.USBSerialPort_S3B",
-
-    "renesas,rcar-scif": "UART.RCAR_UART",
 
     "ti,am4372-i2c": { "type": "Python.PythonPeripheral", "size": 0x1000, "initable": false, "script": "request.value = 0x1" },
     "ti,am335x-timer": { "type": "Timers.OMAP_Timer", "frequency": 4000000 },
