@@ -2,6 +2,8 @@
     "zephyr,memory-region": "Memory.MappedMemory",
     "serial-flash": "Memory.MappedMemory",
 
+    "altr,jtag-uart": "UART.AlteraJTAG_UART",
+
     "ambiq,stimer": "Timers.AmbiqApollo4_SystemTimer",
     "ambiq,counter": "Timers.AmbiqApollo4_Timer",
     "ambiq,apollo4-pinctrl": "GPIOPort.AmbiqApollo4_GPIO",
