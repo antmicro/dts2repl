@@ -167,6 +167,7 @@
     "renesas,rzt2m-uart": "UART.Renesas_SCI",
     "renesas,rcar-scif": "UART.RCAR_UART",
     "renesas,ra-interrupt-controller-unit" : "IRQControllers.RenesasRA_ICU",
+    "renesas,ra-sci" :  { "type" : "SCI.RenesasRA6M5_SCI", "frequency": 48000000, "enableManchesterMode" : false, "enableFIFO" : false },
 
     "nxp,flexpwm": "Timers.IMXRT_PWM",
     "nxp,imx-code-bus": "Memory.MappedMemory",

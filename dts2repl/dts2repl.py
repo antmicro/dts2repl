@@ -864,6 +864,23 @@ def generate(args):
                                         [f'{gpio_name}:', f'    {num} -> {name}@0'])
             blocks.append(gpio_connection)
 
+        if model == 'SCI.RenesasRA6M5_SCI':
+            for child in node.nodes.values():
+                if get_node_prop(child, 'status') == "disabled":
+                    continue
+                icu_irqs = get_node_prop(node, 'interrupts')
+                sci_uart_compat = get_node_prop(child, 'compatible')
+                if 'renesas,ra-uart-sci' in sci_uart_compat:
+                    name = name_mapper.get_name(child)
+                    # We take a substring here because the DTS may have different numbers than the reference manual
+                    # e.g. `0xa300` instead of `0xa3`
+                    receive_irq_num = hex(int(icu_irqs[2]))[:4] if len(hex(int(icu_irqs[2]))) > 4 else hex(int(icu_irqs[2]))
+                    transmit_irq_num = hex(int(icu_irqs[5]))[:4] if len(hex(int(icu_irqs[5]))) > 4 else hex(int(icu_irqs[5]))
+                    transmitend_irq_num = hex(int(icu_irqs[8]))[:4] if len(hex(int(icu_irqs[8]))) > 4 else hex(int(icu_irqs[8]))
+                    indent.append(f'ReceiveIRQ -> icu@{receive_irq_num}')
+                    indent.append(f'TransmitIRQ -> icu@{transmit_irq_num}')
+                    indent.append(f'TransmitEndIRQ -> icu@{transmitend_irq_num}')
+
         if model.startswith('Timers'):
             if 'cc-num' in node.props:
                 count = str(get_node_prop(node, "cc-num"))
