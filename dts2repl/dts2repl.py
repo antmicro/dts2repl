@@ -725,6 +725,9 @@ def generate(args):
             dependencies.add('nvic')
         if model == 'Network.SynopsysDWCEthernetQualityOfService':
             regions += [RegistrationRegion(addr + 0xC00, 0x200, 'mtl'), RegistrationRegion(addr + 0x1000, 0x200, 'dma')]
+        if model == 'IRQControllers.RenesasRA_ICU':
+            indent.append('nvic: nvic')
+            dependencies.add('nvic')
 
         # additional parameters for python peripherals
         if compat.startswith('fsl,imx6') and compat.endswith('-anatop'):
