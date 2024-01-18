@@ -1,0 +1,2 @@
+flash_mem: Memory.MappedMemory @ sysbus 0x60000000
+    size: 0x800000
