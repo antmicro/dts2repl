@@ -6,5 +6,5 @@ puf_sram_ctrl_int_status: Python.PythonPeripheral @ sysbus 0x4003B3E0
 sysbus:
     init:
         Tag <0x50034FE0 0x4> "FLASH_STAT" 0xFFFFFFFF
-        Tag <0x40034FE0 0x4> "FLASH_INTSTAT 0xFFFFFFFF
+        Tag <0x40034FE0 0x4> "FLASH_INTSTAT" 0xFFFFFFFF
 
