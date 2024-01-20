@@ -95,6 +95,7 @@
 
     "infineon,xmc4xxx-uart": "UART.XMC4XXX_UART",
     "infineon,cat1-uart": "UART.Infineon_SCBUART",
+    "cypress,psoc6-uart": "UART.Infineon_SCBUART",    
 
     "gaisler,apbuart": "UART.GaislerUART",
     "gaisler,gptimer": "Timers.GaislerGPTimer",
