@@ -1,3 +1,4 @@
 sysbus:
     init:
         ApplySVD @https://dl.antmicro.com/projects/renode/svd/Infineon_PSoC6_04.svd.gz
+        sysbus Tag <0x40260590 4> "SRSS_CLK_FLL_STATUS" 0xFFFFFFFF
