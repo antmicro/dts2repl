@@ -766,6 +766,12 @@ def generate(args):
         
         if model == 'CPU.RiscV32':  # We use CPU.RiscV32 as a generic model for all RV CPUs and fix it up here
             isa = get_node_prop(node, 'riscv,isa', 'rv32imac')
+            # The g extension already contains Zicsr and Zifencei
+            if '64g' not in isa and '32g' not in isa:
+                if '_zicsr' not in isa:
+                    isa += '_zicsr'
+                if '_zifencei' not in isa:
+                    isa += '_zifencei'
             indent.append(f'cpuType: "{isa}"')
 
             if '64' in isa:
