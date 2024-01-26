@@ -26,6 +26,13 @@ Compare repls:
     - python3 -m dts2repl -h
     - pip3 install .
     - mkdir -p ci-output/{repls/{dashboard,generated,diffs},dts}
+    # Download DTS files from the GCP
+    - |
+      ZEPHYR_VERSION="$(curl -s https://zephyr-dashboard.renode.io/zephyr.version)"
+      cd ci/gcp/
+      pip3 install -r requirements.txt
+      ./download_gcp_dts.py -c zephyr.yaml -v $ZEPHYR_VERSION -o ../../ci-output/dts/
+      cd -
     # Get repl kit from dashboard
     - (cd ci-output && ../ci/get_dashboard_replkit.sh)
 
