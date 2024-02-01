@@ -103,7 +103,8 @@
     "gaisler,leon3": { "type": "CPU.Sparc", "cpuType": "leon3" },
 
     "gd,gd32-rcu": { "type": "Python.PythonPeripheral", "size": 0x400, "initable": false, "script": "request.value = 0xFFFFFFFF" },
-    "gd,gd32-usart": "UART.GD32_UART",
+    "gd,gd32-usart": { "gd,gd32a503v-eval|gd,gd32f350r-eval|gd,gd32l233r-eval": { "type": "UART.GD32_UART", "extendedMode": true },
+                       "_": "UART.GD32_UART" },
 
     "gpio-leds": "Miscellaneous.LED",
 
