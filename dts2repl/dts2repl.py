@@ -657,7 +657,7 @@ def generate(args):
             # hack for x86/ioport
             if model == 'UART.NS16550' and addr == 0x3f8:
                 addr += 0xE0000000
-                
+
             if model == 'Timers.TegraUsecTimer':
                 # the microsecond timer is at offset 0x10 from the base of the timer block
                 addr += 0x10
@@ -666,7 +666,7 @@ def generate(args):
                 any(map(lambda x: x in compat,
                     ['stm32-gpio', 'stm32-timers', 'silabs,gecko', 'gaisler,irqmp',
                      'gaisler,gptimer', 'gaisler,apbuart', 'xlnx,xuartps']))
-                or any(map(lambda x: x in model, 
+                or any(map(lambda x: x in model,
                     ['UART.STM32_UART']))
             ):
                 # sized sysbus registration for peripherals that require an explicit size
@@ -678,7 +678,7 @@ def generate(args):
         else:
             # assume sysbus registration without address like for CPUs
             regions = [RegistrationRegion()]
-            
+
         # special multi-registration address for GIC
         if model == 'IRQControllers.ARM_GenericInterruptController':
             region_names = ('distributor', 'cpuInterface',)
@@ -763,7 +763,7 @@ def generate(args):
             indent.append('nvic: nvic')
             dependencies.add('nvic')
             overlays.add('cortex-m')
-        
+
         if model == 'CPU.RiscV32':  # We use CPU.RiscV32 as a generic model for all RV CPUs and fix it up here
             isa = get_node_prop(node, 'riscv,isa', 'rv32imac')
             # The g extension already contains Zicsr and Zifencei
