@@ -1,10 +1,5 @@
-cpu0: CPU.RiscV64 @ sysbus
-    cpuType: "rv64imac_zicsr_zifencei"
-    hartId: 0
+cpu0:
     privilegeArchitecture: PrivilegeArchitecture.Priv1_10
-    timeProvider: clint
-    // Unaligned accesses are not supported by the hardware, but are normally handled by OpenSBI.
-    allowUnalignedAccesses: true
 
 u74_1: CPU.RiscV64 @ sysbus
     cpuType: "rv64imafdc_zicsr_zifencei"
