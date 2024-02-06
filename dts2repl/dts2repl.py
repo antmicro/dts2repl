@@ -44,6 +44,10 @@ def parse_args():
     parser.add_argument('--flatten',
                         action='store_true',
                         help='Flatten dtsi files to one dts automatically. Only available when dtsi include dirs are provided')
+    parser.add_argument('--override-system-clock-frequency',
+                        action='store',
+                        default=None,
+                        help='Override default system clock frequency.')
 
     args = parser.parse_args()
 
@@ -913,6 +917,8 @@ def generate(args):
         if compat.endswith('nvic'):
             indent.append('-> cpu0@0')
             dependencies.add('cpu0')
+            if args.override_system_clock_frequency:
+                indent.append(f'systickFrequency: {args.override_system_clock_frequency}')
         elif model == 'IRQControllers.ARM_GenericInterruptController':
             # Select correct GIC version
             gic_ver = compat.split(',')[-1]
