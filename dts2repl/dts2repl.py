@@ -724,6 +724,9 @@ def generate(args):
             # the default of 1023 matches the highest one seen in Zephyr's dts
             ndev = get_node_prop(node, 'riscv,ndev', 1023)
             indent.append(f'numberOfSources: {ndev}')
+        if model == "IRQControllers.CoreLevelInterruptor":
+            frequency = args.override_system_clock_frequency or 1000000
+            indent.append(f'frequency: {frequency}')
         if model == 'Miscellaneous.STM32L0_RCC':
             indent.append('systick: nvic')
             dependencies.add('nvic')
