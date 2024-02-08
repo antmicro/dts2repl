@@ -200,7 +200,7 @@
     "riscv": "CPU.RiscV32",
     "riscv,plic1": { "type": "IRQControllers.PlatformLevelInterruptController", "numberOfContexts": 9, "prioritiesEnabled": true },
     "sifive,plic-1.0.0": { "type": "IRQControllers.PlatformLevelInterruptController", "numberOfContexts": 9, "prioritiesEnabled": true },
-    "sifive,clint0": { "type": "IRQControllers.CoreLevelInterruptor", "frequency": 1000000 },
+    "sifive,clint0": "IRQControllers.CoreLevelInterruptor",
     "starfive,jh7100-clint": "IRQControllers.CoreLevelInterruptor",
     "riscv,sifive-e31": "CPU.RiscV32",
     "sifive,e31": "CPU.RiscV32",

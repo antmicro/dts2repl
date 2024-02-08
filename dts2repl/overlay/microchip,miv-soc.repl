@@ -1,6 +1,3 @@
-clint:
-    frequency: 66000000
-
 plic:
     numberOfContexts: 1
     prioritiesEnabled: false

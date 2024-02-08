@@ -1,6 +1,5 @@
 clint:
     numberOfTargets: 5
-    frequency: 1000000
 
 plic:
     prioritiesEnabled: false

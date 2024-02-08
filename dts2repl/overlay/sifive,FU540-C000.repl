@@ -30,7 +30,6 @@ u54_4: CPU.RiscV64 @ sysbus
     allowUnalignedAccesses: true
 
 clint:
-    frequency: 1000000
     numberOfTargets: 5
     [2, 3] -> u54_1@[3, 7]
     [4, 5] -> u54_2@[3, 7]
