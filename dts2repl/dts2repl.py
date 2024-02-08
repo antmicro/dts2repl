@@ -723,6 +723,8 @@ def generate(args):
         if model == 'Miscellaneous.STM32L0_RCC':
             indent.append('systick: nvic')
             dependencies.add('nvic')
+        if model == 'Network.SynopsysDWCEthernetQualityOfService':
+            regions += [RegistrationRegion(addr + 0xC00, 0x200, 'mtl'), RegistrationRegion(addr + 0x1000, 0x200, 'dma')]
 
         # additional parameters for python peripherals
         if compat.startswith('fsl,imx6') and compat.endswith('-anatop'):
