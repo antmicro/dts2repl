@@ -408,22 +408,27 @@ class RegistrationRegion:
 
     @staticmethod
     def to_repl(regions):
+        def _get_registration_str_simple(region):
+            if region.size is not None:
+                return f'{region.registration_point} <{region.address:#x}, +{region.size:#x}>'
+            elif region.address is not None:
+                return f'{region.registration_point} {region.address:#x}'
+            return region.registration_point
+
         if len(regions) == 0:
             return ''
         if len(regions) == 1:
-            region = regions[0]
-            if region.size is not None:
-                return f'{region.registration_point} <{region.address:#x}, +{region.size:#x}>'
-            registration = region.registration_point
-            if region.address is not None:
-                registration += f' {region.address:#x}'
-            return registration
+            return _get_registration_str_simple(regions[0])
 
         # Multi-region registration
-        # We assume that each region will have an address, size and name in this case
         parts = []
         for r in regions:
-            parts.append(f'sysbus new Bus.BusMultiRegistration {{ address: {r.address:#x}; size: {r.size:#x}; region: "{r.region_name}" }}')
+            if not r.region_name:
+                # It's still possible to have a region without name here - use the same syntax as in single registration
+                parts.append(_get_registration_str_simple(r))
+            else:
+                # We assume that each region will have an address, size and name in this case
+                parts.append(f'sysbus new Bus.BusMultiRegistration {{ address: {r.address:#x}; size: {r.size:#x}; region: "{r.region_name}" }}')
         return "{\n" + ";\n".join(f'{" "*8}{p}' for p in parts) + "\n    }"
 
 
