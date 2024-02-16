@@ -817,6 +817,9 @@ def generate(args):
             indent.append(f'cpuId: {name.replace("cpu", "")}')
             indent.append('genericInterruptController: gic')
             dependencies.add('gic')
+        if model == "CPU.Sparc":
+            sysbus_endianness = ReplBlock('sysbus', None, {'sysbus'}, set(), ['sysbus:', '    Endianess: Endianess.BigEndian'])
+            blocks.append(sysbus_endianness)
 
         # additional parameters for STM32F4_RCC
         if model == 'Miscellaneous.STM32F4_RCC':
