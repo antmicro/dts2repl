@@ -2,5 +2,6 @@ cpu0:
     cpuType: "gr716"
 
 timer0:
-    timersNumber: 2
+    numberOfTimers: 2
     frequency: 20000000
+    separateInterrupts: false

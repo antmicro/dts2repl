@@ -98,7 +98,7 @@
     "cypress,psoc6-uart": "UART.Infineon_SCBUART",
 
     "gaisler,apbuart": "UART.GaislerAPBUART",
-    "gaisler,gptimer": "Timers.GaislerGPTimer",
+    "gaisler,gptimer": "Timers.Gaisler_GPTimer",
     "gaisler,irqmp": "IRQControllers.GaislerMIC",
     "gaisler,leon3": { "type": "CPU.Sparc", "cpuType": "leon3" },
 
