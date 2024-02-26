@@ -43,7 +43,6 @@ or by importing and using it in your Python script:
 
 ```
 from dts2repl import dts2repl
-from argparse import Namespace
 
-print(dts2repl.generate(Namespace(filename="path/to/flattened_devicetree.dts")))
+print(dts2repl.generate("path/to/flattened_devicetree.dts"))
 ```

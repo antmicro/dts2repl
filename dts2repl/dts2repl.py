@@ -572,9 +572,9 @@ def get_model(node, mcu=None, overlays=tuple()):
     return None
 
 
-def generate(args):
+def generate(filename, override_system_clock_frequency=None):
     name_mapper = NameMapper()
-    dt = get_dt(args.filename)
+    dt = get_dt(filename)
     if dt is None:
         return ''
 
@@ -725,7 +725,7 @@ def generate(args):
             ndev = get_node_prop(node, 'riscv,ndev', 1023)
             indent.append(f'numberOfSources: {ndev}')
         if model == "IRQControllers.CoreLevelInterruptor":
-            frequency = args.override_system_clock_frequency or 1000000
+            frequency = override_system_clock_frequency or 1000000
             indent.append(f'frequency: {frequency}')
         if model == 'Miscellaneous.STM32L0_RCC':
             indent.append('systick: nvic')
@@ -920,8 +920,8 @@ def generate(args):
         if compat.endswith('nvic'):
             indent.append('-> cpu0@0')
             dependencies.add('cpu0')
-            if args.override_system_clock_frequency:
-                indent.append(f'systickFrequency: {args.override_system_clock_frequency}')
+            if override_system_clock_frequency:
+                indent.append(f'systickFrequency: {override_system_clock_frequency}')
         elif model == 'IRQControllers.ARM_GenericInterruptController':
             # Select correct GIC version
             gic_ver = compat.split(',')[-1]
@@ -1418,7 +1418,7 @@ def main():
     if args.output == "-":
        args.output = "/dev/stdout"
     with open(args.output, 'w') as f:
-        f.write(generate(args))
+        f.write(generate(args.filename, args.override_system_clock_frequency))
 
 if __name__ == "__main__":
     main()
