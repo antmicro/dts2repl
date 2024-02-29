@@ -1,5 +1,6 @@
 clint: IRQControllers.CoreLevelInterruptor @ sysbus 0x02000000
     numberOfTargets: 4
+    frequency: 1000000
     [0, 1] -> cpu0@[3, 7]
     [2, 3] -> cpu1@[3, 7]
     [4, 5] -> cpu2@[3, 7]
