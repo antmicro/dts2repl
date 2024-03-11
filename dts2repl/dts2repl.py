@@ -1251,6 +1251,8 @@ def generate_bus_sensors(filename, overlays, type):
         for node in nodes.values():
             # Get node compats
             compats = get_node_prop(node, 'compatible')
+            if not compats:
+                continue
 
             compat = compats[0]
             if compat in MODELS:
