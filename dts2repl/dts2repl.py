@@ -1161,7 +1161,7 @@ def generate_peripherals(filename, overlays, type, get_snippets=False):
     mcu = get_mcu_compat(filename)
 
     print(f"Generating {type} peripherals for {str(Path(filename).stem)}")
-    par = next((n for n in dt.node_iter() if n.name == 'soc'), None)
+    par = next((n for n in dt.node_iter() if n.name == 'soc'), dt.root)
     if not par:
         return None
 
