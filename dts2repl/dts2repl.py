@@ -229,33 +229,42 @@ def get_node_prop(node, prop, default=None, inherit=False):
     return val
 
 def renode_model_overlay(compat, mcu, overlays):
-    model = None
-    if isinstance(MODELS[compat], str):
-        model = MODELS[compat]
+    def _try_decode(e):
+        if isinstance(e, str):
+            # value is just a string - it's a model type in Renode
+            return e, {}, None
+        elif "type" in e.keys():
+            # value is a dictionary containg the special 'type' entry containig a model type in Renode
+            im = None
+            m = e["type"]
 
-    attribs = {}
+            # treat all other entries in the dictionary as parameters for the model's construtor/properties
+            a = copy.deepcopy(e)
+            del a["type"]
+
+            # check for yet another 'special' argument in the dictionary
+            # here we assume 'irq_mappings' are only present if 'type' is provided as well
+            if "irq_mappings" in e.keys():
+                im = e["irq_mappings"]
+                del a["irq_mappings"]
+
+            return m, a, im
+        else:
+            # some other case, to be handled separately
+            return None, {}, None
+
+    models_entry = MODELS[compat]
+    model, attribs, irq_mappings = _try_decode(models_entry)
 
     if model is None:
-        if "type" in MODELS[compat].keys():
-            model = MODELS[compat]["type"]
-            attribs = copy.deepcopy(MODELS[compat])
-            del attribs["type"]
-        else:
-            for entry in MODELS[compat]:
-                for subentry in entry.split("|"):
-                    if subentry == "_" or subentry in overlays:
-                        if model is None:
-                            if isinstance(MODELS[compat][entry], str):
-                                model = MODELS[compat][entry]
-                            elif "type" in MODELS[compat][entry].keys():
-                                model = MODELS[compat][entry]["type"]
-                                attribs = copy.deepcopy(MODELS[compat][entry])
-                                del attribs["type"]
-                            else:
-                                model = MODELS[compat][entry]
-                        break
-    
-    return model, compat, attribs
+        # let's look for a special match notation containing multiple entries separated with '|' or a '_' else entry
+        for entry in models_entry:
+            for subentry in entry.split("|"):
+                if subentry == "_" or subentry in overlays:
+                    model, attribs, irq_mappings = _try_decode(models_entry[entry])
+                    return model, compat, attribs, irq_mappings
+
+    return model, compat, attribs, irq_mappings
 
 
 def get_cells(cells, n):
@@ -581,7 +590,7 @@ def can_be_memory(node):
 def get_model(node, mcu=None, overlays=tuple()):
     node_compatible = next(filter(lambda x: x in MODELS, get_node_prop(node, 'compatible', [])), None)
     if node_compatible:
-        node_model, _, _ = renode_model_overlay(node_compatible, mcu, overlays)
+        node_model, _, _, _ = renode_model_overlay(node_compatible, mcu, overlays)
         return node_model
     return None
 
@@ -660,7 +669,7 @@ def generate(filename, override_system_clock_frequency=None):
         name = name_mapper.get_name(node)
 
         # decide which Renode model to use
-        model, compat, attribs = renode_model_overlay(compat, mcu_compat, overlays)
+        model, compat, attribs, irq_mappings = renode_model_overlay(compat, mcu_compat, overlays)
         model = str(model)
 
         dependencies = set()
@@ -1014,8 +1023,11 @@ def generate(filename, override_system_clock_frequency=None):
 
         # assign IRQ signals (but not when using TrivialUart or PythonPeripheral)
         if irq_dest_nodes and model != 'Python.PythonPeripheral':
+            if irq_mappings:
+                irq_names = irq_mappings
             # decide which IRQ names to use in Renode model
-            if compat == 'st,stm32-rtc':
+            # to be moved to models.json
+            elif compat == 'st,stm32-rtc':
                 irq_names = ['AlarmIRQ']
             elif (compat in ['nxp,kinetis-lpuart', 'nxp,kinetis-uart', 'silabs,gecko-leuart', 'sifive,uart0', 'st,stm32-adc']
                 or model in ['UART.STM32F7_USART', 'SPI.STM32SPI']):
