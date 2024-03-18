@@ -1065,6 +1065,8 @@ def generate(filename, override_system_clock_frequency=None):
                     irq_names = ['']
 
             for i, (irq_name, irq_dest, irq) in enumerate(zip(irq_names, irq_dest_nodes, irq_numbers)):
+                if irq_name is None:
+                    continue
                 # assume very large IRQ numbers which have all bits set (i.e. 2^n - 1) are invalid
                 if irq >= 0xfff and (irq & (irq + 1)) == 0:
                     continue
