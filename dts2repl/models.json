@@ -173,7 +173,7 @@
     "nxp,imx-code-bus": "Memory.MappedMemory",
     "nxp,imx-dtcm": "Memory.MappedMemory",
     "nxp,imx-flexspi": "SPI.IMXRT_FlexSPI",
-    "nxp,imx-gpio": "GPIOPort.IMXRT_GPIO",
+    "nxp,imx-gpio": { "type": "GPIOPort.IMXRT_GPIO", "irq_mappings": ["IRQ", null] },
     "nxp,imx-itcm": "Memory.MappedMemory",
     "nxp,imx-lpspi": "SPI.IMXRT_LPSPI",
     "nxp,imx-sys-bus": "Memory.MappedMemory",
