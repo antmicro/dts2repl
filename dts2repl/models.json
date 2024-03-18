@@ -138,7 +138,7 @@
     "espressif,riscv": "CPU.RiscV32",
     "intel,niosv": "CPU.RiscV32",
     "ite,riscv-ite": "CPU.RiscV32",
-    
+
     "neorv-sysinfo": { "type": "Python.PythonPeripheral", "size": 0x20, "initable": false, "script": "request.value = 0xFFFFFFFF" },
 
     "nordic,nrf-clock": "Miscellaneous.NRF52840_CLOCK",
