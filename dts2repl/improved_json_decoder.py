@@ -11,11 +11,11 @@ class hexnum:
 # license: MIT
 class ImprovedJsonDecoder(json.JSONDecoder):
     def __init__(self, *args, **kwargs):
-        json.JSONDecoder.__init__(self, *args, **kwargs) 
+        json.JSONDecoder.__init__(self, *args, **kwargs)
         self.NUMBER_RE = re.compile(
     r'(-?(?:0|[1-9]\d*))(\.\d+)?([eE][-+]?\d+)?',
     (re.VERBOSE | re.MULTILINE | re.DOTALL))
-        self.HEX_RE = re.compile(r'0x([0-9a-fA-F]+)?')        
+        self.HEX_RE = re.compile(r'0x([0-9a-fA-F]+)?')
         self.scan_once = self._scan_once
     def _scan_once(self, string, idx):
         try:
@@ -47,7 +47,7 @@ class ImprovedJsonDecoder(json.JSONDecoder):
                    m = self.HEX_RE.match(string, idx)
                    integer = m.groups()[0]
                    res = hexnum(self.parse_int(integer, 16))
-                else:  
+                else:
                    res = self.parse_int(integer)
             return res, m.end()
         else:
