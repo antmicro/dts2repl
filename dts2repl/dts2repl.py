@@ -395,6 +395,7 @@ class RegistrationRegion:
     size: Optional[int] = None
     region_name: Optional[str] = None
     registration_point: str = "sysbus"
+    cpu: [Optional[str]] = None
 
     @property
     def has_address_and_size(self) -> bool:
@@ -413,11 +414,24 @@ class RegistrationRegion:
     @staticmethod
     def to_repl(regions):
         def _get_registration_str_simple(region):
-            if region.size is not None:
-                return f'{region.registration_point} <{region.address:#x}, +{region.size:#x}>'
-            elif region.address is not None:
-                return f'{region.registration_point} {region.address:#x}'
-            return region.registration_point
+            if region.cpu is None:
+                if region.size is not None:
+                    return f'{region.registration_point} <{region.address:#x}, +{region.size:#x}>'
+                elif region.address is not None:
+                    return f'{region.registration_point} {region.address:#x}'
+                return region.registration_point
+            else:
+                NL = '\n'
+                I4 = 4 * ' '
+                # Per-core registration
+                if region.address is None:
+                    logging.error('Cannot perform per-core registration without an address!')
+                    return None
+                if region.size is not None:
+                    bus_range_registartion = f'{I4}sysbus new Bus.BusPointRegistration {{ address: <{region.address:#x} +{region.size:#x}>; cpu: {region.cpu} }}'
+                    return f'{{{NL}{bus_range_registartion}{NL}}}'
+                bus_point_registartion = f'{I4}sysbus new Bus.BusPointRegistration {{ address: {region.address:#x}; cpu: {region.cpu} }}'
+                return f'{{{NL}{bus_point_registartion}{NL}}}'
 
         if len(regions) == 0:
             return ''
