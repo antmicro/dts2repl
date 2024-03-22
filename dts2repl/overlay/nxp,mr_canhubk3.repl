@@ -1,2 +1,51 @@
 flash: Memory.MappedMemory @ sysbus 0x400000
     size: 0x400000
+
+mc_cgm_css0: Python.PythonPeripheral @ sysbus 0x402D8304
+    size: 0x4
+    initable: true
+    filename: "scripts/pydev/flipflop.py"
+
+mc_cgm_css3: Python.PythonPeripheral @ sysbus 0x402D83C4
+    size: 0x4
+    initable: true
+    filename: "scripts/pydev/flipflop.py"
+
+mc_cgm_css4: Python.PythonPeripheral @ sysbus 0x402D8404
+    size: 0x4
+    initable: true
+    filename: "scripts/pydev/flipflop.py"
+
+mc_cgm_css5: Python.PythonPeripheral @ sysbus 0x402D8444
+    size: 0x4
+    initable: true
+    filename: "scripts/pydev/flipflop.py"
+
+mc_cgm_css6: Python.PythonPeripheral @ sysbus 0x402D8484
+    size: 0x4
+    initable: true
+    filename: "scripts/pydev/flipflop.py"
+
+mc_cgm_css11: Python.PythonPeripheral @ sysbus 0x402D85C4
+    size: 0x4
+    initable: true
+    filename: "scripts/pydev/flipflop.py"
+
+pll_status: Python.PythonPeripheral @ sysbus 0x402E0004
+    size: 0x4
+    initable: true
+    filename: "scripts/pydev/flipflop.py"
+
+sysbus:
+    init:
+        Tag <0x402C8004 0x4> "SIRC_status" 0x00000001
+        Tag <0x402CC004 0x4> "SXOSC_status" 0x80000000
+        Tag <0x402D4004 0x4> "FXOSC_status" 0x80000000
+        Tag <0x402DC108 0x4> "ME_MP_part0_status" 0x00000001
+        Tag <0x402DC114 0x4> "ME_MP_part0_set1_status" 0xFFFFFFFF
+        Tag <0x402DC310 0x4> "ME_MP_part1_set0_status" 0xFFFFFFFF
+        Tag <0x402DC314 0x4> "ME_MP_part1_set1_status" 0xFFFFFFFF
+        Tag <0x402DC318 0x4> "ME_MP_part1_set2_status" 0xFFFFFFFF
+        Tag <0x402DC31C 0x4> "ME_MP_part1_set3_status" 0xFFFFFFFF
+        Tag <0x402DC510 0x4> "ME_MP_part2_set0_status" 0xFFFFFFFF
+        Tag <0x402DC514 0x4> "ME_MP_part2_set1_status" 0xFFFFFFFF
