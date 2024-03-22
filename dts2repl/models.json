@@ -181,6 +181,7 @@
     "nxp,imx-sys-bus": "Memory.MappedMemory",
     "nxp,imx-uart": "UART.MxcUart",
     "nxp,imx-iuart": "UART.MxcUart",
+    "nxp,imx-lpi2c": "I2C.S32K3XX_LowPowerInterIntegratedCircuit",
     "nxp,kinetis-lpsci": "UART.ImxUart",
     "nxp,gpt-hw-timer": "Timers.IMX_GPTimer",
     "nxp,kinetis-lpuart": { "nxp,k6x|nxp,k8x": { "type": "UART.Kinetis_LPUART", "hasGlobalRegisters": false }, "_" : "UART.Kinetis_LPUART" },
