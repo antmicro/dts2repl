@@ -815,6 +815,10 @@ def generate(filename, override_system_clock_frequency=None):
                 break
             else:
                 logging.info(f'ZynqMP mailbox has no children: {node}')
+        elif compat == 'nxp,s32-siul2-eirq':
+            name = name_mapper.get_name(node.parent)
+            provides = {name}
+            regions = [RegistrationRegion(int(node.parent.unit_addr, 16))]
 
         if compat.startswith('arm,cortex-m'):
             cpu_number = name[-1]
@@ -916,6 +920,15 @@ def generate(filename, override_system_clock_frequency=None):
                 continue
 
             gpio, num, gpio_flags = gpios[0]
+            gpio_compat = get_node_prop(gpio, 'compatible')
+            if 'nxp,s32-gpio' in gpio_compat:
+                # We have to translate gpio pin to pad
+                gpio_addr = int(gpio.unit_addr, 16)
+                gpio_base_addr = gpio_addr & ~0xFFFF
+                port_index = int((gpio_addr - gpio_base_addr - 0x1700) / 0x4)
+                num = port_index * 32 + num
+                gpio = gpio.parent
+
             active_low = (gpio_flags & 1) == 1
             if active_low:
                 indent.append('invert: true')

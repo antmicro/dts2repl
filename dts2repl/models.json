@@ -198,6 +198,7 @@
     "nxp,iap-fmc55": { "type": "Python.PythonPeripheral", "size": 0x1000, "initable": true, "filename": "scripts/pydev/flipflop.py" },
     "nxp,lpc11u6x-uart": "UART.NS16550",
     "nxp,s32-linflexd": "UART.LINFlexD_UART",
+    "nxp,s32-siul2-eirq": { "type": "Miscellaneous.S32K3XX_SystemIntegrationUnitLite2", "irq_mappings": ["IRQ1", "IRQ2", "IRQ3", "IRQ4" ] },
 
     "riscv": "CPU.RiscV32",
     "riscv,plic1": { "type": "IRQControllers.PlatformLevelInterruptController", "numberOfContexts": 9, "prioritiesEnabled": true },
