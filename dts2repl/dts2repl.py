@@ -755,6 +755,17 @@ def generate(filename, override_system_clock_frequency=None):
         if model == 'Miscellaneous.STM32L0_RCC':
             indent.append('systick: nvic0')
             dependencies.add('nvic0')
+        if model == 'MTD.STM32WBA_FlashController':
+            children = node.nodes.values()
+            child = next(iter(children), None)
+            if child == None:
+                logging.warn(f'{model} should have exactly one flash child node, but got none. Dropping {model}')
+                continue
+            if len(children) > 1:
+                logging.warn(f'{model} should have only one flash assigned, but got: {[c.name for c in children]}. Selecting {child.name}.')
+            child_name = name_mapper.get_name(child)
+            indent.append(f'flash: {child_name}')
+            dependencies.add(child_name)
         if model == 'Network.SynopsysDWCEthernetQualityOfService':
             regions += [RegistrationRegion(addr + 0xC00, 0x200, 'mtl'), RegistrationRegion(addr + 0x1000, 0x200, 'dma')]
         if model == 'IRQControllers.RenesasRA_ICU':

@@ -1,0 +1,15 @@
+rom: Memory.MappedMemory @ sysbus 0x1FFF0000
+    size: 0x10000
+
+fsmcBank1: Memory.MappedMemory @ sysbus 0xC0000000
+    size: 0x10000
+
+pwr: Miscellaneous.STM32WBA_PWR @ sysbus 0x46020800
+
+rcc:
+    nvic: nvic0
+    lptim1: lptim1
+
+nvic0:
+    // without any divider on the way the base clock is still divided by 8
+    systickFrequency: 16000000
