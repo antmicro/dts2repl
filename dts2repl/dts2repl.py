@@ -670,6 +670,10 @@ def generate(filename, override_system_clock_frequency=None):
 
         # decide which Renode model to use
         model, compat, attribs, irq_mappings = renode_model_overlay(compat, mcu_compat, overlays)
+        if model is None:
+            # There is no model for the given "specialized" SoC compat string, but they might exist for other SoC variants
+            logging.info(f'Node {node.name}, compat {compat} has no matching specific model - does the JSON have "_" clause? Skipping...')
+            continue
         model = str(model)
 
         dependencies = set()
