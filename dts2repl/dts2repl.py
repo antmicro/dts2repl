@@ -1053,6 +1053,8 @@ def generate(filename, override_system_clock_frequency=None):
                 irq_names = ['ReceiveIRQ', 'TransmitIRQ']
             elif compat in ['gaisler,gptimer', 'ambiq,counter']:
                 irq_names = ['0']
+            elif model == "Timers.IMX_GPTimer":
+                irq_names = ['IRQ']
             elif model == 'Timers.IMXRT_PWM':
                 irq_names = ['0', '1', '2']
             elif model == 'Timers.ARM_GenericTimer':
