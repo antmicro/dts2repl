@@ -6,3 +6,5 @@ sysbus:
         ApplySVD @https://dl.antmicro.com/projects/renode/svd/iMX6SL.svd.gz
         Tag <0x2100000 0x40000> "SEC4 Cryptographic Accelerator"
         Tag <0x207c000 0x4000> "AIPSTZ AHB to IP Bridge"
+        Tag <0x217c000 0x4000> "AIPSTZ AHB to IP Bridge"
+        Tag <0xA02000 0x1000> "L2 Cache"
