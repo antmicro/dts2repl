@@ -9,7 +9,7 @@ Compare repls:
     name: debian:bullseye
   variables:
     RENODE_VERSION: "latest"
-    DASHBOARD_URL: "https://zephyr-dashboard.renode.io"
+    DASHBOARD_URL: "https://old-zephyr-dashboard.renode.io"
     DEBIAN_FRONTEND: "noninteractive"
   artifacts:
     paths:
@@ -28,7 +28,7 @@ Compare repls:
     - mkdir -p ci-output/{repls/{dashboard,generated,diffs},dts}
     # Download DTS files from the GCP
     - |
-      ZEPHYR_VERSION="$(curl -s https://zephyr-dashboard.renode.io/zephyr.version)"
+      ZEPHYR_VERSION="$(curl -s https://zephyr-dashboard.renode.io/zephyr_sim/latest)"
       cd ci/gcp/
       pip3 install -r requirements.txt
       ./download_gcp_dts.py -c zephyr.yaml -v $ZEPHYR_VERSION -o ../../ci-output/dts/
