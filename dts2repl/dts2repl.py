@@ -895,21 +895,23 @@ def generate(filename, override_system_clock_frequency=None):
             indent.append('rtcPeripheral: rtc')
             dependencies.add('rtc')
 
-        if model == 'Sensors.TMP103' or model == 'Sensors.TMP108':
+        i2c_sensors = [
+            'Sensors.TMP103',
+            'Sensors.TMP108',
+            'Sensors.SI7210',
+            'I2C.BME280',
+            'I2C.SHT45'
+        ]
+
+        if model in i2c_sensors:
             if len(node.parent.labels) == 0:
                 logging.warning(f"Node {node} has no labels! Dropping {model}")
                 continue
 
             i2c_name = name_mapper.get_name(node.parent)
-            i2c_addr = int(node.unit_addr, 16)
-            regions = [RegistrationRegion(address=i2c_addr, registration_point=i2c_name)]
-
-        if model == 'Sensors.SI7210':
-            if len(node.parent.labels) == 0:
-                logging.warning(f"Node {node} has no labels! Dropping {model}")
+            if not i2c_name.startswith("i2c"):
+                logging.warning(f"Parent of {node} is not an I2C controller! Dropping {model}")
                 continue
-
-            i2c_name = name_mapper.get_name(node.parent)
             i2c_addr = int(node.unit_addr, 16)
             regions = [RegistrationRegion(address=i2c_addr, registration_point=i2c_name)]
 
