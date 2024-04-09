@@ -922,7 +922,7 @@ def generate(filename, override_system_clock_frequency=None):
                 continue
 
             gpio, num, gpio_flags = gpios[0]
-            gpio_compat = get_node_prop(gpio, 'compatible')
+            gpio_compat = get_node_prop(gpio, 'compatible', [])
             if 'nxp,s32-gpio' in gpio_compat:
                 # We have to translate gpio pin to pad
                 gpio_addr = int(gpio.unit_addr, 16)
