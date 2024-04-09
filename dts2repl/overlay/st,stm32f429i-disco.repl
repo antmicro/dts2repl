@@ -1,0 +1,24 @@
+flash: Memory.MappedMemory @ sysbus 0x08000000
+    size: 0x200000
+
+ccm0: Memory.MappedMemory @ sysbus 0x10000000
+    size: 0x10000
+
+cpu0: CPU.CortexM @ sysbus
+    cpuType: "cortex-m4f"
+    nvic: nvic0
+
+nvic0: IRQControllers.NVIC @ {
+    sysbus new Bus.BusPointRegistration { address: 0xe000e000; cpu: cpu0 }
+}
+    -> cpu0@0
+    systickFrequency: 168000000
+
+timers5: Timers.STM32_Timer @ sysbus <0x40000C00, +0x400>
+    initialLimit: 0xffffffff
+    frequency: 250000000
+    -> nvic0@50
+
+sysbus:
+    init:
+        ApplySVD @https://dl.antmicro.com/projects/renode/svd/STM32F40x.svd.gz
