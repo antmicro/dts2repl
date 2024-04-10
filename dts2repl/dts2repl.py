@@ -1157,12 +1157,12 @@ def generate(filename, override_system_clock_frequency=None):
             overlay_blocks.extend(parse_overlay(overlay))
 
     # filter out unavailable blocks (with unsatisfied depends)
-    available_blocks = filter_available_blocks(blocks + overlay_blocks)
+    blocks = filter_available_blocks(blocks + overlay_blocks)
 
     # split into blocks of known and unknown size
     sized = []
     unsized = []
-    for block in available_blocks:
+    for block in blocks:
         (unsized, sized)[block.region is not None and block.region.has_address_and_size].append(block)
     # merge overlapping sized blocks
     # NOTE: currently, only memory blocks are merged, other overlapping blocks are removed
@@ -1187,9 +1187,9 @@ def generate(filename, override_system_clock_frequency=None):
             sized_merged.append(block)
 
     # build the repl out of the filtered and merged blocks
-    available_blocks = sized_merged + unsized
-    repl_devices = set.union(*[b.provides for b in available_blocks])
-    repl = [str(b) + '\n' for b in available_blocks]
+    blocks = sized_merged + unsized
+    repl_devices = set.union(*[b.provides for b in blocks])
+    repl = [str(b) + '\n' for b in blocks]
 
     # convert it to a list of lines for the line-based interrupt removal step
     repl = '\n'.join(repl).splitlines()
