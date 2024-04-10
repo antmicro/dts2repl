@@ -1147,7 +1147,7 @@ def generate(filename, override_system_clock_frequency=None):
     # soc and board overlay
     overlay_path = f'{pathlib.Path(__file__).parent.resolve()}/overlay'
     overlay_blocks = []
-    for compat in overlays:
+    for compat in sorted(overlays):
         overlay = f'{overlay_path}/{compat}.repl'
         if os.path.exists(overlay):
             overlay_blocks.append(ReplBlock('', None, set(), set(), [f'// {compat} overlay']))
