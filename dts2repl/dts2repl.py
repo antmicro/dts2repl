@@ -1138,15 +1138,7 @@ def generate(filename, override_system_clock_frequency=None):
         block = ReplBlock(name, model, dependencies, provides, block_content, region)
         blocks.append(block)
 
-    # now all blocks are processed
-
-    # set number of targets for CLINT if necessary
-    # note that IRQ destinations don't create a dependency; this should pick up just CPUs because they get a dependency on the CLINT when we add timeProvider
-    clint_targets = sum(1 for b in blocks if 'clint' in b.depends)
-    if clint_targets > 1:
-        clint_block = next(b for b in blocks if b.name == 'clint')
-        clint_block.content += [f'    numberOfTargets: {clint_targets}']
-
+    # now all blocks originating from the device tree are processed, let's add overlays next
     # soc and board overlay
     overlay_path = f'{pathlib.Path(__file__).parent.resolve()}/overlay'
     overlay_blocks = []
@@ -1158,6 +1150,13 @@ def generate(filename, override_system_clock_frequency=None):
 
     # filter out unavailable blocks (with unsatisfied depends)
     blocks = filter_available_blocks(blocks + overlay_blocks)
+
+    # set number of targets for CLINT if necessary
+    # note that IRQ destinations don't create a dependency; this should pick up just CPUs because they get a dependency on the CLINT when we add timeProvider
+    clint_targets = sum(1 for b in blocks if 'clint' in b.depends)
+    if clint_targets > 1:
+        clint_block = next(b for b in blocks if b.name == 'clint')
+        clint_block.content += [f'    numberOfTargets: {clint_targets}']
 
     # split into blocks of known and unknown size
     sized = []
