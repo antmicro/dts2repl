@@ -981,6 +981,9 @@ def generate(filename, override_system_clock_frequency=None):
                 else:
                     # do not generate memory regions of size 0
                     continue
+            else:
+                logging.warning('Memory node {node.name} has no reg, skipping')
+                continue
 
         irq_dest_nodes = []
         irq_numbers = []
