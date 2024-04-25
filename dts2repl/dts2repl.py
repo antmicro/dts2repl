@@ -605,6 +605,19 @@ def get_model(node, mcu=None, overlays=tuple()):
     return None
 
 
+def get_overlays(dt):
+    # get platform compat names
+    platform = get_node_prop(dt.get_node('/'), 'compatible', [])
+
+    # get soc compat names
+    if dt.has_node('/soc'):
+        soc = get_node_prop(dt.get_node('/soc'), 'compatible', [])
+    else:
+        soc = []
+
+    return set(soc + platform)
+
+
 def generate(filename, override_system_clock_frequency=None):
     name_mapper = NameMapper()
     dt = get_dt(filename)
@@ -621,16 +634,8 @@ def generate(filename, override_system_clock_frequency=None):
     if mcu is not None:
         mcu_compat = get_node_prop(mcu, 'compatible')[0]
 
-    # get platform compat names
-    platform = get_node_prop(dt.get_node('/'), 'compatible', [])
-
-    # get soc compat names
-    if dt.has_node('/soc'):
-        soc = get_node_prop(dt.get_node('/soc'), 'compatible', [])
-    else:
-        soc = []
-
-    overlays = set(soc + platform)
+    # get overlays
+    overlays = get_overlays(dt)
 
     for node in nodes:
         # those memory peripherals sometimes require changing the sysbus address of this peripheral
@@ -850,9 +855,9 @@ def generate(filename, override_system_clock_frequency=None):
                 model = 'CPU.RiscV64'
 
             # Use CPU.VexRiscv for LiteX and Fomu
-            if set(platform) & {'litex,vexriscv', 'kosagi,fomu'}:
+            if overlays & {'litex,vexriscv', 'kosagi,fomu'}:
                 model = 'CPU.VexRiscv'
-            elif "openisa,rv32m1" in platform or "telink,tlsr9518adk80d" in platform or compat == "intel,niosv" or "_xandes" in isa or compat == "nuclei,bumblebee" or compat == "neorv32-cpu" or compat == "espressif,riscv":
+            elif "openisa,rv32m1" in overlays or "telink,tlsr9518adk80d" in overlays or compat == "intel,niosv" or "_xandes" in isa or compat == "nuclei,bumblebee" or compat == "neorv32-cpu" or compat == "espressif,riscv":
                 indent.append('timeProvider: empty')
             else:
                 indent.append('timeProvider: clint')
@@ -983,7 +988,7 @@ def generate(filename, override_system_clock_frequency=None):
                 # actually have 0x40000 and the config headers reflect this, which
                 # would make the stack end up outside of memory if the size from
                 # the device tree was used
-                if any('imx6' in p for p in platform):
+                if any('imx6' in p for p in overlays):
                     if node.labels and 'ocram' in node.labels[0]:
                         size = 0x40000
                 if size != 0:
