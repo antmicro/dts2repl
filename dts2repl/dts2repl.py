@@ -606,6 +606,11 @@ def get_model(node, mcu=None, overlays=tuple()):
 
 
 def get_overlays(dt):
+    if not isinstance(dt, dtlib.DT):
+        dt = get_dt(dt)
+    if not dt:
+        return set()
+
     # get platform compat names
     platform = get_node_prop(dt.get_node('/'), 'compatible', [])
 
