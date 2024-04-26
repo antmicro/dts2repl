@@ -1,0 +1,13 @@
+uart: UART.SemihostingUart @ cpu0
+
+rom0:
+    size: 0x2000000
+
+sram1: Memory.MappedMemory @ sysbus 0x40000000
+    size: 0x1000000
+
+sram2: Memory.MappedMemory @ sysbus 0x50000000
+    size: 0x1000000
+
+sram3: Memory.MappedMemory @ sysbus 0x60000000
+    size: 0x10000000

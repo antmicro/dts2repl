@@ -124,6 +124,16 @@ def get_uart(dts_filename):
     except Exception:
         pass
 
+    # Then, let's check if it's a supported Xtensa platform. We only support
+    # semihosting for those, so return a hardcoded string here
+    try:
+        node = dt.get_node('/cpus/cpu@0')
+        compats = get_node_prop(node, 'compatible')
+        if any('xtensa' in compat for compat in compats):
+            return 'cpu0.uart'
+    except Exception:
+        pass
+
     # Finally, just return any non-disabled node that looks vaguely like a uart
     for node in dt.node_iter():
         if any(x in node.name.lower() for x in ('uart', 'usart', 'serial')):
