@@ -699,7 +699,7 @@ def generate(filename, override_system_clock_frequency=None):
         dependencies = set()
         provides = {name}
         regions = []
-        if addr and (not name.startswith('cpu') or name.endswith('tcm')):
+        if addr and not model.startswith('CPU.'):
             addr = int(addr.split(',')[0], 16)
             addr = translate_address(addr, node)
             if addr % 4 != 0:
