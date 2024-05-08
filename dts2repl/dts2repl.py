@@ -679,7 +679,7 @@ def generate(filename, override_system_clock_frequency=None):
             continue
 
         # not sure why this is needed. We need to investigate the RCC->RTC dependency.
-        if get_node_prop(node, 'status') == 'disabled' and not node.name.startswith('rtc'):
+        if get_node_prop(node, 'status') == 'disabled' and not node.name.startswith('rtc') and not "renesas,smartbond-timer" in compat:
             logging.info(f'Node {node.name} disabled. Skipping...')
             continue
 
