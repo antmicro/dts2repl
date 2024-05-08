@@ -1,2 +1,13 @@
 flash_mem: Memory.MappedMemory @ sysbus 0x18000000
     size: 0x10000000
+
+resetController: Python.PythonPeripheral @ sysbus 0x50020000
+    size: 0x20
+    initable: true
+    filename: "scripts/pydev/flipflop.py"
+
+sysbus:
+    init:
+        Tag <0x50031028 0x4> "PMU CAU_SLP_CTRL" 0xffffffff
+        Tag <0x50003088 0x4> "SYSCTL2 PLL_CTRL" 0xffffffff
+
