@@ -159,6 +159,7 @@
     "nordic,nrf-uarte": { "type": "UART.NRF52840_UART", "easyDMA": true },
     "nordic,nrf-watchdog": "Timers.NRF52840_Watchdog",
     "nordic,nrf91-flash-controller": { "type": "Python.PythonPeripheral", "size": 0x1000, "initable": true, "filename": "scripts/pydev/rolling-bit.py" },
+    "nordic,owned-memory" : "Memory.MappedMemory",
 
     "ns16550": { "type": "UART.NS16550", "wideRegisters": true },
     "ns16550a": { "type": "UART.NS16550", "wideRegisters": true },
