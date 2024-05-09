@@ -1,0 +1,4 @@
+// this is suboptimal: GPIO configuration in DTS for the platform is multi-level and dts2repl does not handle it well atm;
+// the format below is enough to work with automatically generated LED0 for the blinky sample
+gpio19: GPIOPort.Renesas_GPIO @ { sysbus 0x800A0000; sysbus 0x81030000 }
+    158 -> led0@0
