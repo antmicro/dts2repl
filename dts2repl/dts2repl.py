@@ -1274,61 +1274,71 @@ def generate_peripherals(filename, overlays, type, get_snippets=False):
     if not par:
         return None
 
-    for node in par.node_iter():
-        compats = get_node_prop(node, 'compatible')
+    cpus = next((n for n in dt.node_iter() if n.name == 'cpus'), None)
+    sections = [par, cpus] if cpus else [par]
 
-        if compats is None:
-            logging.info(f"No compats (type) for node {node}. Skipping...")
-            continue
+    for section in sections:
+        for node in section.node_iter():
+            compats = get_node_prop(node, 'compatible')
 
-        if any(item in SKIP_COMPATS for item in compats):
-            continue
-
-        if type == "board":
-            status = get_node_prop(node, 'status')
-            if status == 'disabled':
+            if compats is None:
+                logging.info(f"No compats (type) for node {node}. Skipping...")
                 continue
 
-        compat = get_node_prop(node, 'compatible')[0]
+            if any(item in SKIP_COMPATS for item in compats):
+                continue
 
-        if compat in MODELS:
-            model, compat, _, _ = renode_model_overlay(compat, mcu, overlays)
-        else:
-            model = ''
-
-        if (device_type := get_node_prop(node, 'device_type')) and device_type[0] == 'cpu':
-            print('Handling CPU')
-            # CPUs are not registered on bus, use ID instead
-            unit_addr = hex(int(node.unit_addr, 16))
-        else:
-            reg = list(get_reg(node))
-            if reg:
-                unit_addr = hex(reg[0][0])
-                size = sum(r[1] for r in reg)
-                if size == 0:
-                    logging.info(f"Regs for node {node} have total size 0. Skipping...")
+            if type == "board":
+                status = get_node_prop(node, 'status')
+                if status == 'disabled':
                     continue
+
+            compat = get_node_prop(node, 'compatible')[0]
+
+            if compat in MODELS:
+                model, compat, _, _ = renode_model_overlay(compat, mcu, overlays)
             else:
-                logging.info(f"No regs for node {node}. Skipping...")
-                continue
+                model = ''
 
-        if node.labels:
-            label = node.labels[0]
-        else:
-            label = ''
+            if (device_type := get_node_prop(node, 'device_type')) and device_type[0] == 'cpu':
+                print('Handling CPU')
+                # CPUs are not registered on bus, use ID instead
+                if id := node.unit_addr:
+                    unit_addr = hex(int(id, 16))
+                else:
+                    unit_addr = 0x0
 
-        if 'interrupts' in node.props:
-            irq_nums = [irq for irq in get_node_prop(node, 'interrupts')[::2]]
+                size = 0x0
+                compats = [compats[0]]
+            else:
+                reg = list(get_reg(node))
+                if reg:
+                    unit_addr = hex(reg[0][0])
+                    size = sum(r[1] for r in reg)
+                    if size == 0:
+                        logging.info(f"Regs for node {node} have total size 0. Skipping...")
+                        continue
+                else:
+                    logging.info(f"No regs for node {node}. Skipping...")
+                    continue
 
-        result[node.name] = {"unit_addr":unit_addr, "label":label, "model":model, "compats":compats.copy()}
+            if node.labels:
+                label = node.labels[0]
+            else:
+                label = ''
 
-        if reg:
-            result[node.name]["size"] = hex(size)
-        if irq_nums != []:
-            result[node.name]["irq_nums"] = irq_nums.copy()
+            if 'interrupts' in node.props:
+                irq_nums = [irq for irq in get_node_prop(node, 'interrupts')[::2]]
 
-        if get_snippets:
-            result[node.name]['snippet'] = str(node)
+            result[node.name] = {"unit_addr":unit_addr, "label":label, "model":model, "compats":compats.copy()}
+
+            if reg:
+                result[node.name]["size"] = hex(size)
+            if irq_nums != []:
+                result[node.name]["irq_nums"] = irq_nums.copy()
+
+            if get_snippets:
+                result[node.name]['snippet'] = str(node)
 
     return result
 
