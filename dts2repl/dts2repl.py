@@ -1257,6 +1257,7 @@ def generate_cpu_freq(filename):
     return None
 
 def generate_peripherals(filename, overlays, type, get_snippets=False):
+    SKIP_COMPATS = ['arm,armv8m-mpu']
     result = {}
     par = ''
     irq_nums = []
@@ -1278,6 +1279,9 @@ def generate_peripherals(filename, overlays, type, get_snippets=False):
 
         if compats is None:
             logging.info(f"No compats (type) for node {node}. Skipping...")
+            continue
+
+        if any(item in SKIP_COMPATS for item in compats):
             continue
 
         if type == "board":
