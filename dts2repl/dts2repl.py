@@ -1296,16 +1296,21 @@ def generate_peripherals(filename, overlays, type, get_snippets=False):
         else:
             model = ''
 
-        reg = list(get_reg(node))
-        if reg:
-            unit_addr = hex(reg[0][0])
-            size = sum(r[1] for r in reg)
-            if size == 0:
-                logging.info(f"Regs for node {node} have total size 0. Skipping...")
-                continue
+        if (device_type := get_node_prop(node, 'device_type')) and device_type[0] == 'cpu':
+            print('Handling CPU')
+            # CPUs are not registered on bus, use ID instead
+            unit_addr = hex(int(node.unit_addr, 16))
         else:
-            logging.info(f"No regs for node {node}. Skipping...")
-            continue
+            reg = list(get_reg(node))
+            if reg:
+                unit_addr = hex(reg[0][0])
+                size = sum(r[1] for r in reg)
+                if size == 0:
+                    logging.info(f"Regs for node {node} have total size 0. Skipping...")
+                    continue
+            else:
+                logging.info(f"No regs for node {node}. Skipping...")
+                continue
 
         if node.labels:
             label = node.labels[0]
