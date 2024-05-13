@@ -407,6 +407,21 @@ class NameMapper:
         self._mapping[node.path] = name
         return name
 
+@dataclass
+class RedistributorRegistrationRegion:
+    address: int
+    cpu: str
+
+    @property
+    def region_name(self) -> str:
+        return 'redistributor'
+
+    @property
+    def registration_point(self) -> str:
+        return 'sysbus'
+
+    def get_constructor(self) -> str:
+        return f'IRQControllers.ArmGicRedistributorRegistration {{ address: {self.address:#x}; cpu: {self.cpu} }}'
 
 @dataclass
 class RegistrationRegion:
@@ -429,6 +444,10 @@ class RegistrationRegion:
     @end.setter
     def end(self, value: int) -> None:
         self.size = value - self.address
+
+    def get_constructor(self) -> str:
+        # We assume that each region will have an address, size and name in this case
+        return f'Bus.BusMultiRegistration {{ address: {self.address:#x}; size: {self.size:#x}; region: "{self.region_name}" }}'
 
     @staticmethod
     def to_repl(regions):
@@ -464,8 +483,7 @@ class RegistrationRegion:
                 # It's still possible to have a region without name here - use the same syntax as in single registration
                 parts.append(_get_registration_str_simple(r))
             else:
-                # We assume that each region will have an address, size and name in this case
-                parts.append(f'sysbus new Bus.BusMultiRegistration {{ address: {r.address:#x}; size: {r.size:#x}; region: "{r.region_name}" }}')
+                parts.append(f'sysbus new {r.get_constructor()}')
         return "{\n" + ";\n".join(f'{" "*8}{p}' for p in parts) + "\n    }"
 
 
@@ -739,14 +757,23 @@ def generate(filename, override_system_clock_frequency=None):
 
         # special multi-registration address for GIC
         if model == 'IRQControllers.ARM_GenericInterruptController':
+            def arm_gic_get_region(addr, size, name):
+                if name == 'redistributor':
+                    cpus = filter(lambda x: 'cpu' in x.name and not 'timer' in x.name, blocks)
+                    return [RedistributorRegistrationRegion(addr + (i * 0x20000), cpu.name) for i, cpu in enumerate(cpus)]
+                else:
+                    return [RegistrationRegion(addr, size, name)]
+
             region_names = ('distributor', 'cpuInterface',)
             if compat in ('arm,gic-v3', 'arm,gic-v4',):
                 region_names = ('distributor', 'redistributor',)
 
             regions = [
-                RegistrationRegion(region_addr, region_size, region_name)
+                region
                 for (region_addr, region_size), region_name
                 in zip(get_reg(node), region_names)
+                for region
+                in arm_gic_get_region(region_addr, region_size, region_name)
             ]
 
         # check the registration point of guessed memory peripherals
