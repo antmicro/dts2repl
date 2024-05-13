@@ -1257,6 +1257,7 @@ def generate_cpu_freq(filename):
     return None
 
 def generate_peripherals(filename, overlays, type, get_snippets=False):
+    CPU_NODE_REGEX = re.compile(r"^cpu@*[A-Za-z0-9_]*$")
     SKIP_COMPATS = ['arm,armv8m-mpu']
     result = {}
     par = ''
@@ -1300,8 +1301,7 @@ def generate_peripherals(filename, overlays, type, get_snippets=False):
             else:
                 model = ''
 
-            if (device_type := get_node_prop(node, 'device_type')) and device_type[0] == 'cpu':
-                print('Handling CPU')
+            if CPU_NODE_REGEX.match(node.name):
                 # CPUs are not registered on bus, use ID instead
                 if id := node.unit_addr:
                     unit_addr = hex(int(id, 16))
