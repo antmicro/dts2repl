@@ -13,7 +13,7 @@
     "arm,armv8_timer": { "type": "Timers.ARM_GenericTimer", "frequency": 62500000 },
 
     "arm,armv8": { "type": "CPU.ARMv8A", "cpuType": "cortex-a53" },
-    "arm,cortex-a5": { "type": "CPU.ARMv7A", "cpuType": "cortex-a9" },    
+    "arm,cortex-a5": { "type": "CPU.ARMv7A", "cpuType": "cortex-a9" },
     "arm,cortex-a9": { "type": "CPU.ARMv7A", "cpuType": "cortex-a9" },
     "arm,cortex-a53": { "type": "CPU.ARMv8A", "cpuType": "cortex-a53" },
     "arm,cortex-a55": { "type": "CPU.ARMv8A", "cpuType": "cortex-a55" },
@@ -97,7 +97,7 @@
     "fsl,imx6q-mmdc": "Python.PythonPeripheral",
     "fsl,imx6q-uart": "UART.MxcUart",
     "fsl,imx21-uart": "UART.MxcUart",
-    "fsl,vf610-lpuart": "UART.ImxUart",    
+    "fsl,vf610-lpuart": "UART.ImxUart",
 
     "infineon,xmc4xxx-uart": "UART.XMC4XXX_UART",
     "infineon,cat1-uart": "UART.Infineon_SCBUART",
