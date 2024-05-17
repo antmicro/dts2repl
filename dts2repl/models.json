@@ -13,7 +13,7 @@
     "arm,armv8_timer": { "type": "Timers.ARM_GenericTimer", "frequency": 62500000 },
 
     "arm,armv8": { "type": "CPU.ARMv8A", "cpuType": "cortex-a53" },
-    "arm,cortex-a5": { "type": "CPU.ARMv7A", "cpuType": "cortex-a9" },
+    "arm,cortex-a5": { "type": "CPU.ARMv7A", "cpuType": "cortex-a5" },
     "arm,cortex-a9": { "type": "CPU.ARMv7A", "cpuType": "cortex-a9" },
     "arm,cortex-a15": { "type": "CPU.ARMv7A", "cpuType": "cortex-a15" },
     "arm,cortex-a53": { "type": "CPU.ARMv8A", "cpuType": "cortex-a53" },
