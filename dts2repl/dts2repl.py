@@ -1369,7 +1369,7 @@ def generate_peripherals(filename, overlays, generate_type, get_snippets=False):
 
     mcu = get_mcu_compat(filename)
 
-    print(f"Generating {type} peripherals for {str(Path(filename).stem)}")
+    print(f"Generating {generate_type} peripherals for {str(Path(filename).stem)}")
 
     # Go through /cpus node
     try:
@@ -1481,9 +1481,9 @@ def generate_gpio(filename, overlays):
         return
 
     # Handle LEDS and Keys with the same flow, as they contain the same data
-    for type in [KEYS_NODE, LEDS_NODE]:
-        if dt.has_node(type):
-            parent = dt.get_node(type)
+    for typ in [KEYS_NODE, LEDS_NODE]:
+        if dt.has_node(typ):
+            parent = dt.get_node(typ)
             nodes = parent.nodes
             for node in nodes.values():
                 gpio_info = parse_phandles_and_nums(dt, node, "gpios")
