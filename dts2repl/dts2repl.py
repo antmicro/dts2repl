@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 
 import argparse
-import glob
 import logging
 import os
 import pathlib
@@ -1280,7 +1279,7 @@ def generate_cpu_freq(filename):
                     freq = freq * 1000000
                 print(f" * Found clock-frequency - {freq} Hz")
                 return freq
-    print(f" * Not found")
+    print(" * Not found")
     return None
 
 
@@ -1424,7 +1423,7 @@ def get_buses(dt: dtlib.DT) -> list:
     return buses_paths
 
 
-def generate_bus_sensors(filename, overlays, type):
+def generate_bus_sensors(filename, overlays):
     result = {}
 
     try:
@@ -1469,7 +1468,7 @@ def parse_phandles_and_nums(dt: dtlib.DT, node: dtlib.Node, prop: str, signed=Fa
     return [int.from_bytes(value[i:i+4], "big", signed=signed) for i in range(0, len(value), 4)]
 
 
-def generate_gpio(filename, overlays, type):
+def generate_gpio(filename, overlays):
     result = {}
 
     KEYS_NODE = '/gpio_keys'
@@ -1576,7 +1575,6 @@ def main():
     incl_dirs = ' '.join(f'-I {dir}' for dir in dirs)
 
     if args.flatten:
-        board_name = os.path.splitext(os.path.basename(args.filename))[0]
         # get list of #includes (C preprocessor)
         cmd = f'gcc -H -E -P -x assembler-with-cpp {incl_dirs} {args.preprocessor_args} {args.filename}'.split()
         ret = subprocess.run(cmd, capture_output=True)
