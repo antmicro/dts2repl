@@ -420,7 +420,7 @@ class RedistributorRegistrationRegion:
         return 'sysbus'
 
     def get_constructor(self) -> str:
-        return f'IRQControllers.ArmGicRedistributorRegistration {{ address: {self.address:#x}; cpu: {self.cpu} }}'
+        return f'IRQControllers.ArmGicRedistributorRegistration {{ attachedCPU: {self.cpu}; address: {self.address:#x} }}'
 
 @dataclass
 class RegistrationRegion:
