@@ -1,2 +1,0 @@
-flash: Memory.MappedMemory @ sysbus 0x18000000
-    size: 0x2000000
