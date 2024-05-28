@@ -1,6 +1,3 @@
-flash_mem: Memory.MappedMemory @ sysbus 0x30000000
-    size: 0x1000000
-
 ANADIG_PLL_SYS_PLL2_PFD: Python.PythonPeripheral @ sysbus 0x40C84270
     size: 0x4
     initable: true
