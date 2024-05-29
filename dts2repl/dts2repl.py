@@ -734,7 +734,7 @@ def generate(filename, override_system_clock_frequency=None):
             if (
                 any(map(lambda x: x in compat,
                     ['stm32-gpio', 'stm32-timers', 'silabs,gecko', 'gaisler,irqmp',
-                     'gaisler,gptimer', 'gaisler,apbuart', 'xlnx,xuartps']))
+                     'gaisler,gptimer', 'gaisler,apbuart', 'xlnx,xuartps', 'nvidia,tegra114-i2c']))
                 or any(map(lambda x: x in model,
                     ['UART.STM32_UART']))
             ):
