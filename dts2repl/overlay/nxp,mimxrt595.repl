@@ -1,2 +1,35 @@
 flash_mem: Memory.MappedMemory @ sysbus 0x18000000
     size: 0x8000000
+
+otp_fuse_api: Memory.MappedMemory @ sysbus 0x13008000
+    size: 0x1000
+    init:
+        // jump right away from the OTP_FUSE_READ_API function stored in OTP
+        // this address is hardcoded in Zephyr:
+        // https://github.com/zephyrproject-rtos/zephyr/blob/e801f1a9ad6ae0d60362ec0f576ce130659360ee/boards/nxp/mimxrt595_evk/board.c#L21
+        WriteWord 0x5C 0x4770  // asm: bx lr         // return
+
+reset_flexspi1: Python.PythonPeripheral @ sysbus 0x50000010
+    size: 0x4
+    initable: true
+    filename: "scripts/pydev/flipflop.py"
+
+reset_adc0: Python.PythonPeripheral @ sysbus 0x50000014
+    size: 0x4
+    initable: true
+    filename: "scripts/pydev/flipflop.py"
+
+reset_hsgpio3: Python.PythonPeripheral @ sysbus 0x50020014
+    size: 0x4
+    initable: true
+    filename: "scripts/pydev/flipflop.py"
+
+reset_flexcomm12: Python.PythonPeripheral @ sysbus 0x50020010
+    size: 0x4
+    initable: true
+    filename: "scripts/pydev/flipflop.py"
+
+sysbus:
+    init:
+        // to be removed once DTS in Zephyr is fixed
+        Tag <0x501340E0 0x4> "flexspi_status" 0xffffffff
