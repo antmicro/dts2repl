@@ -216,8 +216,8 @@
     "nxp,os-timer": { "type": "Timers.NXP_OsTimer", "frequency": 1000000 },
 
     "riscv": "CPU.RiscV32",
-    "riscv,plic1": { "type": "IRQControllers.PlatformLevelInterruptController", "numberOfContexts": 9, "prioritiesEnabled": true },
-    "sifive,plic-1.0.0": { "type": "IRQControllers.PlatformLevelInterruptController", "numberOfContexts": 9, "prioritiesEnabled": true },
+    "riscv,plic1": { "type": "IRQControllers.PlatformLevelInterruptController", "numberOfContexts": 16, "prioritiesEnabled": true },
+    "sifive,plic-1.0.0": { "type": "IRQControllers.PlatformLevelInterruptController", "numberOfContexts": 16, "prioritiesEnabled": true },
     "sifive,clint0": "IRQControllers.CoreLevelInterruptor",
     "starfive,jh7100-clint": "IRQControllers.CoreLevelInterruptor",
     "riscv,sifive-e31": "CPU.RiscV32",
