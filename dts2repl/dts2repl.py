@@ -810,8 +810,8 @@ def generate(filename, override_system_clock_frequency=None):
 
         # additional parameters for peripherals
         if model == 'IRQControllers.PlatformLevelInterruptController':
-            # the default of 1023 matches the highest one seen in Zephyr's dts
-            ndev = get_node_prop(node, 'riscv,ndev', 1023)
+            # 1023 is currently maximum value supported by the PLIC model in Renode
+            ndev = min(1023, get_node_prop(node, 'riscv,ndev', 1023))
             indent.append(f'numberOfSources: {ndev}')
         if model == "IRQControllers.CoreLevelInterruptor":
             frequency = override_system_clock_frequency or 1000000
