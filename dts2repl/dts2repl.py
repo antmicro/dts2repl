@@ -718,7 +718,21 @@ def generate(filename, override_system_clock_frequency=None):
         regions = []
         indent = []
 
-        if addr and not model.startswith('CPU.'):
+        # special handling of flash devices as those should be treated as memory
+        if compat in [ 'nxp,imx-flexspi-nor', 'nxp,imx-flexspi-hyperflash', 'nxp,imx-flexspi-mx25um51345g', 'nxp,s32-qspi-nor' ]:
+            # try to take the 2nd reg entry from the parent controller
+            if not node.parent:
+                logging.info(f'Parent node for {name} of type {compat} not found. Skipping...')
+                continue
+            parent_regs = list(get_reg(node.parent))
+            if len(parent_regs) != 2:
+                logging.info(f'Expected 2 reg entries for {name} parent. Skipping...')
+                continue
+
+            base, size = parent_regs[1]
+            regions = [RegistrationRegion(base)]
+            indent.append(f'size: {hex(size)}')
+        elif addr and not model.startswith('CPU.'):
             addr = int(addr.split(',')[0], 16)
             addr = translate_address(addr, node)
             if addr % 4 != 0:
