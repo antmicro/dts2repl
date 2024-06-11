@@ -913,7 +913,8 @@ def generate(filename, override_system_clock_frequency=None):
 
             if any(c.startswith('riscv,sifive') or
                    c.startswith('starfive,rocket') or
-                   c == 'sifive,e31'
+                   c == 'sifive,e31' or
+                   c == 'qemu,riscv-virt'
                    for c in compatible) or "_xandes" in isa:
                 indent.append('privilegeArchitecture: PrivilegeArchitecture.Priv1_10')
             else:
