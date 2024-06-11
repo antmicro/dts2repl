@@ -716,6 +716,8 @@ def generate(filename, override_system_clock_frequency=None):
         dependencies = set()
         provides = {name}
         regions = []
+        indent = []
+
         if addr and not model.startswith('CPU.'):
             addr = int(addr.split(',')[0], 16)
             addr = translate_address(addr, node)
@@ -780,8 +782,6 @@ def generate(filename, override_system_clock_frequency=None):
             node_reg = next(get_reg(node), None)
             if node_reg and regions:
                 regions[0].address = node_reg[0]
-
-        indent = []
 
         for attr in attribs:
             if (isinstance(attribs[attr], str)):
