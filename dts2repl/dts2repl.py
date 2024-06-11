@@ -1011,7 +1011,7 @@ def generate(filename, override_system_clock_frequency=None):
                 if count == "8" and model == "Timers.NRF52840_Timer":
                     count = "6"
                 indent.append(f'numberOfEvents: {count}')
-        if model.startswith('Memory'):
+        if model.startswith('Memory') and not any(i for i in indent if i.startswith('size:')):
             if 'reg' in node.props:
                 _, size = next(get_reg(node))
                 # increase OCRAM size for imx6 platforms
