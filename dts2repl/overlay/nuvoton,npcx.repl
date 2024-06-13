@@ -1,4 +1,9 @@
-itim: Python.PythonPeripheral @ sysbus 0x400BE000
-    size: 0x1000
-    initable: true
-    script: "lastVal = 0 if request.isInit else lastVal + 1; request.value = int(lastVal / 4)"
+// Timers are added manually in the overlay due the the fact that both timers are represented as a single
+// dts entry in Zephyr. See: https://github.com/zephyrproject-rtos/zephyr/blob/df788d0b41300473f047a1497fae57e8ab351f26/dts/arm/nuvoton/npcx/npcx9.dtsi#L64-L71
+
+itim32: Timers.NPCX_ITIM @ sysbus 0x400B0000
+    -> nvic0@28
+
+itim64: Timers.NPCX_ITIM @ sysbus 0x400BE000
+    is64Bit: true
+    -> nvic0@58
