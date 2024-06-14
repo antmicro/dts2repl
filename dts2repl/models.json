@@ -177,7 +177,7 @@
 
     "nvidia,tegra114-i2c": "I2C.TegraI2CController",
 
-    "renesas,smartbond-uart": "UART.SmartbondUART",
+    "renesas,smartbond-uart": "UART.RenesasDA14_UART",
     "renesas,rzt2m-uart": "UART.Renesas_SCI",
     "renesas,rcar-scif": "UART.RCAR_UART",
     "renesas,rcar-hscif": "UART.RCAR_UART",
