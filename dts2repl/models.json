@@ -177,10 +177,17 @@
 
     "nvidia,tegra114-i2c": "I2C.TegraI2CController",
 
+    "renesas.smartbond-gpio": "GPIOPort.RenesasDA14_GPIO",
+    "renesas,smartbond-i2c": "I2C.RenesasDA_I2C",
+    "renesas,smartbond-spi": "SPI.RenesasDA_SPI",
     "renesas,smartbond-uart": "UART.RenesasDA14_UART",
+    "renesas,smartbond-watchdog": "Timers.RenesasDA_Watchdog",
+    "renesas,smartbond-adc": "Analog.RenesasDA14_GPADC",
+    "renesas.smartbond-dma" : "DMA.RenesasDA14_DMA",
     "renesas,rzt2m-uart": "UART.Renesas_SCI",
     "renesas,rcar-scif": "UART.RCAR_UART",
     "renesas,rcar-hscif": "UART.RCAR_UART",
+    "renesas,ra-gpio": "GPIOPort.RenesasRA4_GPIO",
     "renesas,ra-interrupt-controller-unit" : "IRQControllers.RenesasRA_ICU",
     "renesas,ra-sci" :  { "type" : "SCI.RenesasRA6M5_SCI", "frequency": 48000000, "enableManchesterMode" : false, "enableFIFO" : false },
     "renesas,smartbond-timer" : "Timers.RenesasDA14_GPT",
