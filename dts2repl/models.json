@@ -34,6 +34,7 @@
     "arm,cortex-m33": { "type": "CPU.CortexM", "cpuType": "cortex-m33" },
     "arm,cortex-m33f": { "type": "CPU.CortexM", "cpuType": "cortex-m33" },
     "arm,cortex-m55": { "type": "CPU.CortexM", "cpuType": "cortex-m33" },
+    "arm,cortex-m85": { "type": "CPU.CortexM", "cpuType": "cortex-m85" },
     "arm,cortex-m4": { "type": "CPU.CortexM", "cpuType": "cortex-m4" },
     "arm,cortex-m4f": { "type": "CPU.CortexM", "cpuType": "cortex-m4f" },
     "arm,cortex-m7": { "type": "CPU.CortexM", "cpuType": "cortex-m7" },
