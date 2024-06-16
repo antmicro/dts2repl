@@ -1,4 +1,4 @@
 sysbus:
     init:
         ApplySVD @https://dl.antmicro.com/projects/renode/svd/R7FA4M1AB.svd.gz
-        Tag <0x4001E03C 4> "SYSTEM_OSCSF" 0xFFFFFFFF
+        Tag <0x4001E03C 4> "SYSTEM_OSCSF" 0xF
