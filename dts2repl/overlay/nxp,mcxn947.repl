@@ -1,9 +1,9 @@
 sysbus:
     init:
         Tag <0x50045040 4> "UNKNOWN1" 0xF0000000
-	Tag <0x50044300 4> "UNKNOWN2" 0x0F000000
-	Tag <0x50044500 4> "UNKNOWN3" 0x0F000000
-	Tag <0x50044600 4> "UNKNOWN4" 0x0F000000
+        Tag <0x50044300 4> "UNKNOWN2" 0x0F000000
+        Tag <0x50044500 4> "UNKNOWN3" 0x0F000000
+        Tag <0x50044600 4> "UNKNOWN4" 0x0F000000
 
 unknown5: PythonPeripheral @ sysbus 0x50044010
     size: 0x4
