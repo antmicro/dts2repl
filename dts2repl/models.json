@@ -180,6 +180,7 @@
     "renesas,ra-interrupt-controller-unit" : "IRQControllers.RenesasRA_ICU",
     "renesas,ra-sci" :  { "type" : "SCI.RenesasRA6M5_SCI", "frequency": 48000000, "enableManchesterMode" : false, "enableFIFO" : false },
     "renesas,smartbond-timer" : "Timers.RenesasDA14_GPT",
+    "renesas,ra-clock-generation-circuit": { "type": "Python.PythonPeripheral", "size": 0x40, "initable": false, "script": "request.value = 0xFFFFFFFF" },
 
     "nxp,flexpwm": "Timers.IMXRT_PWM",
     "nxp,imx-code-bus": "Memory.MappedMemory",
