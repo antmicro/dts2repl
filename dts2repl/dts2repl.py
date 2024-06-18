@@ -136,12 +136,15 @@ def get_uart(dts_filename):
     # Finally, just return any non-disabled node that looks vaguely like a uart
     for node in dt.node_iter():
         if any(x in node.name.lower() for x in ('uart', 'usart', 'serial')):
-            if get_node_prop(node, 'status', default='okay') != 'disabled' and 'reg' in node.props:
+            if not is_disabled(node) and 'reg' in node.props:
                 return name_mapper.get_name(node)
 
     # No uart found
     return None
 
+
+def is_disabled(node):
+    return get_node_prop(node, 'status', default='okay') == 'disabled'
 
 
 def get_user_led0(dts_filename):
@@ -696,7 +699,7 @@ def generate(filename, override_system_clock_frequency=None):
             continue
 
         # not sure why this is needed. We need to investigate the RCC->RTC dependency.
-        if get_node_prop(node, 'status') == 'disabled' and not node.name.startswith('rtc') and not "renesas,smartbond-timer" in compat:
+        if is_disabled(node) and not node.name.startswith('rtc') and not "renesas,smartbond-timer" in compat:
             logging.info(f'Node {node.name} disabled. Skipping...')
             continue
 
@@ -1004,7 +1007,7 @@ def generate(filename, override_system_clock_frequency=None):
 
         if model == 'SCI.RenesasRA6M5_SCI':
             for child in node.nodes.values():
-                if get_node_prop(child, 'status') == "disabled":
+                if is_disabled(child):
                     continue
                 icu_irqs = get_node_prop(node, 'interrupts')
                 sci_uart_compat = get_node_prop(child, 'compatible')
@@ -1316,10 +1319,8 @@ def process_node(node, node_type, mcu, overlays, get_snippets, skip_disabled):
     label = None
     model = None
 
-    if skip_disabled:
-        status = get_node_prop(node, 'status')
-        if status == 'disabled':
-            return None
+    if skip_disabled and is_disabled(node):
+        return None
 
     if (compats := get_compats(node)) is None:
         return None
