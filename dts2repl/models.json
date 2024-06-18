@@ -11,7 +11,7 @@
     "arm,armv8-timer": { "renesas,rzt2m_starter_kit": { "type": "Timers.ARM_GenericTimer", "frequency": 20000000 }, "_": { "type": "Timers.ARM_GenericTimer", "frequency": 62500000 } },
     "arm,armv8_timer": { "type": "Timers.ARM_GenericTimer", "frequency": 62500000 },
 
-    "arm,armv8": { "type": "CPU.ARMv8A", "cpuType": "cortex-a53" },
+    "arm,armv8": { "type": "CPU.ARMv8A", "cpuType": "cortex-a55" },
     "arm,cortex-a5": { "type": "CPU.ARMv7A", "cpuType": "cortex-a5" },
     "arm,cortex-a9": { "type": "CPU.ARMv7A", "cpuType": "cortex-a9" },
     "arm,cortex-a15": { "type": "CPU.ARMv7A", "cpuType": "cortex-a15" },
