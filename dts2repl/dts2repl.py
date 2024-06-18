@@ -1169,6 +1169,8 @@ def generate(filename, override_system_clock_frequency=None):
                 # assume very large IRQ numbers which have all bits set (i.e. 2^n - 1) are invalid
                 if irq >= 0xfff and (irq & (irq + 1)) == 0:
                     continue
+                if is_disabled(irq_dest):
+                    continue
                 irq_dest_name = name_mapper.get_name(irq_dest)
                 if i in irq_local_indices:
                     irq_dest_name += f'#{irq_local_indices[i]}'
