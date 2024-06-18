@@ -8,17 +8,3 @@ mstimer: Timers.MPFS_Timer @ sysbus 0x20125000
     Timer1IRQ -> plic@82
     Timer2IRQ -> plic@83
 
-cpu0:
-    privilegeArchitecture: PrivilegeArchitecture.Priv1_10
-
-cpu1:
-    privilegeArchitecture: PrivilegeArchitecture.Priv1_10
-
-cpu2:
-    privilegeArchitecture: PrivilegeArchitecture.Priv1_10
-
-cpu3:
-    privilegeArchitecture: PrivilegeArchitecture.Priv1_10
-
-cpu4:
-    privilegeArchitecture: PrivilegeArchitecture.Priv1_10
