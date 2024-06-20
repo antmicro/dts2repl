@@ -7,4 +7,5 @@ sysbus:
     init:
         Tag <0x50034FE0 0x4> "FLASH_STAT" 0xFFFFFFFF
         Tag <0x40034FE0 0x4> "FLASH_INTSTAT" 0xFFFFFFFF
+        Tag <0x40013024 0x4> "ANACTRL_24" 0xFFFFFFFF
 
