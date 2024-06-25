@@ -1209,11 +1209,14 @@ def generate(filename, override_system_clock_frequency=None):
     # soc and board overlay
     overlay_path = f'{pathlib.Path(__file__).parent.resolve()}/overlay'
     overlay_blocks = []
+    overlay_files = os.listdir(overlay_path)
     for compat in sorted(overlays):
-        overlay = f'{overlay_path}/{compat}.repl'
-        if os.path.exists(overlay):
-            overlay_blocks.append(ReplBlock('', None, set(), set(), [f'// {compat} overlay']))
-            overlay_blocks.extend(parse_overlay(overlay))
+        overlay = f'{compat}.repl'
+        for file in overlay_files:
+            if overlay.lower() == file.lower():
+                overlay_blocks.append(ReplBlock('', None, set(), set(), [f'// {compat} overlay']))
+                overlay_blocks.extend(parse_overlay(f'{overlay_path}/{file}'))
+                break
 
     # filter out unavailable blocks (with unsatisfied depends)
     blocks = filter_available_blocks(blocks + overlay_blocks)
