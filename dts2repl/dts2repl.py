@@ -15,6 +15,7 @@ from collections import Counter
 from dataclasses import dataclass
 from typing import List, Set, Optional
 import itertools
+import functools
 from dts2repl import dtlib, name
 from dts2repl.improved_json_decoder import ImprovedJsonDecoder
 
@@ -178,6 +179,7 @@ def get_user_led0(dts_filename):
     return {'name': gpio_name, 'led_name': led_name}
 
 
+@functools.cache
 def get_dt(filename):
     dts_file = []
 
