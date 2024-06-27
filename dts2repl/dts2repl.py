@@ -840,6 +840,9 @@ def generate(filename, override_system_clock_frequency=None):
         if model == 'IRQControllers.RenesasRA_ICU':
             indent.append('nvic: nvic0')
             dependencies.add('nvic0')
+        if model == 'Timers.RenesasDA_Watchdog':
+            indent.append('nvic: nvic0')
+            dependencies.add('nvic0')
 
         # additional parameters for python peripherals
         if compat.startswith('fsl,imx6') and compat.endswith('-anatop'):

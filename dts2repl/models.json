@@ -182,7 +182,7 @@
     "renesas,smartbond-i2c": "I2C.RenesasDA_I2C",
     "renesas,smartbond-spi": "SPI.RenesasDA_SPI",
     "renesas,smartbond-uart": "UART.RenesasDA14_UART",
-    "renesas,smartbond-watchdog": "Timers.RenesasDA_Watchdog",
+    "renesas,smartbond-watchdog": {"type": "Timers.RenesasDA_Watchdog", "frequency": 32000},
     "renesas,smartbond-adc": "Analog.RenesasDA14_GPADC",
     "renesas.smartbond-dma" : "DMA.RenesasDA14_DMA",
     "renesas,rzt2m-uart": "UART.Renesas_SCI",
