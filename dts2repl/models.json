@@ -70,7 +70,9 @@
     "atmel,sam-usart": "UART.SAM_USART",
     "atmel,sam-uart": "UART.SAM_USART",
     "atmel,sam0-uart": { "atmel,samd20": "UART.SAMD20_UART", "_": "UART.SAMD5_UART" },
+
     "nuvoton,npcx-uart": "UART.NPCX_UART",
+    "nuvoton,npcx-gpio": "GPIOPort.NPCX_GPIO",
     "nuvoton,numicro-uart": "UART.NS16550",
 
     "brcm,iproc-pcie-ep": {"type": "Python.PythonPeripheral", "size": 0x2100, "initable": false, "script": "request.value = 0x1" },
