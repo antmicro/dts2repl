@@ -2,8 +2,10 @@
 // dts entry in Zephyr. See: https://github.com/zephyrproject-rtos/zephyr/blob/df788d0b41300473f047a1497fae57e8ab351f26/dts/arm/nuvoton/npcx/npcx9.dtsi#L64-L71
 
 itim32: Timers.NPCX_ITIM @ sysbus 0x400B0000
+    apb2Frequency: 15000000
     -> nvic0@28
 
 itim64: Timers.NPCX_ITIM @ sysbus 0x400BE000
     is64Bit: true
+    apb2Frequency: 15000000
     -> nvic0@58
