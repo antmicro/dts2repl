@@ -1,3 +1,6 @@
+mem: Memory.MappedMemory @ 0x2000000
+    size: 0x100000
+
 sysbus:
     init:
         // ApplySVD @https://dl.antmicro.com/projects/renode/svd//MSP432P401R.svd.gz
@@ -15,4 +18,4 @@ sysbus:
 
 cpu0:
     init:
-        AddHook 0x2014000 "console = monitor.Machine['sysbus.uart'];cpu.GetRegisterUnsafe(1).RawValue"
+        AddHook 0x2014000 "console = monitor.Machine['sysbus.uart0'];console.WriteChar(cpu.GetRegisterUnsafe(1).RawValue)"
