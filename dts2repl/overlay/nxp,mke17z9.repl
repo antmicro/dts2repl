@@ -8,4 +8,5 @@ if request.isRead: request.value = 0x2000000 if lastVal == None else 0x3000000; 
 
 sysbus:
     init:
-        Tag <0x40064200 4> "UNKNOWN" 0xFFFFFFFF
+        Tag <0x40064200 4> "UNKNOWN1" 0xFFFFFFFF
+        Tag <0x40064300 4> "UNKNOWN2" 0xFFFFFFFF
