@@ -916,8 +916,10 @@ def generate(filename, override_system_clock_frequency=None):
                 indent.append('timeProvider: clint')
                 dependencies.add('clint')
                 indent.append('allowUnalignedAccesses: true')
-
-            indent.append(f'hartId: {node.name.split("@")[1]}')
+            hartid = 0
+            if len(node.name.split("@")) >= 2:
+                hartid = node.name.split("@")[1]
+            indent.append(f'hartId: {hartid}')
 
             if any(c.startswith('riscv,sifive') or
                    c.startswith('starfive,rocket') or
