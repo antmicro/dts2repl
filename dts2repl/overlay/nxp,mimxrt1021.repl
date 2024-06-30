@@ -1,0 +1,4 @@
+sysbus:
+    init:
+        Tag <0x40080000 4> "UNKNOWN1" 0xFFFFFFFF
+        Tag <0x400D80E0 4> "UNKNOWN2" 0xFFFFFFFF
