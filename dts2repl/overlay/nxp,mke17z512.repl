@@ -1,0 +1,11 @@
+SCG_CSR: Python.PythonPeripheral @ sysbus 0x40064010
+    size: 0x4
+    initable: true
+    script: '''
+if request.isInit: lastVal = None
+if request.isRead: request.value = 0x2000000 if lastVal == None else 0x3000000; lastVal = request.value
+'''
+
+sysbus:
+    init:
+        Tag <0x40064200 4> "UNKNOWN" 0xFFFFFFFF
