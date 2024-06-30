@@ -894,10 +894,10 @@ def generate(filename, override_system_clock_frequency=None):
             dependencies.add(f'nvic{cpu_number}')
             overlays.add('cortex-m')
 
-        if model == 'CPU.RiscV32':  # We use CPU.RiscV32 as a generic model for all RV CPUs and fix it up here
+        if model == 'CPU.RiscV32' or model == 'CPU.Ri5cy':  # We use CPU.RiscV32 as a generic model for all RV CPUs and fix it up here
             isa = get_node_prop(node, 'riscv,isa', 'rv32imac')
             # The g extension already contains Zicsr and Zifencei
-            if '64g' not in isa and '32g' not in isa:
+            if 'rv64g' not in isa and 'rv32g' not in isa:
                 if '_zicsr' not in isa:
                     isa += '_zicsr'
                 if '_zifencei' not in isa:
