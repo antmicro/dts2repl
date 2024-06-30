@@ -2,4 +2,4 @@ sysbus:
     init:
         Unregister "sysbus.rcu"
         Tag <0x40021000 4> "RCU_UNKNOWN" 0xFFFFFFFF
-        Machine PyDevFromFile @scripts/pydev/rolling-bit.py 0x40021004 True
+        Machine PyDevFromFile @scripts/pydev/rolling-bit.py 0x40021004 4 True
