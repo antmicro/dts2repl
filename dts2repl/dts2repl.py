@@ -179,7 +179,9 @@ def get_user_led0(dts_filename):
     return {'name': gpio_name, 'led_name': led_name}
 
 
-@functools.cache
+# Returns the same as @functools.cache but is available before Python 3.9
+# https://docs.python.org/3/library/functools.html#functools.cache
+@functools.lru_cache(maxsize=None)
 def get_dt(filename):
     dts_file = []
 
