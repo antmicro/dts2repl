@@ -249,6 +249,7 @@
     "sifive,e31": "CPU.RiscV32",
     "neorv32-cpu": "CPU.RiscV32",
     "neorv32-uart": "UART.NEORV32_UART",
+    "neorv32-machine-timer": { "type": "Timers.NEORV32_MachineSystemTimer", "frequency": 100000000 },
 
     "sifive,dtim0": "Memory.MappedMemory",
     "sifive,gpio0": "GPIOPort.SiFive_GPIO",
