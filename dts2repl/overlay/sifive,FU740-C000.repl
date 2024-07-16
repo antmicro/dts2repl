@@ -1,21 +1,21 @@
 cpu0:
-    privilegeArchitecture: PrivilegeArchitecture.Priv1_10
+    privilegedArchitecture: PrivilegedArchitecture.Priv1_10
 
 cpu1:
     cpuType: "rv64gc_zicsr_zifencei"
-    privilegeArchitecture: PrivilegeArchitecture.Priv1_10
+    privilegedArchitecture: PrivilegedArchitecture.Priv1_10
 
 cpu2:
     cpuType: "rv64gc_zicsr_zifencei"
-    privilegeArchitecture: PrivilegeArchitecture.Priv1_10
+    privilegedArchitecture: PrivilegedArchitecture.Priv1_10
 
 cpu3:
     cpuType: "rv64gc_zicsr_zifencei"
-    privilegeArchitecture: PrivilegeArchitecture.Priv1_10
+    privilegedArchitecture: PrivilegedArchitecture.Priv1_10
 
 cpu4:
     cpuType: "rv64gc_zicsr_zifencei"
-    privilegeArchitecture: PrivilegeArchitecture.Priv1_10
+    privilegedArchitecture: PrivilegedArchitecture.Priv1_10
 
 clint:
     numberOfTargets: 5

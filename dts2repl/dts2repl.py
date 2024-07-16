@@ -929,9 +929,9 @@ def generate(filename, override_system_clock_frequency=None):
                    c == 'sifive,u54' or
                    c == 'qemu,riscv-virt'
                    for c in compatible) or "_xandes" in isa:
-                indent.append('privilegeArchitecture: PrivilegeArchitecture.Priv1_10')
+                indent.append('privilegedArchitecture: PrivilegedArchitecture.Priv1_10')
             else:
-                indent.append('privilegeArchitecture: PrivilegeArchitecture.Priv1_09')
+                indent.append('privilegedArchitecture: PrivilegedArchitecture.Priv1_09')
         if model in ("CPU.ARMv8A", "CPU.ARMv8R", "CPU.ARMv7A", "CPU.ARMv7R") and name != "cpu0":
             # We generate the cpu0 timer along with correct interrupt connections
             # while processing the timer node in the dts, and we generate 'fake'
