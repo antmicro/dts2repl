@@ -1,13 +1,3 @@
 clint: IRQControllers.CoreLevelInterruptor @ sysbus 0x02000000
     frequency: 1000000
     [0, 1] -> cpu0@[3, 7]
-
-pciex8mgmt_phy0_cr_para_ack: Python.PythonPeripheral @ sysbus 0x100d0898
-    size: 0x4
-    initable: true
-    filename: "scripts/pydev/flipflop.py"
-
-pciex8mgmt_phy1_cr_para_ack: Python.PythonPeripheral @ sysbus 0x100d08d8
-    size: 0x4
-    initable: true
-    filename: "scripts/pydev/flipflop.py"

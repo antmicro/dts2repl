@@ -34,6 +34,16 @@ plic:
 l2Cache: Memory.MappedMemory @ sysbus 0x8000000
     size: 0x200000
 
+pciex8mgmt_phy0_cr_para_ack: Python.PythonPeripheral @ sysbus 0x100d0898
+    size: 0x4
+    initable: true
+    filename: "scripts/pydev/flipflop.py"
+
+pciex8mgmt_phy1_cr_para_ack: Python.PythonPeripheral @ sysbus 0x100d08d8
+    size: 0x4
+    initable: true
+    filename: "scripts/pydev/flipflop.py"
+
 // memory size is temporarily reduced
 // to avoid problems when running Renode
 // on specific hardware targets
