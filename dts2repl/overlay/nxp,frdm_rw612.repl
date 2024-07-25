@@ -1,0 +1,14 @@
+reset_hsgpio3: Python.PythonPeripheral @ sysbus 0x50020014
+    size: 0x4
+    initable: true
+    filename: "scripts/pydev/flipflop.py"
+
+reset_flexcomm12: Python.PythonPeripheral @ sysbus 0x50020010
+    size: 0x4
+    initable: true
+    filename: "scripts/pydev/flipflop.py"
+
+sysbus:
+    init:
+        Tag <0x50031028 4> "UNKNOWN1" 0xFFFFFFFF
+        Tag <0x50003088 4> "UNKNOWN2" 0xFFFFFFFF
