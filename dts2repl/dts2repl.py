@@ -552,6 +552,8 @@ def get_prop_value(prop: dtlib.Property, fmt: str):
         yield tuple(values)
 
 
+# This regex does not handle multi-registration points correctly, in the case of such a registration
+# only the leading '{' is captured (see below)
 OVERLAY_NODE = re.compile(
     r"""
     ^                                   # Start of a line
@@ -560,7 +562,7 @@ OVERLAY_NODE = re.compile(
      [^\S\n]*                           # be present on nodes that just override properties on existing ones
      (?P<model>[\w.]+)                  # Capture the model name in `model @ registration_point`
      \s*@\s*                            # Match the @ and whitespace
-     (?P<registration_point>\w+)        # Capture the registration point in `model @ registration_point`
+     (?P<registration_point>[{\w]+)     # Capture the registration point (or '{') in `model @ registration_point`
      (                                  # Optional: address
       \s+                               # Skip whitespace
       (?P<address>(0[xX])?[0-9a-fA-F]+) # Capture the address
@@ -594,6 +596,10 @@ def parse_overlay(path):
         # properties (such as `timeProvider: clint`) could be used to derive additional
         # dependency information here
         registration_point = node.group('registration_point')
+        # We don't support properly parsing multi-registration points, we just treat them as
+        # a sysbus registration instead for dependency purposes
+        if registration_point == '{':
+            registration_point = 'sysbus'
         region = None
         if registration_point:
             # Only creating entries actually provide the name
