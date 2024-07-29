@@ -593,10 +593,11 @@ def parse_overlay(path):
         # the same prefix in `generate` for reasoning
         # properties (such as `timeProvider: clint`) could be used to derive additional
         # dependency information here
-        provides.add(node.group('name'))
         registration_point = node.group('registration_point')
         region = None
         if registration_point:
+            # Only creating entries actually provide the name
+            provides.add(node.group('name'))
             depends.add(registration_point)
             if node.group('address'):
                 address = node.group('address')
@@ -606,6 +607,9 @@ def parse_overlay(path):
                     if 'size:' in line:
                         region.size = int(line.split()[1], 16)
                         break
+        else:
+            # Non-creating entries depend on a creating entry
+            depends.add(node.group('name'))
         blocks.append(
             ReplBlock(node.group('name'), node.group('model'), depends, provides, part, region)
         )
