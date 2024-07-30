@@ -1262,13 +1262,17 @@ def generate(filename, override_system_clock_frequency=None):
     unsized = []
     for block in blocks:
         (unsized, sized)[block.region is not None and block.region.has_address_and_size].append(block)
+
+    def are_compatible(model_a, model_b):
+        return model_a == model_b or (model_a.startswith('Memory') and model_b.startswith('Memory'))
+
     # merge overlapping sized blocks
     # NOTE: currently, only memory blocks are merged, other overlapping blocks are removed
     sized_merged = []
     for block in sorted(sized, key=lambda b: (b.region.address, b.region.end)):
         if (
             sized_merged
-            and sized_merged[-1].model == block.model
+            and are_compatible(sized_merged[-1].model, block.model)
             and sized_merged[-1].region.end >= block.region.address + 1
         ):
             target = sized_merged[-1]
