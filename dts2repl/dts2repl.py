@@ -1219,6 +1219,12 @@ def generate(filename, override_system_clock_frequency=None):
         for r in regions:
             dependencies.add(r.registration_point)
 
+        if model.startswith('Memory'):
+            if model == 'Memory.MappedMemory' and size % 0x400 != 0:
+                # there is a requirement for mapped memory regions to be of certain size in tlib;
+                # let's fallback to array memory for smaller regions
+                model = 'Memory.ArrayMemory'
+
         block_content = [f'{name}: {model} @ {RegistrationRegion.to_repl(regions)}']
         block_content.extend(map(lambda x: f'    {x}', indent))
 
