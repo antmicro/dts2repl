@@ -1,0 +1,10 @@
+SYSC_SCICKCR: Python.PythonPeripheral @ sysbus 0x4001e055
+    size: 0x1
+    initable: true
+    filename: "scripts/pydev/flipflop.py"
+
+SYSC_OSCSF: Python.PythonPeripheral @ sysbus 0x4001e03c
+    size: 0x1
+    initable: true
+    filename: "scripts/pydev/flipflop.py"
+
