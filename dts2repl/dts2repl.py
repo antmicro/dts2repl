@@ -787,6 +787,12 @@ def generate(filename, override_system_clock_frequency=None):
             # assume sysbus registration without address like for CPUs
             regions = [RegistrationRegion()]
 
+        if compat == 'renesas,ra-sci':
+            # get the name from the first enabled child
+            child = next((n for n in node.nodes.values() if not is_disabled(n)), None)
+            if child:
+                name = name_mapper.get_name(child)
+
         # special multi-registration address for GIC
         if model == 'IRQControllers.ARM_GenericInterruptController':
             def arm_gic_get_region(addr, size, name):
