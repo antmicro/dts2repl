@@ -147,6 +147,7 @@
     "marvell,sheeva-v7": { "type": "CPU.ARMv7A", "cpuType": "cortex-a9" },
 
     "openisa,rv32m1": "CPU.Ri5cy",
+    "openisa,rv32m1-lpuart": { "type": "UART.NXP_LPUART", "fifoSize": 8 },
 
     "microchip,miv": "CPU.RiscV32",
     "microchip,coreuart": { "type": "UART.MiV_CoreUART", "clockFrequency": 66000000 },
@@ -226,7 +227,7 @@
     "nxp,imx-lpi2c": "I2C.S32K3XX_LowPowerInterIntegratedCircuit",
     "nxp,kinetis-lpsci": "UART.ImxUart",
     "nxp,gpt-hw-timer": "Timers.IMX_GPTimer",
-    "nxp,kinetis-lpuart": { "nxp,k6x|nxp,k8x": { "type": "UART.Kinetis_LPUART", "hasGlobalRegisters": false }, "_" : "UART.Kinetis_LPUART" },
+    "nxp,kinetis-lpuart": { "nxp,k6x|nxp,k8x": { "type": "UART.NXP_LPUART", "hasGlobalRegisters": false, "fifoSize": 4 }, "_" : "UART.NXP_LPUART" },
     "nxp,kinetis-mcg": "Miscellaneous.K6xF_MCG",
     "nxp,kinetis-rnga": "Miscellaneous.K6xF_RNG",
     "nxp,kinetis-sim": "Miscellaneous.K6xF_SIM",
