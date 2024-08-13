@@ -226,7 +226,7 @@ def get_node_prop(node, prop, default=None, inherit=False):
         return default
 
     val = node.props[prop]
-    if prop in ('compatible', 'device_type'):
+    if prop in ('compatible', 'device_type', 'model'):
         val = val.to_strings()
     elif prop in ('interrupts', 'reg', 'ranges'):
         val = val.to_nums()
@@ -647,6 +647,9 @@ def get_overlays(dt):
 
     # get platform compat names
     platform = get_node_prop(dt.get_node('/'), 'compatible', [])
+    if not platform:
+        # if there is no compatible for the platform, let's try model
+        platform = get_node_prop(dt.get_node('/'), 'model', [])
 
     # get soc compat names
     if dt.has_node('/soc'):
