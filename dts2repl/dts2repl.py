@@ -965,6 +965,9 @@ def generate(filename, override_system_clock_frequency=None):
             indent.append(f'cpuId: {name.replace("cpu", "")}')
             indent.append('genericInterruptController: gic')
             dependencies.add('gic')
+        if model == "CPU.X86":
+            indent.append('lapic: intcloapic')
+            dependencies.add('intcloapic')
 
         if model == "CPU.Sparc":
             sysbus_endianness = ReplBlock('sysbus', None, {'sysbus'}, set(), ['sysbus:', '    Endianess: Endianess.BigEndian'])
