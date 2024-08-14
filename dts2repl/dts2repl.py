@@ -1145,6 +1145,9 @@ def generate(filename, override_system_clock_frequency=None):
             irq_dests = [(d, ps) for d, ps in get_node_prop(node, 'interrupts-extended') if len(ps) == 1]
             irq_dest_nodes = [d for d, _ in irq_dests]
             irq_numbers = [ps[0] for _, ps in irq_dests]
+        elif model == 'IRQControllers.LAPIC':
+            indent.append('IRQ -> cpu0@0')
+            dependencies.add('cpu0')
         for i, irq_dest_node in enumerate(irq_dest_nodes):
             irq_dest_compatible = get_node_prop(irq_dest_node, 'compatible', [])
             # treat the RISC-V CPU interrupt controller as the CPU itself
