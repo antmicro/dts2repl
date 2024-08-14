@@ -760,7 +760,7 @@ def generate(filename, override_system_clock_frequency=None):
                 continue
 
             # hack for x86/ioport
-            if model == 'UART.NS16550' and addr == 0x3f8:
+            if model == 'UART.NS16550' and addr in [0x2f8, 0x3f8]:
                 addr += 0xE0000000
 
             if model == 'Timers.TegraUsecTimer':
