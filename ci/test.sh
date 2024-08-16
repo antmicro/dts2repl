@@ -24,12 +24,14 @@ cd ci-output
 # Save diffs for repls that are different
 # diff returns 0 on no difference which we use to delete diff files if the
 # generated repl is identical (+/- blank lines) to the dashboard one
-cd repls/diffs
+pushd repls/diffs
 ls -1 ../generated | parallel 'diff -u --new-file --ignore-blank-lines "../dashboard/{}" "../generated/{}" > "{}.diff" && rm "{}.diff" || true'
-cd ../../
+popd
 
 if [ "$(ls -A repls/diffs | wc -l)" != 0 ]; then
-    echo Found differences, running Renode
-    export PATH=`find /ci -name renode-test | sed 's/\/renode-test//g'`:$PATH
+    echo "Found differences, running Renode"
+    RENODE_LOCATION=$(cat ${CI_PROJECT_DIR}/renode-location)
+    echo "Renode should be at ${RENODE_LOCATION}"
+    export PATH=$(find ${RENODE_LOCATION} -type f -name renode-test | xargs realpath | xargs dirname):$PATH
     renode-test --results-dir robot-results "$PWD/../ci/load_repls_with_diffs.robot"
 fi

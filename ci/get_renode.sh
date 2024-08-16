@@ -25,6 +25,9 @@ try_download() {
         tar xf renode*portable.tar.gz -C ..
         cd ..
         mv renode_*_portable renode-portable
+        RENODE_LOCATION=$(realpath renode-portable)
+        echo "Renode portable is now in ${RENODE_LOCATION}"
+        echo ${RENODE_LOCATION} > ${CI_PROJECT_DIR}/renode-location
         pip install -r renode-portable/tests/requirements.txt
         return 0
     else
@@ -42,6 +45,9 @@ try_build() {
     fi
 
     cd renode
+    RENODE_LOCATION=$(realpath .)
+    echo "Renode sources are now in ${RENODE_LOCATION}"
+    echo ${RENODE_LOCATION} > ${CI_PROJECT_DIR}/renode-location
     git checkout "${RENODE_VERSION}" || exit 1
     git submodule update --init --recursive || exit 1
 
