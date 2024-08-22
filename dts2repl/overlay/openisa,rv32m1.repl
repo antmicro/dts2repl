@@ -3,14 +3,34 @@ SCG_CSR: Python.PythonPeripheral @ sysbus 0x4002C010
     initable: true
     script: '''
 if request.isInit: lastVal = None
-if request.isRead: request.value = 0x2000000 if lastVal == None else 0x3000000; lastVal = request.value
+if request.isRead: request.value = 0x2000000 if lastVal == None else 0x3000001; lastVal = request.value
 '''
 
-sysbus:
-    init add:
+pcc0: Python.PythonPeripheral @ sysbus 0x4002B000
+    initable: true
+    size: 0x204
+    script: '''
+if request.isInit: regs = [0x80000000] * (size / 4)
+if request.isRead: request.value = regs[request.offset >> 2]
+if request.isWrite: regs[request.offset >> 2] = request.value
+'''
+
+pcc1: Python.PythonPeripheral @ sysbus 0x41027000
+    initable: true
+    size: 0x208
+    script: '''
+if request.isInit: regs = [0x80000000] * (size / 4)
+if request.isRead: request.value = regs[request.offset >> 2]
+if request.isWrite: regs[request.offset >> 2] = request.value
+'''
+
+sysbus: 
+    init:
         ApplySVD @https://dl.antmicro.com/projects/renode/svd/RV32M1_RI5CY.svd.gz
-        Tag <0x4002C200 4> "SCG_SIRCCSR" 0xFFFFFFFF
-        Tag <0x4002C500 4> "SCG_C500" 0xFFFFFFF
-        Tag <0x410270DC 4> "UNKNOWN1" 0xFFFFFFFF
-        Tag <0x4002B13C 4> "UNKNOWN_4002B13C" 0xFFFFFFFF
-        Tag <0x4102703C 4> "UNKNOWN2" 0xFFFFFFFF
+        Tag <0x4002C200 4> "SIRCCSR" 0xFFFFFFFF          
+        Tag <0x4002C300 4> "FIRCCSR" 0xFFFFFFFF          
+        Tag <0x4002C304 4> "FIRCDIV" 0x00010101
+        Tag <0x4002C500 4> "LPFFLCSR" 0xFFFFFFFF
+        Tag <0x4002C208 4> "SIRCFFG" 0x1
+        Tag <0x4004F004 4> "intmux0_channel0_source" 0xDC
+        SilenceRange <0xE004100C 4>

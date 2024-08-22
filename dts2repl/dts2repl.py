@@ -1449,6 +1449,14 @@ def generate(filename, override_system_clock_frequency=None):
         if model == "Timers.NEORV32_MachineSystemTimer":
             indent.append('-> cpu0@23')
 
+        # XXX: This differs from the DTS, as the 'intmux' interrupt controller is not simulated.
+        if compat == "openisa,rv32m1-lptmr" and name == "lptmr0":
+            indent.append("-> cpu0@24")
+
+        # XXX: This differs from the DTS, as the 'intmux' interrupt controller is not simulated.
+        if compat == "openisa,rv32m1-lpuart" and name == "lpuart0":
+            indent.append("IRQ -> cpu0@17")
+
         i2c_sensors = [
             'Sensors.TMP103',
             'Sensors.TMP108',
