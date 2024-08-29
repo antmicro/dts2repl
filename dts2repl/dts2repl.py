@@ -965,7 +965,7 @@ def generate(filename, override_system_clock_frequency=None):
             indent.append(f'cpuId: {name.replace("cpu", "")}')
             indent.append('genericInterruptController: gic')
             dependencies.add('gic')
-        if model == "CPU.X86":
+        if model in ("CPU.X86", "CPU.X86_64"):
             indent.append('lapic: intcloapic')
             dependencies.add('intcloapic')
 
