@@ -1,5 +1,15 @@
 #!/bin/bash
 
+# checkout on the specified version if needed
+if [ -n "$DTS2REPL_VERSION" ]; then
+	echo -e "\n========== DOING CHECKOUT ON VERSION ============"
+	echo $DTS2REPL_VERSION
+	git checkout $DTS2REPL_VERSION
+fi
+echo -e "\n========== INSTALLING DTS2REPL VERSION =========="
+git branch -v
+echo -e "=================================================\n"
+
 # install dts2repl as module
 pip3 install .
 
