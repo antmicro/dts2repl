@@ -207,7 +207,7 @@
     "renesas,ra-i2c" : "I2C.RenesasRA_IIC",
     "renesas,ra-interrupt-controller-unit" : "IRQControllers.RenesasRA_ICU",
     "renesas,ra-sci" :  { "renesas,ra8m1" : { "type" : "UART.RenesasRA8M1_SCI", "frequency": 48000000, "irq_mappings": ["ReceiveIRQ", "TransmitIRQ", "TransmitEndIRQ", null] },
-                          "_": { "type" : "SCI.RenesasRA6M5_SCI", "frequency": 48000000, "enableManchesterMode" : false, "enableFIFO" : false } },
+                          "_": { "type" : "SCI.RenesasRA6M5_SCI", "frequency": 48000000, "enableManchesterMode" : false, "enableFIFO" : false, "irq_mappings": ["ReceiveIRQ", "TransmitIRQ", "TransmitEndIRQ", null ] } },
     "renesas,ra-timer" : "Timers.RenesasRA_GPT",
     "renesas,smartbond-timer" : "Timers.RenesasDA14_GPT",
     "renesas,ra-clock-generation-circuit": { "type": "Python.PythonPeripheral", "size": 0x40, "initable": false, "script": "request.value = 0xFFFFFFFF" },

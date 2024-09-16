@@ -1041,23 +1041,6 @@ def generate(filename, override_system_clock_frequency=None):
                                         [f'{gpio_name}:', f'    {num} -> {name}@0'])
             blocks.append(gpio_connection)
 
-        if model == 'SCI.RenesasRA6M5_SCI':
-            for child in node.nodes.values():
-                if is_disabled(child):
-                    continue
-                icu_irqs = get_node_prop(node, 'interrupts')
-                sci_uart_compat = get_node_prop(child, 'compatible')
-                if 'renesas,ra-uart-sci' in sci_uart_compat:
-                    name = name_mapper.get_name(child)
-                    # We take a substring here because the DTS may have different numbers than the reference manual
-                    # e.g. `0xa300` instead of `0xa3`
-                    receive_irq_num = hex(int(icu_irqs[2]))[:4] if len(hex(int(icu_irqs[2]))) > 4 else hex(int(icu_irqs[2]))
-                    transmit_irq_num = hex(int(icu_irqs[5]))[:4] if len(hex(int(icu_irqs[5]))) > 4 else hex(int(icu_irqs[5]))
-                    transmitend_irq_num = hex(int(icu_irqs[8]))[:4] if len(hex(int(icu_irqs[8]))) > 4 else hex(int(icu_irqs[8]))
-                    indent.append(f'ReceiveIRQ -> icu@{receive_irq_num}')
-                    indent.append(f'TransmitIRQ -> icu@{transmit_irq_num}')
-                    indent.append(f'TransmitEndIRQ -> icu@{transmitend_irq_num}')
-
         if model.startswith('Timers'):
             if 'cc-num' in node.props:
                 count = str(get_node_prop(node, "cc-num"))
@@ -1127,6 +1110,13 @@ def generate(filename, override_system_clock_frequency=None):
             if interrupt_parent is not None:
                 interrupt_cells = get_node_prop(interrupt_parent, '#interrupt-cells', default=2)
                 irq_numbers = get_node_prop(node, 'interrupts')[::interrupt_cells]
+
+                if compat == 'renesas,ra-sci' and 'uart' in node.nodes and node.nodes['uart'].props['compatible'].to_string() == 'renesas,ra-uart-sci':
+                    # there is a difference between IRQ description for 'renesas,ra-uart-sci' and 'renesas,ra-sci-uart' drivers!
+                    # we need to use the last cell and additionally use upper two bytes of the value there
+                    irq_numbers = get_node_prop(node, 'interrupts')[(interrupt_cells - 1)::interrupt_cells]
+                    irq_numbers = [i >> 8 for i in irq_numbers]
+
                 irq_dest_nodes = [interrupt_parent] * len(irq_numbers)
 
                 # Handle GIC IRQ number remapping
