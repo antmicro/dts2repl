@@ -18,6 +18,7 @@
     "arm,cortex-a5": { "type": "CPU.ARMv7A", "cpuType": "cortex-a5" },
     "arm,cortex-a9": { "type": "CPU.ARMv7A", "cpuType": "cortex-a9" },
     "arm,cortex-a15": { "type": "CPU.ARMv7A", "cpuType": "cortex-a15" },
+    "arm,cortex-a35": { "type": "CPU.ARMv8A", "cpuType": "cortex-a53" },
     "arm,cortex-a53": { "type": "CPU.ARMv8A", "cpuType": "cortex-a53" },
     "arm,cortex-a55": { "type": "CPU.ARMv8A", "cpuType": "cortex-a55" },
     "arm,cortex-a57": { "type": "CPU.ARMv8A", "cpuType": "cortex-a53" },
