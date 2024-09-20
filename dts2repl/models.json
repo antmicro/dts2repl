@@ -206,7 +206,7 @@
                           "renesas,r7fa8m1a" : "GPIOPort.RenesasRA8_GPIO" },
     "renesas,ra-i2c" : "I2C.RenesasRA_IIC",
     "renesas,ra-interrupt-controller-unit" : "IRQControllers.RenesasRA_ICU",
-    "renesas,ra-sci" :  { "renesas,ra8m1" : { "type" : "UART.RenesasRA8M1_SCI", "frequency": 48000000, "irq_mappings": ["ReceiveIRQ", "TransmitIRQ", "TransmitEndIRQ", null] },
+    "renesas,ra-sci" :  { "renesas,ra8|renesas,ra8m1" : { "type" : "UART.RenesasRA8M1_SCI", "frequency": 48000000, "irq_mappings": ["ReceiveIRQ", "TransmitIRQ", "TransmitEndIRQ", null] },
                           "_": { "type" : "SCI.RenesasRA6M5_SCI", "frequency": 48000000, "enableManchesterMode" : false, "enableFIFO" : true, "irq_mappings": ["ReceiveIRQ", "TransmitIRQ", "TransmitEndIRQ", null ] } },
     "renesas,ra-timer" : "Timers.RenesasRA_GPT",
     "renesas,smartbond-timer" : "Timers.RenesasDA14_GPT",
