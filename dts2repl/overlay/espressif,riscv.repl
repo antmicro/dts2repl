@@ -1,0 +1,36 @@
+irom0: Memory.MappedMemory @ sysbus 0x40000000
+    size: 0x40000
+
+irom1: Memory.MappedMemory @ { sysbus 0x40040000; sysbus 0x3ff00000 }
+    size: 0x20000
+
+flash: Memory.ArrayMemory @ sysbus 0x0
+    size: 0x100000
+
+// sram0: Memory.MappedMemory @ { sysbus 0x4037c000; sysbus 0x3fc7c000 }
+//    size: 0x4000
+
+// sram1: Memory.MappedMemory @ { sysbus 0x40380000; sysbus 0x3fc80000 }
+//    size: 0x60000
+
+rtcfast: Memory.MappedMemory @ sysbus 0x50000000
+    size: 0x2000
+
+ucache: Memory.MappedMemory @ { sysbus 0x42000000; sysbus 0x3c000000 }
+    size: 0x800000
+
+cpu0:
+    init:
+        RegisterCustomCSR "0x0" 0x0 User
+        RegisterCustomCSR "0x800" 0x800 User
+        RegisterCustomCSR "0x801" 0x801 User
+        RegisterCustomCSR "0x802" 0x802 User
+        RegisterCustomCSR "0x7e2_PERF_COUNTER" 0x7e2 User
+
+sysbus:
+    init:
+        LoadELF @https://dl.antmicro.com/projects/renode/esp32c3_rev3_rom.elf-s_556332-d68afeb5bd7ab7904e7d5d3adf4d670df9d19c96
+        ApplySVD @https://github.com/esp-rs/esp32c3/raw/refs/heads/master/svd/esp32c3.svd
+        Tag <0x60008858 4> "EFUSE_REV" 0xFFFFFFFF
+        Tag <0x60004038 4> "GPIO_STRAP" 0x0c // SPI_FAST_FLASH_BOOT
+        Tag <0x60008038 4> "RTC_CNTL:RTC_RESET_STAT" 0x1 // POWERON  
