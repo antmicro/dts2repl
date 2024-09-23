@@ -148,7 +148,7 @@
     "marvell,mv78230-a0-i2c": {"type": "Python.PythonPeripheral", "size": 0x100, "initable": false, "script": "request.value = 0xf8" },
     "marvell,sheeva-v7": { "type": "CPU.ARMv7A", "cpuType": "cortex-a9" },
 
-    "openisa,rv32m1": "CPU.Ri5cy",
+    "openisa,ri5cy": "CPU.Ri5cy",
     "openisa,rv32m1-lpuart": { "type": "UART.NXP_LPUART", "fifoSize": 8 },
 
     "microchip,miv": "CPU.RiscV32",
