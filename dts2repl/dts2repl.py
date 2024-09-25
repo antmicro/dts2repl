@@ -702,11 +702,13 @@ def generate(filename, override_system_clock_frequency=None):
                 # 'can_be_memory' function
                 if can_be_memory(node):
                     compatible = ['memory']
-                    is_heuristic_memory = True
                     logging.debug(f'Node {node.name} will be treated as memory')
                 else:
                     logging.debug(f'Node {node.name} has no compat string or device_type and cannot be treated as memory. Skipping...')
                     continue
+
+        if 'memory' in compatible:
+            is_heuristic_memory = True
 
         # look at all compat strings and take the first one that has a Renode model
         # if none of them do, skip the node
