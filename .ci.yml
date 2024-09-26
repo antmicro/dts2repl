@@ -19,7 +19,7 @@ Compare repls:
     when: always
   before_script:
     - apt -qqy update > /dev/null 2> /dev/null
-    - apt -qqy install automake autoconf libtool g++ coreutils policykit-1 libgtk2.0-dev uml-utilities gtk-sharp2 wget jq git curl python3 python3-pip parallel xz-utils rename > /dev/null 2> /dev/null
+    - apt -qqy install automake autoconf cmake libtool g++ coreutils policykit-1 libgtk2.0-dev uml-utilities gtk-sharp2 wget jq git curl python3 python3-pip parallel xz-utils rename > /dev/null 2> /dev/null
     - apt -qqy install mono-complete 2> /dev/null > /dev/null
     - mono --version
     - ./ci/prepare.sh
