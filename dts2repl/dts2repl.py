@@ -87,6 +87,32 @@ def get_cpu_dep_chain(arch, dts_filename, zephyr_path, chain):
                 return get_cpu_dep_chain(arch, dtsi_filename, zephyr_path, chain+[name])
     return chain
 
+def get_usb_cdc_acm_uart(dts_filename):
+    # This function will check if CDC ACM UART is supported
+    # and will return its USB device name if it is supported
+    # and return None if it's not
+    try:
+        dt = dtlib.DT(dts_filename)
+    except FileNotFoundError:
+        logging.error(f'File not found: "{dts_filename}"')
+        return None
+    except Exception:
+        logging.exception('Error while parsing DT')
+        return None
+
+    name_mapper = NameMapper()
+    # Check if cdc-acm-uart is in dts file
+    # Then get chosen shell-uart, then by that get parent of CDC ACM UART.
+    # The CDC ACM UART is supposed to be a child of USB device.
+    try:
+        chosen = dt.get_node('/chosen')
+        cdc_acm_uart_node = chosen.props['zephyr,shell-uart'].to_path()
+        if cdc_acm_uart_node.props['compatible'].to_string() != 'zephyr,cdc-acm-uart':
+            logging.info(f'cdc acm uart is not supported: "{dts_filename}"')
+            return None
+        return name_mapper.get_name(cdc_acm_uart_node.parent)
+    except Exception:
+        return None
 
 def get_uart(dts_filename):
     try:
