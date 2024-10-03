@@ -1668,6 +1668,9 @@ def main():
         cmd = f'gcc -H -E -P -x assembler-with-cpp {incl_dirs} {args.preprocessor_args} {args.filename}'.split()
         ret = subprocess.run(cmd, capture_output=True)
 
+        if ret.returncode != 0:
+            raise ValueError(f'Preprocessing failed. Compiler output:\n{ret.stderr.decode("utf-8")}')
+
         # save partially flattened device tree
         base = os.path.splitext(args.output)[0]
         flat_dts = f'{base}.flat.dts'
