@@ -1,10 +1,10 @@
 #!/bin/bash
 
 # checkout on the specified version if needed
-if [ -n "$DTS2REPL_VERSION" ]; then
+if [ -n "$TARGET_VERSION" ]; then
 	echo -e "\n========== DOING CHECKOUT ON VERSION ============"
-	echo $DTS2REPL_VERSION
-	git checkout $DTS2REPL_VERSION
+	echo "$TARGET_VERSION"
+	git checkout "$TARGET_VERSION"
 fi
 echo -e "\n========== INSTALLING DTS2REPL VERSION =========="
 git branch -v
