@@ -7,11 +7,9 @@ irom1: Memory.MappedMemory @ { sysbus 0x40040000; sysbus 0x3ff00000 }
 flash: Memory.ArrayMemory @ sysbus 0x0
     size: 0x100000
 
-// sram0: Memory.MappedMemory @ { sysbus 0x4037c000; sysbus 0x3fc7c000 }
-//    size: 0x4000
-
-// sram1: Memory.MappedMemory @ { sysbus 0x40380000; sysbus 0x3fc80000 }
-//    size: 0x60000
+// readdress ram as it has a separate addressing for data and instructions
+sram0: @ { sysbus 0x3fc7c000; sysbus 0x4037c000 }
+    size: 0x64000
 
 rtcfast: Memory.MappedMemory @ sysbus 0x50000000
     size: 0x2000
