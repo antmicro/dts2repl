@@ -28,7 +28,10 @@ cpu0:
 sysbus:
     init:
         LoadELF @https://dl.antmicro.com/projects/renode/esp32c3_rev3_rom.elf-s_556332-d68afeb5bd7ab7904e7d5d3adf4d670df9d19c96
+        Tag <0x60009000 0x100> "IOMUX"
+        Tag <0x60004000 0x100> "GPIO"
+        Tag <0x60003000 0x100> "SPI0"
         ApplySVD @https://github.com/esp-rs/esp32c3/raw/refs/heads/master/svd/esp32c3.svd
         Tag <0x60008858 4> "EFUSE_REV" 0xFFFFFFFF
         Tag <0x60004038 4> "GPIO_STRAP" 0x0c // SPI_FAST_FLASH_BOOT
-        Tag <0x60008038 4> "RTC_CNTL:RTC_RESET_STAT" 0x1 // POWERON  
+        Tag <0x60008038 4> "RTC_CNTL:RTC_RESET_STAT" 0x1 // POWERON
