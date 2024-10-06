@@ -16,8 +16,22 @@ from dataclasses import dataclass
 from typing import List, Set, Optional
 import itertools
 import functools
-from dts2repl import dtlib, name
+from dts2repl import dtlib
 from dts2repl.improved_json_decoder import ImprovedJsonDecoder
+
+from dts2repl import name, version
+
+try:
+   from dts2repl import version_commit
+   version = version + "-" + version_commit
+except:
+   pass
+
+try:
+   from dts2repl import version_additional
+   version = version + "-" + version_additional
+except:
+   pass
 
 def get_models_path() -> Path:
     return pathlib.Path(__file__).parent.resolve() / "models.json"
@@ -27,6 +41,7 @@ with open(get_models_path()) as f:
 
 def parse_args():
     parser = argparse.ArgumentParser(prog=name)
+    parser.add_argument('-v', '--version', action="version", help="Display dts2repl version", version=name + " version " + version)
     parser.add_argument('filename')
     parser.add_argument('--loglevel',
                         default='warning',
