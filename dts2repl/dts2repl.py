@@ -813,9 +813,9 @@ def generate(filename, override_system_clock_frequency=None):
             if (
                 any(map(lambda x: x in compat,
                     ['stm32-gpio', 'stm32-timers', 'silabs,gecko', 'gaisler,irqmp',
-                     'gaisler,gptimer', 'gaisler,apbuart', 'xlnx,xuartps', 'nvidia,tegra114-i2c']))
+                     'gaisler,gptimer', 'gaisler,apbuart', 'xlnx,xuartps']))
                 or any(map(lambda x: x in model,
-                    ['UART.STM32_UART']))
+                    ['UART.STM32_UART', 'I2C.TegraI2CController']))
             ):
                 # sized sysbus registration for peripherals that require an explicit size
                 _, size = next(get_reg(node))
