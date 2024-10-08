@@ -1214,9 +1214,9 @@ def generate(filename, override_system_clock_frequency=None):
                 irq_names = ['0', '1', '2']
             elif model == 'Timers.ARM_GenericTimer':
                 irq_names = ['EL3PhysicalTimerIRQ', 'EL1PhysicalTimerIRQ', 'EL1VirtualTimerIRQ', 'NonSecureEL2PhysicalTimerIRQ', 'NonSecureEL2VirtualTimerIRQ']
-            # the Renode model for these UARTs only has 1 IRQ
+            # the Renode model for these only has 1 IRQ
             elif (compat in ['arm,pl011', 'atmel,sam0-uart']
-                  or model in ['UART.Cadence_UART', 'UART.NS16550']):
+                  or model in ['UART.Cadence_UART', 'UART.NS16550', 'Timers.ARM_SP804_Timer']):
                 irq_names = ['']
             elif compat in ['st,stm32-i2c-v1', 'st,stm32-i2c-v2']:
                 irq_names = ['EventInterrupt', 'ErrorInterrupt']
