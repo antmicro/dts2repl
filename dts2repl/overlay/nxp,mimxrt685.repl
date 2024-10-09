@@ -1,6 +1,21 @@
 rom: Memory.MappedMemory @ sysbus 0x13000000
     size: 0x10000
 
+reset_adc0: Python.PythonPeripheral @ sysbus 0x50000014
+    size: 0x4
+    initable: true
+    filename: "scripts/pydev/flipflop.py"
+
+reset_hsgpio3: Python.PythonPeripheral @ sysbus 0x50020014
+    size: 0x4
+    initable: true
+    filename: "scripts/pydev/flipflop.py"
+
+reset_flexcomm12: Python.PythonPeripheral @ sysbus 0x50020010
+    size: 0x4
+    initable: true
+    filename: "scripts/pydev/flipflop.py"
+
 sysbus:
     init:
         LoadBinary @https://dl.antmicro.com/projects/renode/rom_rt6xx.bin-s_41136-1a8f2af7d469626657587b933b3dc1e323f93135 0x13000000
