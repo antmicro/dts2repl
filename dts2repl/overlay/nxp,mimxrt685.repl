@@ -1,3 +1,6 @@
+rom: Memory.MappedMemory @ sysbus 0x13000000
+    size: 0x10000
+
 sysbus:
     init:
         LoadBinary @https://dl.antmicro.com/projects/renode/rom_rt6xx.bin-s_41136-1a8f2af7d469626657587b933b3dc1e323f93135 0x13000000
