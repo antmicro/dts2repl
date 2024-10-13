@@ -1,6 +1,7 @@
 {
     "zephyr,memory-region": "Memory.MappedMemory",
     "serial-flash": "Memory.MappedMemory",
+    "nordic,mram": "Memory.MappedMemory",
 
     "adi,max32-uart": "UART.MAX32655_UART",
     "adi,max32-gcr": {"type": "Python.PythonPeripheral", "size": 0x400, "initable": false, "script": "request.value = 0xFFFFFFFF if request.offset == 0x8 else 0x0" },
