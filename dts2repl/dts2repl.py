@@ -541,6 +541,7 @@ class RegistrationRegion:
 @dataclass
 class ReplFile:
     blocks: List[ReplBlock] = field(default_factory=list)
+    tags: List[TagBlock] = field(default_factory=list)
 
 
     def get_block_by_name(self, name: str) -> Optional[ReplBlock]:
@@ -559,7 +560,22 @@ class ReplFile:
         self.blocks.append(block)
 
 
-    def filter_available_blocks(self):
+    def try_generate_tag(self, dts_node: dtlib.Node) -> bool:
+        generated_any = False
+        for node_reg in get_reg(dts_node):
+            offset = node_reg[0]
+            size = node_reg[1]
+            if size is None or get_node_prop(dts_node.parent, 'device_type', [None], True)[0] == 'pci':
+                # this should filter out CPUs, SPI, I2C, PCI devices, etc.
+                continue
+            name = dts_node.labels[0] if any(dts_node.labels) else dts_node.name
+            tag = TagBlock(name, offset, size)
+            self.tags.append(tag)
+            generated_any = True
+        return generated_any
+
+
+    def filter_available_blocks(self) -> None:
         available_blocks = []
         visited_blocks = set()
 
@@ -629,8 +645,41 @@ class ReplFile:
             block.content = filtered_content
 
 
-    def __str__(self):
-        return '\n'.join([str(b) + '\n' for b in self.blocks]) + '\n'
+    def _get_grouped_tags(self) -> iterable[TagBlock]:
+        if len(self.tags) < 2:
+            return self.tags
+
+        # aggregate tags that occupy the same area, Renode doesn't like that
+        s = sorted(self.tags, key=lambda t: t.offset)
+        r = []
+        accumulator = copy.copy(s[0])
+        for t in s[1:]:
+            if t.offset <= (accumulator.offset + accumulator.size):
+                # the next tag partially overlaps the previous one - join them
+                if (t.offset + t.size) > (accumulator.offset + accumulator.size):
+                    accumulator.size = (t.offset + t.size) - accumulator.offset
+
+                if accumulator.name != t.name:
+                    accumulator.name += ' / ' + t.name
+            else:
+                r.append(accumulator)
+                accumulator = copy.copy(t)
+        r.append(accumulator)
+        return r
+
+
+    def __str__(self) -> str:
+        # generate tags first
+        # overlays can add more precise tagging with return values
+        body = ''
+        if any(self.tags):
+            body = 'sysbus:\n    init:\n'
+            for tag in self._get_grouped_tags():
+                body += 8 * ' ' + str(tag) + '\n'
+            body += '\n'
+        body += '\n'.join([str(b) + '\n' for b in self.blocks])
+        return body
+
 
 @dataclass
 class ReplBlock:
@@ -651,6 +700,14 @@ class ReplBlock:
         return '\n'.join(self.content)
 
 
+@dataclass
+class TagBlock:
+    name: str
+    offset: int
+    size: int
+
+    def __str__(self) -> str:
+        return  f'Tag <{hex(self.offset)}, {hex(self.offset + self.size - 1)}> "{self.name}"'
 
 
 # Allowed characters in format string:
@@ -829,6 +886,7 @@ def generate(filename, override_system_clock_frequency=None):
                     logging.debug(f'Node {node.name} will be treated as memory')
                 else:
                     logging.debug(f'Node {node.name} has no compat string or device_type and cannot be treated as memory. Skipping...')
+                    repl_file.try_generate_tag(node)
                     continue
 
         if 'memory' in compatible:
@@ -839,11 +897,13 @@ def generate(filename, override_system_clock_frequency=None):
         compat = next(filter(lambda x: x in MODELS, compatible), None)
         if compat is None:
             logging.info(f'Node {node.name} does not have a matching Renode model. Skipping...')
+            repl_file.try_generate_tag(node)
             continue
 
         # not sure why this is needed. We need to investigate the RCC->RTC dependency.
         if is_disabled(node) and not node.name.startswith('rtc') and not "renesas,smartbond-timer" in compat:
             logging.info(f'Node {node.name} disabled. Skipping...')
+            repl_file.try_generate_tag(node)
             continue
 
 
@@ -856,6 +916,7 @@ def generate(filename, override_system_clock_frequency=None):
         if model is None:
             # There is no model for the given "specialized" SoC compat string, but they might exist for other SoC variants
             logging.info(f'Node {node.name}, compat {compat} has no matching specific model - does the JSON have "_" clause? Skipping...')
+            repl_file.try_generate_tag(node)
             continue
         model = str(model)
 
@@ -883,6 +944,7 @@ def generate(filename, override_system_clock_frequency=None):
             addr = translate_address(addr, node)
             if addr % 4 != 0:
                 logging.info(f'Node {node.name} has misaligned address {addr}. Skipping...')
+                repl_file.try_generate_tag(node)
                 continue
 
             # hack for x86/ioport
@@ -976,6 +1038,7 @@ def generate(filename, override_system_clock_frequency=None):
             child = next(iter(children), None)
             if child == None:
                 logging.warn(f'{model} should have exactly one flash child node, but got none. Dropping {model}')
+                repl_file.try_generate_tag(node)
                 continue
             if len(children) > 1:
                 logging.warn(f'{model} should have only one flash assigned, but got: {[c.name for c in children]}. Selecting {child.name}.')
