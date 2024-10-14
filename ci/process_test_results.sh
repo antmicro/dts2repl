@@ -18,18 +18,18 @@ fi
 cd ci-output/status
 for dir in */ ; do
     dirname=${dir::-1}
-    if [ "$dirname" == "passed-to-generated" ] ; then
-        MSG="PASSED -> GENERATED"
+    if [ "$dirname" == "loading-to-not_loading" ] ; then
+        MSG="LOADING -> NOT LOADING"
         COLOR=$RED
         RESULT=1
-    elif [ "$dirname" == "not_generated-to-passed" ] ; then
-        MSG="NOT GENERATED -> PASSED"
+    elif [ "$dirname" == "not_existing-to-loading" ] ; then
+        MSG="NOT EXISTING -> LOADING"
         COLOR=$GREEN
-    elif [ "$dirname" == "not_generated-to-generated" ] ; then
-        MSG="NOT GENERATED -> GENERATED"
+    elif [ "$dirname" == "not_existing-to-not_loading" ] ; then
+        MSG="NOT EXISTING -> NOT LOADING"
         COLOR=$GREEN
-    elif [ "$dirname" == "generated-to-passed" ] ; then
-        MSG="GENERATED -> PASSED"
+    elif [ "$dirname" == "not_loading-to-loading" ] ; then
+        MSG="NOT LOADING -> LOADING"
         COLOR=$GREEN
     fi
     cd $dir
