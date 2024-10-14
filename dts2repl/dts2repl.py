@@ -1046,7 +1046,7 @@ def generate(filename, override_system_clock_frequency=None):
         if model == 'Miscellaneous.STM32F4_RCC':
             indent.append('rtcPeripheral: rtc')
             dependencies.add('rtc')
-        
+
         # Temporary solution until Zephyr merges model name in dts
         if model == "Timers.NEORV32_MachineSystemTimer":
             indent.append('-> cpu0@23')
