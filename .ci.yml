@@ -44,7 +44,7 @@ Static release:
     - staticx dist/dts2repl dts2repl-static
     - chmod +x dts2repl-static
     - cp dist/dts2repl dts2repl-dynamic
-    - chmod +x dts2repl-dynamic    
+    - chmod +x dts2repl-dynamic
   artifacts:
     paths:
       - dts2repl-static
@@ -54,7 +54,7 @@ Test Static release:
   stage: TestRelease
   image:
     name: debian:bullseye
-  dependencies: [Static release]    
+  dependencies: [Static release]
   script:
     - ./dts2repl-static https://zephyr-samples-builder.storage.googleapis.com/zephyr/063ce9caf54fa656f02ae48f3c9d537659a10dec/96b_aerocore2/hello_world/hello_world.dts --output test.repl
     - apt -qqy update > /dev/null 2> /dev/null
