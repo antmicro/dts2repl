@@ -31,6 +31,12 @@ for dir in */ ; do
     elif [ "$dirname" == "not_loading-to-loading" ] ; then
         MSG="NOT LOADING -> LOADING"
         COLOR=$GREEN
+    elif [ "$dirname" == "not_loading-to-not_existing" ] ; then
+        MSG="NOT LOADING -> NOT EXISTING"
+        COLOR=$RED
+    elif [ "$dirname" == "loading-to-not_existing" ] ; then
+        MSG="LOADING -> NOT EXISTING"
+        COLOR=$RED
     fi
     cd $dir
     for subdir in */ ; do
