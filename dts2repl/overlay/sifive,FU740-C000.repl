@@ -51,7 +51,7 @@ ram0:
     size: 0x40000000
 
 sysbus:
-    init:
+    init add:
         Tag <0x10000004 0x4> "PRCI:core_pllcfg" 0xffffffff
         Tag <0x1000000C 0x4> "PRCI:ddr_pllcfg" 0xffffffff
         Tag <0x10000050 0x4> "PRCI:hfpclk_pllcfg" 0xffffffff

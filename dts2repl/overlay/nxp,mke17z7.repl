@@ -7,5 +7,5 @@ if request.isRead: request.value = 0x2000000 if lastVal == None else 0x3000000; 
 '''
 
 sysbus:
-    init:
+    init add:
         ApplySVD @https://dl.antmicro.com/projects/renode/svd/MKE17Z7.svd.gz

@@ -16,5 +16,5 @@ intrCtrl: IRQControllers.EOSS3_IntrCtrl @ {
     }
 
 sysbus:
-    init:
+    init add:
         Tag <0x400054A0, 0x400057FF> "AnalogIP (unlocked)" 0x1

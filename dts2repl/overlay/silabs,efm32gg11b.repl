@@ -1,5 +1,5 @@
 sysbus:
-    init:
+    init add:
         // We have to split emu peripheral into two tags as those two registers have to return different value
         Tag <0x400E3024, 0x400E3028> "emu_if" 0xFFFFFFFF
         Tag <0x400E3078, 0x400E3090> "emu_dcdcsync" 0x0

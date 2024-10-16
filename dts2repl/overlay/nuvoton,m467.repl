@@ -1,4 +1,4 @@
 sysbus:
-    init:
+    init add:
         Tag <0x40000100 4> "SYS_CTRL1" 0xFFFFFFFF
         Tag <0x40000250 4> "CLK_CTRL1" 0xFFFFFFFF

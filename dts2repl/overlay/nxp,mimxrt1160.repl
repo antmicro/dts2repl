@@ -24,7 +24,7 @@ ANADIG_MISC_VDDSOC2PLL_AI_CTRL_VIDEO: Python.PythonPeripheral @ sysbus 0x40C848B
     filename: "scripts/pydev/flipflop.py"
 
 sysbus:
-    init:
+    init add:
         Tag <0x40CA8008 4> "DCDC_REG0" 0x84030511
         Tag <0x40C84560 4> "ANADIG_PMU_PMU_BIAS_CTRL2" 0xFFFFFFFF
         Tag <0x40C84020 4> "ANADIG_OSC_OSC_24M_CTRL" 0xF0000080

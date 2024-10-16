@@ -1,5 +1,5 @@
 sysbus:
-    init:
+    init add:
         Tag <0x40200004 4> "s32-clock" 0xFFFFFFFF
         Tag <0x40210004 4> "s32-clock" 0xFFFFFFFF
         Tag <0x40220004 4> "s32-clock" 0xFFFFFFFF

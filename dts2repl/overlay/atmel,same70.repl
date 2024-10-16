@@ -7,5 +7,5 @@ cpu0:
     numberOfMPURegions: 16
 
 sysbus:
-    init:
+    init add:
         ApplySVD @https://dl.antmicro.com/projects/renode/svd/ATSAME70Q21.svd

@@ -4,5 +4,5 @@ bitband_peripherals: Miscellaneous.BitBanding @ sysbus <0x42000000, +0x2000000>
     peripheralBase: 0x40000000
 
 sysbus:
-    init:
+    init add:
         ApplySVD @https://dl.antmicro.com/projects/renode/svd/EFM32PG1B200F256GM48.svd.gz

@@ -2,7 +2,7 @@ rom: Memory.MappedMemory @ sysbus 0x10000000
     size: 0x200000
 
 sysbus:
-    init:
+    init add:
         Tag <0x500010A0 4> "MISC_CONF_1" 0x20
         Tag <0x50001318 4> "ICEPICK_DEVICE_ID" 0x2BB4102F
         Tag <0x40082028 4> "PRCM_CLKLOADCTL" 0x2

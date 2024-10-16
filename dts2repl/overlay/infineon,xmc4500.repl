@@ -4,7 +4,7 @@ SCU_PLL_PLLSTAT: Python.PythonPeripheral @ sysbus 0x50004710
     filename: "scripts/pydev/flipflop.py"
 
 sysbus:
-    init:
+    init add:
         ApplySVD @https://dl.antmicro.com/projects/renode/svd/XMC4500.svd.gz
         Tag <0x50004200 0x4> "SCU_POWER_PWRSTAT" 0x1
         Tag <0x50004418 0x4> "SCU_RESET_PRSTAT1" 0x0

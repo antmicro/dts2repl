@@ -4,5 +4,5 @@ PMC_SR: Python.PythonPeripheral @ sysbus 0x400E0668
     filename: "scripts/pydev/flipflop.py"
 
 sysbus:
-    init:
+    init add:
         ApplySVD @https://dl.antmicro.com/projects/renode/svd/ATSAM3X8E.svd.gz

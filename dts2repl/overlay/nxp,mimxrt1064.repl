@@ -9,7 +9,7 @@ dcdc: Python.PythonPeripheral @ sysbus 0x40080000
     filename: "scripts/pydev/flipflop.py"
 
 sysbus:
-    init:
+    init add:
         Tag <0x400FC014, 0x400FC017> "CCM_CBCDR" 0x000A8200
         Tag <0x400FC024, 0x400FC027> "CCM(CSCDR1)" 0x40
         Tag <0x400D8030, 0x400D8033> "analog02" 0x80002001

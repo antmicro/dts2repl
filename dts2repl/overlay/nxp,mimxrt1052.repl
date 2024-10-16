@@ -1,4 +1,4 @@
 sysbus:
-    init:
+    init add:
         Tag <0x40080000 4> "dcdc" 0xFFFFFFFF
         Tag <0x400D8000 4> "analog" 0xFFFFFFFF

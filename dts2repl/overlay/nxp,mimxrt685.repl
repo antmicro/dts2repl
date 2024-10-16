@@ -17,5 +17,5 @@ reset_flexcomm12: Python.PythonPeripheral @ sysbus 0x50020010
     filename: "scripts/pydev/flipflop.py"
 
 sysbus:
-    init:
+    init add:
         LoadBinary @https://dl.antmicro.com/projects/renode/rom_rt6xx.bin-s_41136-1a8f2af7d469626657587b933b3dc1e323f93135 0x13000000

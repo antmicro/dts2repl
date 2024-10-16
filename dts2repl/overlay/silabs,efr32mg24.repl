@@ -2,7 +2,7 @@ flash: Memory.MappedMemory @ sysbus 0x08000000
     size: 0x200000
 
 sysbus:
-    init:
+    init add:
         Tag <0x50094028 4> "dcdcStatus" 0xFFFFFFFF
         Tag <0x50008070 4> "cmuSysClkStr" 0x1
 

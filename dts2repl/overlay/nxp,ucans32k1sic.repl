@@ -4,5 +4,5 @@ clock: Python.PythonPeripheral @ sysbus 0x40064000
     filename: "scripts/pydev/flipflop.py"
 
 sysbus:
-    init:
+    init add:
         Tag <0x40052000 0x4> "wdog" 0xffffffff

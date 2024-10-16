@@ -1,3 +1,3 @@
 sysbus:
-    init:
+    init add:
         Tag <0x40007004 4> "PMU_CS0" 0xFFFFFFFF

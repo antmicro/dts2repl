@@ -4,7 +4,7 @@ puf_sram_ctrl_int_status: Python.PythonPeripheral @ sysbus 0x4003B3E0
     filename: "scripts/pydev/flipflop.py"
 
 sysbus:
-    init:
+    init add:
         Tag <0x50034FE0 0x4> "FLASH_STAT" 0xFFFFFFFF
         Tag <0x40034FE0 0x4> "FLASH_INTSTAT" 0xFFFFFFFF
         Tag <0x40013024 0x4> "ANACTRL_24" 0xFFFFFFFF

@@ -1,5 +1,5 @@
 sysbus:
-    init:
+    init add:
         ApplySVD @https://dl.antmicro.com/projects/renode/svd/ATSAME54P20A.svd.gz
         Tag <0x4000140C 4> "OSC32KCTRL_STATUS" 0xFFFFFFFF
         Tag <0x40001010 4> "OSCCTRL_STATUS" 0xFFFFFFFF

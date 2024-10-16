@@ -26,7 +26,7 @@ cpu0:
         RegisterCustomCSR "0x7e2_PERF_COUNTER" 0x7e2 User
 
 sysbus:
-    init:
+    init add:
         LoadELF @https://dl.antmicro.com/projects/renode/esp32c3_rev3_rom.elf-s_556332-d68afeb5bd7ab7904e7d5d3adf4d670df9d19c96
         Tag <0x60009000 0x100> "IOMUX"
         Tag <0x60004000 0x100> "GPIO"

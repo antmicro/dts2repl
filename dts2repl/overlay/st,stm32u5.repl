@@ -4,7 +4,7 @@ PWR_VOSR: Python.PythonPeripheral @ sysbus 0x4602080C
     filename: "scripts/pydev/flipflop.py"
 
 sysbus:
-    init:
+    init add:
         ApplySVD @https://dl.antmicro.com/projects/renode/svd/STM32U5XX.svd.gz
         Unregister "sysbus.rcc"
         Machine PyDevFromFile @scripts/pydev/flipflop.py 0x46020C1C 0x4 True "RCC_CFGR1"

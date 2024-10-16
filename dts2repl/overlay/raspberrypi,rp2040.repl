@@ -1,5 +1,5 @@
 sysbus:
-    init:
+    init add:
         ApplySVD @https://dl.antmicro.com/projects/renode/svd/RP2040.svd.gz
         Tag <0x4000C008 4> "RESET_DONE" 0xFFFFFFFF
         Tag <0x40024004 4> "XOSC_STATUS" 0xFFFFFFFF

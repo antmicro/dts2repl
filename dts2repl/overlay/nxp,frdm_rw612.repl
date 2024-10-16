@@ -9,6 +9,6 @@ reset_flexcomm12: Python.PythonPeripheral @ sysbus 0x50020010
     filename: "scripts/pydev/flipflop.py"
 
 sysbus:
-    init:
+    init add:
         Tag <0x50031028 4> "UNKNOWN1" 0xFFFFFFFF
         Tag <0x50003088 4> "UNKNOWN2" 0xFFFFFFFF

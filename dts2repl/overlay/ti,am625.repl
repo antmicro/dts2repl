@@ -1,5 +1,5 @@
 sysbus:
-    init:
+    init add:
         # TODO: AM625 has a RAT memory redirection system for Cortex-M
         # We are just hardcoding the setting used by Zephyr here
         Redirect 0x80000000 0x0 0x10000000

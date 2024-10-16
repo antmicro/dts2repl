@@ -30,6 +30,6 @@ reset_flexcomm12: Python.PythonPeripheral @ sysbus 0x50020010
     filename: "scripts/pydev/flipflop.py"
 
 sysbus:
-    init:
+    init add:
         // to be removed once DTS in Zephyr is fixed
         Tag <0x501340E0 0x4> "flexspi_status" 0xffffffff

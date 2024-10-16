@@ -37,7 +37,7 @@ pll_status: Python.PythonPeripheral @ sysbus 0x402E0004
     filename: "scripts/pydev/flipflop.py"
 
 sysbus:
-    init:
+    init add:
         Tag <0x402C8004 0x4> "SIRC_status" 0x00000001
         Tag <0x402CC004 0x4> "SXOSC_status" 0x80000000
         Tag <0x402D4004 0x4> "FXOSC_status" 0x80000000

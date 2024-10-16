@@ -2,7 +2,7 @@ mem: Memory.MappedMemory @ 0x2000000
     size: 0x100000
 
 sysbus:
-    init:
+    init add:
         // ApplySVD @https://dl.antmicro.com/projects/renode/svd//MSP432P401R.svd.gz
         WriteDoubleWord 0x2000824 0x2010000 # ROM_GPIOTABLE_OFFSET
         WriteDoubleWord 0x201001c 0x2012001 # ROM_GPIOTABLE_7_setAsPeripheralModuleFunctionInputPin

@@ -4,7 +4,7 @@ HFX0_STATUS: Python.PythonPeripheral @ sysbus 0x5000C058
     filename: "scripts/pydev/flipflop.py"
 
 sysbus:
-    init:
+    init add:
         Tag <0x50094034 4> "DCDC_IF" 0xFFFFFFFF
         Tag <0x50008070 4> "CMU_SYSCLKCTRL" 0x1
         Tag <0x50004064 4> "EMU_IF" 0xFFFFFFFF

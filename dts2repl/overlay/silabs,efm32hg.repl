@@ -1,3 +1,3 @@
 sysbus:
-    init:
+    init add:
         Tag <0x400C8000, 0x400C8400> "cmu" 0xFFFFFFFF

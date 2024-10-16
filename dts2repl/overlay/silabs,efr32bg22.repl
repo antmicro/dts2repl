@@ -14,6 +14,6 @@ emuVscaleEm: Python.PythonPeripheral @ sysbus 0x50004084
     filename: "scripts/pydev/rolling-bit.py"
 
 sysbus:
-    init:
+    init add:
         Tag <0x50008070 4> "cmuSysClkStr" 0x1
         Tag <0x50008160 4> "cmuEm4GrpAClkCtrl" 0x2

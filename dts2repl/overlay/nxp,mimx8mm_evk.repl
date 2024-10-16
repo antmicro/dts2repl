@@ -1,4 +1,4 @@
 sysbus:
-    init:
+    init add:
         Tag <0x30360000 4> "CCM_ANALOG_AUDIO_PLL1_CFG0" 0xFFFFFFFF
         Tag <0x30360014 4> "CCM_ANALOG_VIDEO_PLL1_CFG1" 0xFFFFFFFF

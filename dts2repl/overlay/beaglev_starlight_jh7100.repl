@@ -89,7 +89,7 @@ phy: Network.EthernetPhysicalLayer @ethernet 7
     AutoNegotiationLinkPartnerBasePageAbility: 0x0000
 
 sysbus:
-    init:
+    init add:
         SilenceRange <0x02010000 0x1000>
         Tag <0x10000000 0x10000> "SDIO"
         Tag <0x104C0000 0x40000> "USB30"

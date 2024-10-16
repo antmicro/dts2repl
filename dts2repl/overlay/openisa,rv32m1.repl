@@ -7,7 +7,7 @@ if request.isRead: request.value = 0x2000000 if lastVal == None else 0x3000000; 
 '''
 
 sysbus:
-    init:
+    init add:
         ApplySVD @https://dl.antmicro.com/projects/renode/svd/RV32M1_RI5CY.svd.gz
         Tag <0x4002C200 4> "SCG_SIRCCSR" 0xFFFFFFFF
         Tag <0x4002C500 4> "SCG_C500" 0xFFFFFFF

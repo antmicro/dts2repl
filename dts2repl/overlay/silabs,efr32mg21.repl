@@ -1,5 +1,5 @@
 sysbus:
-    init:
+    init add:
         Tag <0x50008070 4> "cmuSysClkStr" 0x1
 
 HFXO0_NS: Python.PythonPeripheral @ sysbus 0x5000C058
