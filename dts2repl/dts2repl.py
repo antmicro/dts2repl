@@ -381,7 +381,10 @@ def get_reg(node):
     reg = get_node_prop(node, 'reg')
     while reg:
         address, reg = get_cells(reg, address_cells)
-        size, reg = get_cells(reg, size_cells)
+        if size_cells > 0:
+            size, reg = get_cells(reg, size_cells)
+        else:
+            size = None
         address = translate_address(address, node)
         yield (address, size)
 
@@ -1115,7 +1118,7 @@ def generate(filename, override_system_clock_frequency=None):
                 if any('imx6' in p for p in overlays):
                     if node.labels and 'ocram' in node.labels[0]:
                         size = 0x40000
-                if size != 0:
+                if size:
                     indent.append(f'size: {hex(size)}')
                 else:
                     # do not generate memory regions of size 0
