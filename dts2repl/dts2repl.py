@@ -1010,25 +1010,37 @@ def generate(filename, override_system_clock_frequency=None):
             indent.append('genericInterruptController: gic')
             dependencies.add('gic')
         if model in ("CPU.X86", "CPU.X86_64"):
-            indent.append('lapic: intcloapic')
-            dependencies.add('intcloapic')
+            cpu_number = name[-1]
+            lapic_name = f'intcloapic{cpu_number}'
+            indent.append(f'lapic: {lapic_name}')
+            dependencies.add(lapic_name)
 
         if model == "CPU.Sparc":
             sysbus_endianness = ReplBlock('sysbus', None, {'sysbus'}, set(), ['sysbus:', '    Endianess: Endianess.BigEndian'])
             blocks.append(sysbus_endianness)
 
+        # Create 'model_name' only visible to 'cpu_name' at 'offset'
+        def create_per_cpu_model(cpu_name, model_name, csharp_model_name, offset, arguments):
+            cpu_number = cpu_name[-1]
+            model_name = f'{model_name}{cpu_number}'
+            region = RegistrationRegion.to_repl([RegistrationRegion(offset, cpu=f'cpu{cpu_number}')])
+            block = f'{model_name}: {csharp_model_name} @ {region}'
+            arguments = [f'    {key}: {val}' for key, val in arguments.items()]
+
+            repl_block = ReplBlock(model_name, csharp_model_name, {cpu_name}, {model_name}, [block, *arguments])
+            blocks.append(repl_block)
+
+        # For CortexM and x86_64 multi core systems, we generate the IRQ controllers
+        # along with correct interrupt connections while processing the IRQ controller node in the dts,
+        # and we generate 'fake' IRQ controllers for other cores.
+
         # fake NVICs for multi-core ARM systems
         if model in ("CPU.CortexM") and name != "cpu0":
-            # We generate the cpu0 nvic along with correct interrupt connections
-            # while processing the timer node in the dts, and we generate 'fake'
-            # nvics for other cores here for now
-            cpu_number = name[-1]
-            nvic_name = f'nvic{cpu_number}'
-            fake_nvic_region = RegistrationRegion.to_repl([RegistrationRegion(0xe000e000, cpu=f'cpu{cpu_number}')])
-            fake_nvic_block = f'{nvic_name}: IRQControllers.NVIC @ {fake_nvic_region}'
+            create_per_cpu_model(name, "nvic", "IRQControllers.NVIC", 0xe000e000, {})
 
-            fake_nvic_repl_block = ReplBlock(nvic_name, 'IRQControllers.NVIC', {name}, {nvic_name}, [fake_nvic_block])
-            blocks.append(fake_nvic_repl_block)
+        # fake LAPICs for multi-core x86_64 systems
+        if model in ("CPU.X86_64") and name != "cpu0":
+            create_per_cpu_model(name, "intcloapic", "IRQControllers.LAPIC", 0xfee00000, {"id": name[-1]})
 
         # additional parameters for STM32F4_RCC
         if model == 'Miscellaneous.STM32F4_RCC':
@@ -1180,8 +1192,13 @@ def generate(filename, override_system_clock_frequency=None):
             irq_dest_nodes = [d for d, _ in irq_dests]
             irq_numbers = [ps[0] for _, ps in irq_dests]
         elif model == 'IRQControllers.LAPIC':
+            # Each CPU has it's own LAPIC
+            name += '0'
+            provides = {name}
             indent.append('IRQ -> cpu0@0')
+            indent.append('id: 0')
             dependencies.add('cpu0')
+
         for i, irq_dest_node in enumerate(irq_dest_nodes):
             irq_dest_compatible = get_node_prop(irq_dest_node, 'compatible', [])
             # treat the RISC-V CPU interrupt controller as the CPU itself
@@ -1258,6 +1275,9 @@ def generate(filename, override_system_clock_frequency=None):
         # each CPU with the proper interrupt connections
         if model == "Timers.ARM_GenericTimer":
             regions = [RegistrationRegion(address=None, registration_point="cpu0")]
+
+        if model == 'IRQControllers.LAPIC':
+            regions = [RegistrationRegion(addr, cpu='cpu0')]
 
         # devices other than CPUs require an address to register on the sysbus
         if any(r.registration_point == 'sysbus' and r.address is None for r in regions) and not model.startswith('CPU.'):
