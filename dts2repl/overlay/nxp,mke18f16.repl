@@ -9,6 +9,9 @@ if request.isRead: request.value = 0x2000000 if lastVal == None else 0x6000000; 
 sysbus:
     init add:
         ApplySVD @https://dl.antmicro.com/projects/renode/svd/MKE18F16.svd.gz
+        Tag <0x4000D404 4> "MPU" 0xFFFFFFFF
         Tag <0x40064100 4> "SCG_SOSCCSR" 0xFFFFFFFF
+        Tag <0x40064200 4> "SCG_SIRCCSR" 0xFFFFFFFF
         Tag <0x40064300 4> "SCG_FIRCCSR" 0xFFFFFFFF
         Tag <0x40064600 4> "SCG_SPLLCSR" 0xFFFFFFFF
+        Tag <0x40065000 0x1000> "PCC" 0x83000000
