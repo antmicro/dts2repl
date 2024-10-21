@@ -163,7 +163,6 @@
     "intel,niosv": "CPU.RiscV32",
     "intel,x86": { "acrn": { "type": "CPU.X86_64", "cpuType": "x86_64" }, "_": { "type": "CPU.X86", "cpuType": "n270" } },
     "intel,loapic": "IRQControllers.LAPIC",
-    "intel,hpet": { "type": "Python.PythonPeripheral", "size": 0x400, "initable": false, "script": "request.value = 10000000" },
     "ite,riscv-ite": "CPU.RiscV32",
 
     "neorv-sysinfo": { "type": "Python.PythonPeripheral", "size": 0x20, "initable": false, "script": "request.value = 0xFFFFFFFF" },
