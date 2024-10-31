@@ -1,17 +1,3 @@
-hpet: Python.PythonPeripheral @ sysbus 0xFED00000
-    size: 0x400
-    initable: true
-    script: '''
-if request.isInit:
-   counter = 0
-if request.isRead:
-    if request.offset == 0x4: # counter clock period
-        request.value = 10000000
-    elif request.offset == 0xf0: # main counter value register
-        request.value = counter
-        counter += 100
-'''
-
 uart0: UART.NS16550 @ sysbus 0xa0000000
 
 pci: Python.PythonPeripheral @ sysbus 0xE0000CF8
