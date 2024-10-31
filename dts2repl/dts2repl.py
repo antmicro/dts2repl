@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+from __future__ import annotations
 
 import argparse
 import logging
@@ -12,7 +13,7 @@ import tempfile
 import re
 import copy
 from collections import Counter
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from typing import List, Set, Optional
 import itertools
 import functools
@@ -538,6 +539,100 @@ class RegistrationRegion:
 
 
 @dataclass
+class ReplFile:
+    blocks: List[ReplBlock] = field(default_factory=list)
+
+
+    def get_block_by_name(self, name: str) -> Optional[ReplBlock]:
+        return next((b for b in self.blocks if b.name == name), None)
+
+
+    def get_blocks_by_type(self, type: str) -> iterable[ReplBlock] :
+        if type == 'cpu':
+            return filter(lambda x: 'cpu' in x.name and not 'timer' in x.name, self.blocks)
+
+        raise Exception(f'Unsupported block type {type}')
+
+
+    def add_block(self, block: ReplBlock) -> None:
+        block.owner = self
+        self.blocks.append(block)
+
+
+    def filter_available_blocks(self):
+        available_blocks = []
+        visited_blocks = set()
+
+        def dfs(block: ReplBlock) -> None:
+            visited_blocks.add(id(block))
+            for dep in block.depends:
+                for other_block in self.blocks:
+                    if dep in other_block.provides:
+                        if id(other_block) not in visited_blocks:
+                            dfs(other_block)
+                        break
+                else:
+                    return
+            available_blocks.append(block)
+
+        for block in self.blocks:
+            if id(block) not in visited_blocks:
+                dfs(block)
+
+        self.blocks = available_blocks
+
+
+    def merge_overlapping_blocks(self) -> None:
+        # split into blocks of known and unknown size
+        sized = []
+        unsized = []
+        for block in self.blocks:
+            (unsized, sized)[block.region is not None and block.region.has_address_and_size].append(block)
+
+        def are_compatible(model_a, model_b):
+            return model_a == model_b or (model_a.startswith('Memory') and model_b.startswith('Memory'))
+
+        # merge overlapping sized blocks
+        # NOTE: currently, only memory blocks are merged, other overlapping blocks are removed
+        sized_merged = []
+        for block in sorted(sized, key=lambda b: (b.region.address, b.region.end)):
+            if (
+                sized_merged
+                and are_compatible(sized_merged[-1].model, block.model)
+                and sized_merged[-1].region.end >= block.region.address + 1
+            ):
+                target = sized_merged[-1]
+                target.region.end = max(target.region.end, block.region.end)
+                # merge memory blocks by updating their name and size
+                if target.model.startswith('Memory'):
+                    target.name += f'_{block.name}'
+                    # for now we manually update the string representation
+                    header = target.content[0].split(':')
+                    target.content[0] = target.name + ':' + header[1]
+                    target.content[1] = f'    size: {hex(target.region.size)}'
+
+            else:
+                sized_merged.append(block)
+
+        # build the repl out of the filtered and merged blocks
+        self.blocks = sized_merged + unsized
+
+
+    def remove_dangling_irqs(self) -> None:
+        existing_devices = set.union(*[b.provides for b in self.blocks])
+        for block in self.blocks:
+            filtered_content = []
+            for line in block.content:
+                irq_dest = re.search(r"->\s*(\w+)(#\d+)?\s*@", line)
+                if irq_dest is None or irq_dest.group(1) in existing_devices:
+                    filtered_content.append(line)
+            block.content = filtered_content
+
+
+    def __str__(self):
+        return '\n'.join([str(b) + '\n' for b in self.blocks]) + '\n'
+
+@dataclass
 class ReplBlock:
     name: str
     model: Optional[str]
@@ -545,33 +640,17 @@ class ReplBlock:
     provides: Set[str]
     content: List[str]
     region: Optional[RegistrationRegion] = None
+    owner: ReplFile = None # this field will be filled when adding this block to a ReplFile
 
-    def __str__(self):
+
+    def get_depending_blocks(self) -> list[ReplBlock]:
+        return [b for b in self.owner.blocks if self.name in b.depends]
+
+
+    def __str__(self) -> str:
         return '\n'.join(self.content)
 
 
-def filter_available_blocks(blocks) -> List[ReplBlock]:
-    available_blocks = []
-    visited_blocks = set()
-
-    def dfs(block):
-        visited_blocks.add(id(block))
-        for dep in block.depends:
-            for other_block in blocks:
-                if dep in other_block.provides:
-                    if id(other_block) not in visited_blocks:
-                        dfs(other_block)
-                    break
-            else:
-                return False
-        available_blocks.append(block)
-        return True
-
-    for block in blocks:
-        if id(block) not in visited_blocks:
-            dfs(block)
-
-    return available_blocks
 
 
 # Allowed characters in format string:
@@ -711,7 +790,8 @@ def generate(filename, override_system_clock_frequency=None):
         return ''
 
     # `sysbus` and `none` are registration points provided by Renode itself
-    blocks = [ReplBlock("sysbus", None, set(), {'sysbus', 'none'}, ['// autogenerated'])]
+    repl_file = ReplFile()
+    repl_file.add_block(ReplBlock("sysbus", None, set(), {'sysbus', 'none'}, ['// autogenerated']))
     nodes = sorted(dt.node_iter(), key=lambda x: get_node_prop(x, 'compatible')[0] if 'compatible' in x.props else '')
 
     # get mcu compat name
@@ -846,7 +926,7 @@ def generate(filename, override_system_clock_frequency=None):
         if model == 'IRQControllers.ARM_GenericInterruptController':
             def arm_gic_get_region(addr, size, name):
                 if name == 'redistributor':
-                    cpus = filter(lambda x: 'cpu' in x.name and not 'timer' in x.name, blocks)
+                    cpus = repl_file.get_blocks_by_type('cpu')
                     return [RedistributorRegistrationRegion(addr + (i * 0x20000), cpu.name) for i, cpu in enumerate(cpus)]
                 else:
                     return [RegistrationRegion(addr, size, name)]
@@ -1005,7 +1085,7 @@ def generate(filename, override_system_clock_frequency=None):
             timer_name = f'{name}_timer'
             timer_lines = [f'{timer_name}: Timers.ARM_GenericTimer @ {name}', '    frequency: 62500000']
             generic_timer = ReplBlock(timer_name, 'Timers.ARM_GenericTimer', {name}, {timer_name}, timer_lines)
-            blocks.append(generic_timer)
+            repl_file.add_block(generic_timer)
         if model in ("CPU.ARMv8A", "CPU.ARMv8R", "CPU.ARMv7A", "CPU.ARMv7R"):
             # We use our CPU number as the CPU ID instead of the reg address
             # This relies on the fact that the name will have been changed to "cpu{n}"
@@ -1020,7 +1100,7 @@ def generate(filename, override_system_clock_frequency=None):
 
         if model == "CPU.Sparc":
             sysbus_endianness = ReplBlock('sysbus', None, {'sysbus'}, set(), ['sysbus:', '    Endianess: Endianess.BigEndian'])
-            blocks.append(sysbus_endianness)
+            repl_file.add_block(sysbus_endianness)
 
         # Create 'model_name' only visible to 'cpu_name' at 'offset'
         def create_per_cpu_model(cpu_name, model_name, csharp_model_name, offset, arguments):
@@ -1031,7 +1111,7 @@ def generate(filename, override_system_clock_frequency=None):
             arguments = [f'    {key}: {val}' for key, val in arguments.items()]
 
             repl_block = ReplBlock(model_name, csharp_model_name, {cpu_name}, {model_name}, [block, *arguments])
-            blocks.append(repl_block)
+            repl_file.add_block(repl_block)
 
         # For CortexM and x86_64 multi core systems, we generate the IRQ controllers
         # along with correct interrupt connections while processing the IRQ controller node in the dts,
@@ -1098,7 +1178,7 @@ def generate(filename, override_system_clock_frequency=None):
 
             gpio_connection = ReplBlock(gpio_name, None, {gpio_name, name}, set(),
                                         [f'{gpio_name}:', f'    {num} -> {name}@0'])
-            blocks.append(gpio_connection)
+            repl_file.add_block(gpio_connection)
 
         if model.startswith('Timers'):
             if 'cc-num' in node.props:
@@ -1158,7 +1238,7 @@ def generate(filename, override_system_clock_frequency=None):
             combiner_name = 'gicIrqCombiner'
             combiner_lines = [f'{combiner_name}: {combiner_model} @ none', '    numberOfInputs: 2', '    -> cpu0@0']
             combiner = ReplBlock(combiner_name, combiner_model, {'cpu0'}, {combiner_name}, combiner_lines)
-            blocks.append(combiner)
+            repl_file.add_block(combiner)
             indent.append(f'[0, 1] -> {combiner_name}@[0, 1]')
             dependencies.add('cpu0')
         elif compat == 'gaisler,irqmp':
@@ -1304,78 +1384,35 @@ def generate(filename, override_system_clock_frequency=None):
         if model.startswith('Memory'):
             region.size = size
         block = ReplBlock(name, model, dependencies, provides, block_content, region)
-        blocks.append(block)
+        repl_file.add_block(block)
 
     # now all blocks originating from the device tree are processed, let's add overlays next
     # soc and board overlay
     overlay_path = f'{pathlib.Path(__file__).parent.resolve()}/overlay'
-    overlay_blocks = []
     overlay_files = os.listdir(overlay_path)
     for compat in sorted(overlays):
         overlay = f'{compat}.repl'
         for file in overlay_files:
             if overlay.lower() == file.lower():
-                overlay_blocks.append(ReplBlock('', None, set(), set(), [f'// {compat} overlay']))
-                overlay_blocks.extend(parse_overlay(f'{overlay_path}/{file}'))
+                repl_file.add_block(ReplBlock('', None, set(), set(), [f'// {compat} overlay']))
+                for overlay_block in parse_overlay(f'{overlay_path}/{file}'):
+                    repl_file.add_block(overlay_block)
                 break
 
     # filter out unavailable blocks (with unsatisfied depends)
-    blocks = filter_available_blocks(blocks + overlay_blocks)
+    repl_file.filter_available_blocks()
 
     # set number of targets for CLINT if necessary
     # note that IRQ destinations don't create a dependency; this should pick up just CPUs because they get a dependency on the CLINT when we add timeProvider
-    clint_targets = sum(1 for b in blocks if 'clint' in b.depends)
-    if clint_targets > 1:
-        clint_block = next(b for b in blocks if b.name == 'clint')
+    clint_block = repl_file.get_block_by_name('clint')
+    if clint_block:
+        clint_targets = len(clint_block.get_depending_blocks())
         clint_block.content += [f'    numberOfTargets: {clint_targets}']
 
-    # split into blocks of known and unknown size
-    sized = []
-    unsized = []
-    for block in blocks:
-        (unsized, sized)[block.region is not None and block.region.has_address_and_size].append(block)
+    repl_file.merge_overlapping_blocks()
+    repl_file.remove_dangling_irqs()
 
-    def are_compatible(model_a, model_b):
-        return model_a == model_b or (model_a.startswith('Memory') and model_b.startswith('Memory'))
-
-    # merge overlapping sized blocks
-    # NOTE: currently, only memory blocks are merged, other overlapping blocks are removed
-    sized_merged = []
-    for block in sorted(sized, key=lambda b: (b.region.address, b.region.end)):
-        if (
-            sized_merged
-            and are_compatible(sized_merged[-1].model, block.model)
-            and sized_merged[-1].region.end >= block.region.address + 1
-        ):
-            target = sized_merged[-1]
-            target.region.end = max(target.region.end, block.region.end)
-            # merge memory blocks by updating their name and size
-            if target.model.startswith('Memory'):
-                target.name += f'_{block.name}'
-                # for now we manually update the string representation
-                header = target.content[0].split(':')
-                target.content[0] = target.name + ':' + header[1]
-                target.content[1] = f'    size: {hex(target.region.size)}'
-
-        else:
-            sized_merged.append(block)
-
-    # build the repl out of the filtered and merged blocks
-    blocks = sized_merged + unsized
-    repl_devices = set.union(*[b.provides for b in blocks])
-    repl = [str(b) + '\n' for b in blocks]
-
-    # convert it to a list of lines for the line-based interrupt removal step
-    repl = '\n'.join(repl).splitlines()
-
-    # remove interrupts connected to nonexistent peripherals
-    filtered_repl = []
-    for line in repl:
-        irq_dest = re.search(r"->\s*(\w+)(#\d+)?\s*@", line)
-        if irq_dest is None or irq_dest.group(1) in repl_devices:
-            filtered_repl.append(line)
-
-    return '\n'.join(filtered_repl) + '\n'
+    return str(repl_file)
 
 def get_mcu_compat(filename):
     dt = get_dt(filename)
