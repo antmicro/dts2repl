@@ -45,6 +45,7 @@
     "arm,cortex-r5f": { "type": "CPU.ARMv7R", "cpuType": "cortex-r5f" },
     "arm,cortex-r7": { "type": "CPU.ARMv7R", "cpuType": "cortex-r8" },
     "arm,cortex-r8": { "type": "CPU.ARMv7R", "cpuType": "cortex-r8" },
+    "arm,cortex-r8f": { "type": "CPU.ARMv7R", "cpuType": "cortex-r8" },
 
     "arm,cortex-a9-twd-timer": { "type": "Timers.ARM_PrivateTimer", "frequency": 667000000 },
 
