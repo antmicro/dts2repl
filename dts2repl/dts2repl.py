@@ -1571,6 +1571,9 @@ def process_node(node, node_type, mcu, overlays, get_snippets, skip_disabled):
     else:
         reg = list(get_reg(node))
         if reg:
+            # transform the second item of each tuple (representing the size):
+            # 'set it to 0 if it's None'
+            reg = [(r[0], r[1] if r[1] else 0) for r in reg]
             unit_addr = reg[0][0]
             size = sum(r[1] for r in reg)
             if size == 0:
