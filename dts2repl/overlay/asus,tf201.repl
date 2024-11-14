@@ -1,0 +1,22 @@
+cpu1:
+    init:
+        IsHalted True
+
+cpu2:
+    init:
+        IsHalted True
+
+cpu3:
+    init:
+        IsHalted True
+
+gic:
+    supportsTwoSecurityStates: false
+    architectureVersion: IRQControllers.ARM_GenericInterruptControllerVersion.GICv1
+
+memory: Memory.MappedMemory @ { sysbus 0; sysbus 0x80000000 }
+    size: 0x40000000
+
+sysbus:
+    init add:
+        Tag <0x7000F050 4> "MC" 0x1000
