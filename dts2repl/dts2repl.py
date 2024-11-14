@@ -1481,10 +1481,12 @@ def get_mcu_compat(filename):
     dt = get_dt(filename)
     if dt is None:
         return ''
-
+    logging.debug(f'trying to find cpu for {filename}')
     mcu = next(filter(lambda x: 'cpu' in x.name and get_node_prop(x, 'compatible'), dt.node_iter()), None)
+    logging.debug(f'Found: {mcu}')
     if mcu is not None:
         mcu = get_node_prop(mcu, 'compatible')[0]
+    logging.debug(f'Result: {mcu}')
     return mcu
 
 def generate_cpu_freq(filename):
@@ -1602,6 +1604,7 @@ def generate_peripherals(filename, overlays, generate_type, get_snippets=False):
     try:
         cpus = dt.get_node("/cpus")
         for node in cpus.nodes.values():
+            logging.debug(f'Checking cpu node {node}')
             if not CPU_NODE_REGEX.match(node.name):
                 continue
 
