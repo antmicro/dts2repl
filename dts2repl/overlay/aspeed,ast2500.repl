@@ -1,8 +1,19 @@
+memory: @ { sysbus 0x80000000; sysbus 0x0 }
+    size: 0x10000000
+
+flash: Memory.MappedMemory @ sysbus 0x20000000
+    size: 0x10000000
+
 sysbus:
-    init:
+    init add:
         Tag <0x1E6E2148 4> "UNKNOWN1" 0xFFFFFFFF
         Tag <0x1E6E0070 4> "UNKNOWN2" 0x1000
         Tag <0x1E620008 4> "UNKNOWN3" 0xFFFFFFFF
-        Machine PyDevFromFile @scripts/pydev/rolling-bit.py 0x1E6c0090 0x4 True "UNKNOWN4"
+        Tag <0x1E6E0050 4> "SCU_50" 0x80001000
+        Tag <0x1E6E2070 4> "SCU_70_STRAP" 0xFFFFFFFF
+        Tag <0x1E6E0004 4> "UNKNOWN4" 0xFFFFFFFF
+        Machine PyDevFromFile @scripts/pydev/rolling-bit.py 0x1E6c0090 0x4 True "VIC"
         Machine PyDevFromFile @scripts/pydev/rolling-bit.py 0x1E6E0000 0x4 True "UNKNOWN5"
-        Machine PyDevFromFile @scripts/pydev/ticker.py 0x1E782000 0x4 True "UNKNOWN6"
+        Machine PyDevFromFile @scripts/pydev/ticker.py 0x1E782000 0x4 True "TIMER"
+        Machine PyDevFromFile @scripts/pydev/rolling-bit.py 0x1E6E2000 0x4 True "SCU_0x00"
+        
