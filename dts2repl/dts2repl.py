@@ -853,7 +853,6 @@ def generate(filename, override_system_clock_frequency=None):
 
     # get mcu compat name
     mcu = next(filter(lambda x: 'cpu' in x.name and get_node_prop(x, 'compatible'), dt.node_iter()), None)
-    logging.debug(f'mcu node: {mcu}')
     mcu_compat = None
     if mcu is not None:
         mcu_compat = get_node_prop(mcu, 'compatible')[0]
@@ -912,6 +911,8 @@ def generate(filename, override_system_clock_frequency=None):
         # get model name and addr
         _, _, addr = node.name.partition('@')
         name = name_mapper.get_name(node)
+
+        logging.info(f'Node {node.name} mapped to {name}...')
 
         # decide which Renode model to use
         model, compat, attribs, irq_mappings = renode_model_overlay(compat, mcu_compat, overlays)
