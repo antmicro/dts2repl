@@ -922,6 +922,7 @@ def generate(filename, override_system_clock_frequency=None):
             repl_file.try_generate_tag(node)
             continue
         model = str(model)
+        logging.info(f'Node {node.name} mapped to {name} was assigned model {model}')
 
         dependencies = set()
         provides = {name}
