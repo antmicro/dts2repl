@@ -1157,7 +1157,7 @@ def generate(filename, override_system_clock_frequency=None):
             # We use our CPU number as the CPU ID instead of the reg address
             # This relies on the fact that the name will have been changed to "cpu{n}"
             indent.append(f'cpuId: {name.replace("cpu", "")}')
-            if not compat.startswith("arm,arm11") and not compat.startstwith("arm,arm9"):
+            if not compat.startswith("arm,arm11") and not compat.startswith("arm,arm9"):
                 indent.append('genericInterruptController: gic')
                 dependencies.add('gic')
         if model in ("CPU.X86", "CPU.X86_64"):
