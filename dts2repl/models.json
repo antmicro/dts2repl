@@ -288,6 +288,7 @@
 
     "snps,dw-apb-uart": "UART.NS16550",
     "nuvoton,numaker-uart": "UART.NS16550",
+    "nuvoton,npcm845-uart": "UART.NS16550",
 
     "soc-nv-flash": "Memory.MappedMemory",
     "renesas,ra-nv-flash": "Memory.MappedMemory",
