@@ -1,0 +1,8 @@
+sysbus:
+    init:
+        Tag <0x1E6E2148 4> "UNKNOWN1" 0xFFFFFFFF
+        Tag <0x1E6E0070 4> "UNKNOWN2" 0x1000
+        Tag <0x1E620008 4> "UNKNOWN3" 0xFFFFFFFF
+        Machine PyDevFromFile @scripts/pydev/rolling-bit.py 0x1E6c0090 0x4 True "UNKNOWN4"
+        Machine PyDevFromFile @scripts/pydev/rolling-bit.py 0x1E6E0000 0x4 True "UNKNOWN5"
+        Machine PyDevFromFile @scripts/pydev/ticker.py 0x1E782000 0x4 True "UNKNOWN6"
