@@ -853,9 +853,11 @@ def generate(filename, override_system_clock_frequency=None):
 
     # get mcu compat name
     mcu = next(filter(lambda x: 'cpu' in x.name and get_node_prop(x, 'compatible'), dt.node_iter()), None)
+    logging.debug(f'mcu node: {mcu}')
     mcu_compat = None
     if mcu is not None:
         mcu_compat = get_node_prop(mcu, 'compatible')[0]
+    logging.debug(f'mcu_compat: {mcu_compat}')
 
     # get overlays
     overlays = get_overlays(dt)
