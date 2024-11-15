@@ -861,6 +861,7 @@ def generate(filename, override_system_clock_frequency=None):
     # get overlays
     overlays = get_overlays(dt)
 
+    main_compatible = None
 
     for node in nodes:
         # those memory peripherals sometimes require changing the sysbus address of this peripheral
