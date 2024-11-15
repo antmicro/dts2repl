@@ -861,18 +861,15 @@ def generate(filename, override_system_clock_frequency=None):
     # get overlays
     overlays = get_overlays(dt)
 
-    main_compatible_node = node = dt.get_node('/')
-    main_compatible = None
-    if main_compatible_node != None:
-        main_compatible = get_node_prop(node, 'compatible')[0]
-    logging.debug(f'main compat string is = {main_compatible}')
 
     for node in nodes:
         # those memory peripherals sometimes require changing the sysbus address of this peripheral
         is_heuristic_memory = False
         # filter out nodes without compat strings
         compatible = get_node_prop(node, 'compatible')
-        
+        if node.name == "/":
+            main_compatible = compatible
+            logging.debug(f'main compat string is = {main_compatible}')
         
         if compatible and 'gpio-leds' in compatible:
             logging.debug(f'Skipping LED parent node {node.name}')
