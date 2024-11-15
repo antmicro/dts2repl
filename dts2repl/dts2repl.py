@@ -862,6 +862,8 @@ def generate(filename, override_system_clock_frequency=None):
     overlays = get_overlays(dt)
 
     main_compatible = next(filter(lambda x: '/' in x.name and get_node_prop(x, 'compatible'), dt.node_iter()), None)
+    if main_compatible != None:
+        main_compatible = get_node_prop(mcu, 'compatible')[0]
     logging.debug(f'main compat string is = {main_compatible}')
 
     for node in nodes:
