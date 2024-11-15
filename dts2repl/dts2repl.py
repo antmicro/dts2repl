@@ -863,10 +863,12 @@ def generate(filename, override_system_clock_frequency=None):
 
     main_compatible = None
     for node in nodes:
-        if node.name == "/":
-            main_compatible = get_node_prop(node, 'compatible')[0]
-            logging.debug(f'main compat string is = {main_compatible}')
-            break
+        compatible = get_node_prop(node, 'compatible')
+        if compatible:
+            if node.name == "/":
+                main_compatible = compatible[0]
+                logging.debug(f'main compat string is = {main_compatible}')
+                break
 
     for node in nodes:
         # those memory peripherals sometimes require changing the sysbus address of this peripheral
