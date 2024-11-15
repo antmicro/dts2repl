@@ -1,0 +1,1 @@
+flexcomm2_lpi2c2: @ sysbus <0x50094800, +0x800>
