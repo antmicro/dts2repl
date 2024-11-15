@@ -866,6 +866,15 @@ def generate(filename, override_system_clock_frequency=None):
         is_heuristic_memory = False
         # filter out nodes without compat strings
         compatible = get_node_prop(node, 'compatible')
+        
+        main_compatible = None
+        try:
+            if node.name == "/":
+                main_compatible = get_node_prop(node, 'compatible')[0]
+                logging.debug(f'Main compat string is {main_compatible}')
+        except:
+            pass
+        
         if compatible and 'gpio-leds' in compatible:
             logging.debug(f'Skipping LED parent node {node.name}')
             continue
@@ -1157,7 +1166,7 @@ def generate(filename, override_system_clock_frequency=None):
             # We use our CPU number as the CPU ID instead of the reg address
             # This relies on the fact that the name will have been changed to "cpu{n}"
             indent.append(f'cpuId: {name.replace("cpu", "")}')
-            if not compat.startswith("arm,arm11") and not compat.startswith("arm,arm9"):
+            if not compat.startswith("arm,arm11") and not compat.startswith("arm,arm9") and not main_compatible == "beagle,beaglebone-ai64":
                 indent.append('genericInterruptController: gic')
                 dependencies.add('gic')
         if model in ("CPU.X86", "CPU.X86_64"):
