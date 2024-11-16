@@ -137,6 +137,7 @@
     "litex,clk": "Miscellaneous.LiteX_MMCM_CSR32",
     "litex,timer0": { "fomu": { "type" : "Timers.LiteX_Timer", "frequency": 100000000 }, "_": { "type": "Timers.LiteX_Timer_CSR32", "frequency": 100000000 } },
     "litex,uart0": "UART.LiteX_UART",
+    "litex,vexriscv-standard": "CPU.RiscV32",
 
     "memory": "Memory.MappedMemory",
     "mmio-sram": "Memory.MappedMemory",
