@@ -1,0 +1,8 @@
+rom: Memory.MappedMemory @ sysbus 0x10000000
+    size: 0x200000
+
+sysbus:
+    init:
+        Tag <0x5000131C 4> "FCFG1_REVISION" 0x00000025
+        Tag <0x50001318 4> "ICEPICK_DEVICE_ID" 0x2BB7702F
+
