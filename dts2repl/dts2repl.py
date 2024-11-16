@@ -1142,7 +1142,7 @@ def generate(filename, override_system_clock_frequency=None):
                 indent.append('allowUnalignedAccesses: true')
             hartid = 0
             if len(node.name.split("@")) >= 2:
-                hartid = node.name.split("@")[1]
+                hartid = int(node.name.split("@")[1], 16)
             indent.append(f'hartId: {hartid}')
 
             if any(c.startswith('riscv,sifive') or
