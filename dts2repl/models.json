@@ -280,6 +280,8 @@
     "sifive,otp0": "Memory.MappedMemory",
     "sifive,rocket0": "CPU.RiscV32",
     "sifive,uart0": "UART.SiFive_UART",
+    
+    "sensry,sy1xx" : "CPU.RiscV32",
 
     "sc,hrmem": "Memory.MappedMemory",
 
