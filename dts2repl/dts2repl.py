@@ -1134,7 +1134,7 @@ def generate(filename, override_system_clock_frequency=None):
             # Use CPU.VexRiscv for LiteX and Fomu
             if overlays & {'litex,vexriscv', 'kosagi,fomu'}:
                 model = 'CPU.VexRiscv'
-            elif "openisa,rv32m1" in overlays or "telink,tlsr9518adk80d" in overlays or "_xandes" in isa or compat in ["intel,niosv", "nuclei,bumblebee", "neorv32-cpu", "espressif,riscv", "ite,riscv-ite", "litex,vexriscv-standard", "sensry,sy1xx"]:
+            elif "openisa,rv32m1" in overlays or "telink,tlsr9518adk80d" in overlays or "_xandes" in isa or compat in ["intel,niosv", "nuclei,bumblebee", "neorv32-cpu", "espressif,riscv", "ite,riscv-ite", "litex,vexriscv-standard", "sensry,sy1xx", "nordic,vpr"]:
                 indent.append('timeProvider: empty')
             else:
                 indent.append('timeProvider: clint')
