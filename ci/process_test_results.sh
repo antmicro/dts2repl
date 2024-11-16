@@ -47,5 +47,5 @@ for dir in */ ; do
 done
 echo -e "-----------------------------------------------------------\n\n"
 
-cp -R ./passed-to-generated ../regressions
+cp -R ./passed-to-generated ../regressions || true
 exit $RESULT
