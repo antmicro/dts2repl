@@ -810,6 +810,14 @@ def parse_overlay(path):
 
 
 def can_be_memory(node):
+    chosen_node = node.dt.get_node("/chosen")
+    if chosen_node:
+        sram = get_node_prop(chosen_node, "zephyr,sram")
+        flash = get_node_prop(chosen_node, "zephyr,flash")
+        if sram and node == sram:
+            return True
+        if flash and node == flash:
+            return True
     possible_names = ('ram', 'flash', 'partition', 'memory')
     return len(node.props) == 1 and 'reg' in node.props \
         and any(x in node.name.lower() for x in possible_names) \
