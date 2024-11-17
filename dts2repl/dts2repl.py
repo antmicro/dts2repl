@@ -269,22 +269,28 @@ def get_node_prop(node, prop, default=None, inherit=False):
 
     val = node.props[prop]
     if prop in ('compatible', 'device_type', 'model'):
-        val = val.to_strings()
+        return val.to_strings()
     elif prop in ('interrupts', 'reg', 'ranges'):
-        val = val.to_nums()
+        return val.to_nums()
     elif prop in ('#address-cells', '#size-cells', '#interrupt-cells', 'cc-num', 'clock-frequency',
                   'riscv,ndev'):
-        val = val.to_num()
+        return val.to_num()
     elif prop in ('interrupt-parent',):
-        val = val.to_node()
+        return val.to_node()
     elif prop in ('interrupts-extended',):
-        val = get_interrupts_extended(val)
+        return get_interrupts_extended(val)
     elif prop in ('gpios',):
-        val = get_prop_value(val, 'pnn')
+        return get_prop_value(val, 'pnn')
     else:
-        val = val.to_string()
-
-    return val
+        try:
+            return val.to_string()
+        except:
+            pass
+        try:
+            return val.to_path()
+        except:
+            pass
+    return None
 
 def renode_model_overlay(compat, mcu, overlays):
     def _try_decode(e):
