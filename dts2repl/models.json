@@ -52,6 +52,7 @@
 
     "arm,cortex-a9-twd-timer": { "type": "Timers.ARM_PrivateTimer", "frequency": 667000000 },
 
+    "arm,cortex-a7-gic": "IRQControllers.ARM_GenericInterruptController",
     "arm,cortex-a9-gic": "IRQControllers.ARM_GenericInterruptController",
     "arm,cortex-a15-gic": "IRQControllers.ARM_GenericInterruptController",
     "arm,gic": "IRQControllers.ARM_GenericInterruptController",
