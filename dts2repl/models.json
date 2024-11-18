@@ -12,6 +12,7 @@
     "ambiq,apollo4-pinctrl": "GPIOPort.AmbiqApollo4_GPIO",
     "ambiq,uart": "UART.PL011",
 
+    "arm,arm926ej-s": { "type": "CPU.ARMv7A", "cpuType": "arm926" },
     "arm,arm1176jzf-s": { "type": "CPU.ARMv7A", "cpuType": "arm1176" },
 
     "arm,armv8-timer": { "renesas,rzt2m_starter_kit": { "type": "Timers.ARM_GenericTimer", "frequency": 20000000 }, "_": { "type": "Timers.ARM_GenericTimer", "frequency": 62500000 } },
