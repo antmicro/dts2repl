@@ -1,31 +1,6 @@
 stages:
-  - Test
   - Release
-  - TestRelease
-
-Compare repls:
-  stage: Test
-  image:
-    name: debian:bullseye
-  variables:
-    RENODE_VERSION: "latest"
-    DEBIAN_FRONTEND: "noninteractive"
-    GET_CUSTOM_RENODE_REVISION: ""
-  artifacts:
-    paths:
-      - ci-output/repls
-      - ci-output/robot-results
-      - ci-output/regressions
-    when: always
-  before_script:
-    - apt -qqy update > /dev/null 2> /dev/null
-    - apt -qqy install automake autoconf cmake libtool g++ coreutils policykit-1 libgtk2.0-dev uml-utilities gtk-sharp2 wget jq git curl python3 python3-pip parallel xz-utils rename > /dev/null 2> /dev/null
-    - apt -qqy install mono-complete 2> /dev/null > /dev/null
-    - mono --version
-    - ./ci/prepare.sh
-  script:
-    - ./ci/test.sh
-    - ./ci/process_test_results.sh
+  - Test
 
 Static release:
   stage: Release
@@ -51,7 +26,7 @@ Static release:
       - dts2repl-dynamic
 
 Test Static release:
-  stage: TestRelease
+  stage: Test
   image:
     name: debian:bullseye
   dependencies: [Static release]
@@ -68,3 +43,27 @@ Test Static release:
     paths:
       - test.repl
       - test2.repl
+
+Compare repls:
+  stage: Test
+  image:
+    name: debian:bullseye
+  variables:
+    RENODE_VERSION: "latest"
+    DEBIAN_FRONTEND: "noninteractive"
+    GET_CUSTOM_RENODE_REVISION: ""
+  artifacts:
+    paths:
+      - ci-output/repls
+      - ci-output/robot-results
+      - ci-output/regressions
+    when: always
+  before_script:
+    - apt -qqy update > /dev/null 2> /dev/null
+    - apt -qqy install automake autoconf cmake libtool g++ coreutils policykit-1 libgtk2.0-dev uml-utilities gtk-sharp2 wget jq git curl python3 python3-pip parallel xz-utils rename > /dev/null 2> /dev/null
+    - apt -qqy install mono-complete 2> /dev/null > /dev/null
+    - mono --version
+    - ./ci/prepare.sh
+  script:
+    - ./ci/test.sh
+    - ./ci/process_test_results.sh
