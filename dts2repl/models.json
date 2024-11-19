@@ -293,6 +293,7 @@
     "silabs,gecko-gpio-port": "GPIOPort.EFR32_GPIOPort",
     "silabs,gecko-burtc": "Timers.EFR32xG2_BURTC",
     "silabs,si32-usart": "UART.SI32_USART",
+    "silabs,series-clock": { "type": "Python.PythonPeripheral", "size": 0x400, "initable": false, "script": "request.value = {0x70: 0x1, 0x160: 0x2, 0x240: 0x1}.get(request.offset, 0)" },
 
     "snps,dw-apb-uart": "UART.NS16550",
     "nuvoton,numaker-uart": "UART.NS16550",
