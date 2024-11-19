@@ -294,6 +294,7 @@
     "silabs,gecko-burtc": "Timers.EFR32xG2_BURTC",
     "silabs,si32-usart": "UART.SI32_USART",
     "silabs,series-clock": { "type": "Python.PythonPeripheral", "size": 0x400, "initable": false, "script": "request.value = {0x70: 0x1, 0x160: 0x2, 0x240: 0x1}.get(request.offset, 0)" },
+    "silabs,gecko-stimer": { "type": "Timers.EFR32xG24_SYSRTC", "irq_mappings": ["AppIRQ"] },
 
     "snps,dw-apb-uart": "UART.NS16550",
     "nuvoton,numaker-uart": "UART.NS16550",
