@@ -1,0 +1,32 @@
+uart1: UART.NS16550 @ sysbus 0xa0000000
+
+pci: Python.PythonPeripheral @ sysbus 0xE0000CF8
+    size: 0x400
+    initable: false
+    script: '''
+if request.isRead:
+    if addr == 0x0:
+        # ns16550 vendor and device ID
+        request.value = 0x54a98086
+    elif addr == 0x10:
+        # address to memory-mapped accesses, it should be the same as 'uart' point of registration
+        request.value = 0xa0000000
+else:
+    addr = request.value & 0xFF
+'''
+
+sysbus:
+    init:
+        Tag <0xE0000020 1> "PIC1_CMD"
+        Tag <0xE0000021 1> "PIC1_DATA"
+        Tag <0xE00000A0 1> "PIC2_CMD"
+        Tag <0xE00000A1 1> "PIC2_DATA"
+        Tag <0xE0000040 1> "PIT_CHANNEL0"
+        Tag <0xE0000041 1> "PIT_CHANNEL1"
+        Tag <0xE0000042 1> "PIT_CHANNEL2"
+        Tag <0xE0000043 1> "PIT_CMDREG"
+        Tag <0xE0000CF8 4> "PCI_ADDRESS"
+        Tag <0xE0000CFC 4> "PCI_DATA"
+        Tag <0xE0000070 1> "CMOS_ADDRESS"
+        Tag <0xE0000071 1> "CMOS_DATA"
+        GenerateACPITable 0xe0000
