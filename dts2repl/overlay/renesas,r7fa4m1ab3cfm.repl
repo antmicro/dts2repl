@@ -1,3 +1,4 @@
 sysbus:
     init add:
         ApplySVD @https://dl.antmicro.com/projects/renode/svd/R7FA4M1AB.svd.gz
+        Tag <0x4001E03C 1> "Oscillation Stabilization Flag Register (OSCSF)" 0xF
