@@ -278,6 +278,7 @@
     "neorv32-machine-timer": { "type": "Timers.NEORV32_MachineSystemTimer", "frequency": 100000000 },
 
     "sifive,dtim0": "Memory.MappedMemory",
+    "sifive,l2lim0": "Memory.MappedMemory",
     "sifive,gpio0": "GPIOPort.SiFive_GPIO",
     "sifive,maskrom0": "Memory.MappedMemory",
     "sifive,otp0": "Memory.MappedMemory",
