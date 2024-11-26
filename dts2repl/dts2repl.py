@@ -810,7 +810,12 @@ def parse_overlay(path):
 
 
 def can_be_memory(node):
-    chosen_node = node.dt.get_node("/chosen")
+    chosen_node = None
+    try:
+        chosen_node = node.dt.get_node("/chosen")
+    except dtlib.DTError:
+        pass  # No "/chosen" node
+
     if chosen_node:
         sram = get_node_prop(chosen_node, "zephyr,sram")
         flash = get_node_prop(chosen_node, "zephyr,flash")
