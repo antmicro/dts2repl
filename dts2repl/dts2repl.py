@@ -713,7 +713,7 @@ class TagBlock:
     size: int
 
     def __str__(self) -> str:
-        return  f'Tag <{hex(self.offset)}, {hex(self.offset + self.size - 1)}> "{self.name}"'
+        return  f'Tag <{hex(self.offset)} {hex(self.size)}> "{self.name}"'
 
 
 # Allowed characters in format string:
