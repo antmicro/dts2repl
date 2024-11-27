@@ -660,7 +660,7 @@ class ReplFile:
         r = []
         accumulator = copy.copy(s[0])
         for t in s[1:]:
-            if t.offset <= (accumulator.offset + accumulator.size):
+            if t.offset < (accumulator.offset + accumulator.size):
                 # the next tag partially overlaps the previous one - join them
                 if (t.offset + t.size) > (accumulator.offset + accumulator.size):
                     accumulator.size = (t.offset + t.size) - accumulator.offset
@@ -679,8 +679,11 @@ class ReplFile:
         # overlays can add more precise tagging with return values
         body = ''
         if any(self.tags):
+            # Generate tags in a size-based descending order
+            grouped_tags = self._get_grouped_tags()
+            grouped_tags.sort(reverse=True)
             body = 'sysbus:\n    init:\n'
-            for tag in self._get_grouped_tags():
+            for tag in grouped_tags:
                 body += 8 * ' ' + str(tag) + '\n'
             body += '\n'
         body += '\n'.join([str(b) + '\n' for b in self.blocks])
@@ -714,6 +717,9 @@ class TagBlock:
 
     def __str__(self) -> str:
         return  f'Tag <{hex(self.offset)} {hex(self.size)}> "{self.name}"'
+
+    def __lt__(self, other):
+        return self.size < other.size
 
 
 # Allowed characters in format string:
