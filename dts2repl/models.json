@@ -159,6 +159,8 @@
     "marvell,mv64xxx-i2c": {"type": "Python.PythonPeripheral", "size": 0x100, "initable": false, "script": "request.value = 0xf8" },
     "marvell,mv78230-a0-i2c": {"type": "Python.PythonPeripheral", "size": 0x100, "initable": false, "script": "request.value = 0xf8" },
     "marvell,sheeva-v7": { "type": "CPU.ARMv7A", "cpuType": "cortex-a9" },
+ 
+    "amlogic,meson-gx-uart": "UART.NS16550",
 
     "openisa,ri5cy": "CPU.Ri5cy",
     "openisa,rv32m1-lpuart": { "type": "UART.NXP_LPUART", "fifoSize": 8 },
