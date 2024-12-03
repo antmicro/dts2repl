@@ -280,7 +280,10 @@ def get_node_prop(node, prop, default=None, inherit=False):
     elif prop in ('interrupts-extended',):
         return get_interrupts_extended(val)
     elif prop in ('gpios',):
-        return get_prop_value(val, 'pnn')
+        fmt = 'pnn'
+        while len(fmt) * 4 < len(val.value): 
+            fmt += 'n'
+        return get_prop_value(val, fmt)
     else:
         try:
             return val.to_string()
@@ -1262,8 +1265,7 @@ def generate(filename, override_system_clock_frequency=None):
             if not gpios:
                 logging.info(f'LED {node.name} has no gpios property, skipping...')
                 continue
-
-            gpio, num, gpio_flags = gpios[0]
+            gpio, num, gpio_flags = gpios[0][:3]
             gpio_compat = get_node_prop(gpio, 'compatible', [])
             if 'nxp,s32-gpio' in gpio_compat:
                 # We have to translate gpio pin to pad
