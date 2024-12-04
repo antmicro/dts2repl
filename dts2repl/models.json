@@ -80,7 +80,7 @@
     "raspberrypi,pico-uart": "UART.PL011",
 
     "atmel,sam-usart": "UART.SAM_USART",
-    "atmel,sam-uart": "UART.SAM_USART",
+    "atmel,sam-uart": { "type": "UART.SAM_USART", "uartOnlyMode": true },
     "atmel,sam0-uart": { "atmel,samd20": "UART.SAMD20_UART", "_": "UART.SAMD5_UART" },
 
     "nuvoton,npcx-uart": "UART.NPCX_UART",
