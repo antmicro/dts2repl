@@ -1691,7 +1691,7 @@ class DT:
                 try:
                     alias2node[prop.name] = prop.to_path()
                 except DTError:
-                    if self._force:
+                    if not self._force:
                         continue
                     raise
 
