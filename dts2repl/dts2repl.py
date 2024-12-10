@@ -60,6 +60,9 @@ def parse_args():
     parser.add_argument('--flatten',
                         action='store_true',
                         help='Flatten dtsi files to one dts automatically. Only available when dtsi include dirs are provided')
+    parser.add_argument('--force-valid-aliases',
+                    action='store_true',
+                    help='Enables fatal errors when encountering invalid aliases')
     parser.add_argument('--override-system-clock-frequency',
                         action='store',
                         default=None,
@@ -1867,7 +1870,7 @@ def main():
         dts_includes = get_includes(flat_dts, dirs)
 
         # save fully flattened device tree (also /include/s)
-        dts = dtlib.DT(flat_dts, dirs)
+        dts = dtlib.DT(flat_dts, dirs, args.force_valid_aliases)
         with open(flat_dts, 'w') as f:
             f.write(str(dts))
         args.filename = flat_dts
