@@ -660,6 +660,49 @@ class ReplFile:
         self.blocks = available_blocks
 
 
+    def merge_registration_points_duplicates(self, sized: List[ReplBlock]):
+        # merge overlapping memory with multiple registration points
+        # NOTE: this is a simplified solution 
+        # 1. will work for this case:
+        # memory: Memory.MappedMemory @ { sysbus 0x0; sysbus 0x80000000 }
+        #   size: 0x40000000
+        # memory: Memory.MappedMemory @ { sysbus 0x80000000 }
+        #   size: 0x40000000
+        # it'll output
+        # memory: Memory.MappedMemory @ { sysbus 0x0; sysbus 0x80000000 }
+        #   size: 0x40000000
+        #
+        # 2. will drop one of the addresses in the following case:
+        # memory: Memory.MappedMemory @ { sysbus 0x0; sysbus 0x80000000 }
+        #   size: 0x40000000
+        # memory: Memory.MappedMemory @ { sysbus 0xb16b00b5; sysbus 0x80000000 }
+        #   size: 0x40000000 
+        # 0xb16b00b5 will be dropped and it'll output
+        # memory: Memory.MappedMemory @ { sysbus 0x0; sysbus 0x80000000 }
+        #   size: 0x40000000
+
+        sized_not_memory = []
+        sized_memory = []
+        sized_memory_filtered = []
+
+        for block in sized:
+            (sized_not_memory, sized_memory)[block.model is not None and block.model.startswith('Memory')].append(block)
+        for block in sized_memory:
+            any_overlaps = False
+            for target_block in sized_memory:
+                target_region = target_block.region
+                if (
+                    block.region.size == target_region.size 
+                    and set(block.region.addresses) & set(target_region.addresses)
+                    and len(block.region.addresses) < len(target_region.addresses)
+                ):
+                    any_overlaps = True
+                    break
+            if not any_overlaps:
+                sized_memory_filtered.append(block)
+        return sized_not_memory + sized_memory_filtered
+
+
     def merge_overlapping_blocks(self) -> None:
         # split into blocks of known and unknown size
         sized = []
@@ -691,9 +734,8 @@ class ReplFile:
 
             else:
                 sized_merged.append(block)
-
         # build the repl out of the filtered and merged blocks
-        self.blocks = sized_merged + unsized
+        self.blocks = self.merge_registration_points_duplicates(sized_merged) + unsized
 
 
     def remove_dangling_irqs(self) -> None:
