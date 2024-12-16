@@ -149,6 +149,7 @@
     "memory": "Memory.MappedMemory",
     "mmio-sram": "Memory.MappedMemory",
     "jedec,spi-nor": "Memory.MappedMemory",
+    "shared-dma-pool": "Memory.MappedMemory",
 
     "marvell,armada-370-timer": {"type": "Timers.Marvell_Armada_Timer", "frequency": 100000000 },
     "marvell,armada-375-timer": {"type": "Timers.Marvell_Armada_Timer", "frequency": 100000000 },
