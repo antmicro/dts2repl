@@ -273,7 +273,7 @@ def get_node_prop(node, prop, default=None, inherit=False):
     val = node.props[prop]
     if prop in ('compatible', 'device_type', 'model'):
         return val.to_strings()
-    elif prop in ('interrupts', 'reg', 'ranges'):
+    elif prop in ('interrupts', 'reg', 'ranges', 'alloc-ranges'):
         return val.to_nums()
     elif prop in ('#address-cells', '#size-cells', '#interrupt-cells', 'cc-num', 'clock-frequency',
                   'riscv,ndev'):
@@ -383,7 +383,7 @@ def translate_address(addr, node):
 
 # The returned addresses are in the root address space, that is they have all
 # `ranges` translations applied.
-def get_reg(node):
+def get_reg(node, variant='reg'):
     if node.parent:
         address_cells = get_node_prop(node.parent, '#address-cells', inherit=True)
         size_cells = get_node_prop(node.parent, '#size-cells', inherit=True)
@@ -391,7 +391,7 @@ def get_reg(node):
         address_cells = 1
         size_cells = 1
 
-    reg = get_node_prop(node, 'reg')
+    reg = get_node_prop(node, variant)
     while reg:
         address, reg = get_cells(reg, address_cells)
         if size_cells > 0:
@@ -1311,6 +1311,10 @@ def generate(filename, override_system_clock_frequency=None):
                 else:
                     # do not generate memory regions of size 0
                     continue
+            elif 'alloc-ranges' in node.props:
+                addr, size = next(get_reg(node, 'alloc-ranges'))
+                regions = [RegistrationRegion([addr])]
+                indent.append(f'size: {hex(size)}')
             else:
                 logging.warning('Memory node {node.name} has no reg, skipping')
                 continue
