@@ -1407,7 +1407,7 @@ def generate(filename, override_system_clock_frequency=None):
             # to be moved to models.json
             elif compat == 'st,stm32-rtc':
                 irq_names = ['AlarmIRQ']
-            elif (compat in ['nxp,kinetis-lpuart', 'nxp,kinetis-uart', 'silabs,gecko-leuart', 'sifive,uart0', 'st,stm32-adc']
+            elif (compat in ['nxp,kinetis-lpuart', 'nxp,lpuart', 'nxp,kinetis-uart', 'silabs,gecko-leuart', 'sifive,uart0', 'st,stm32-adc']
                 or model in ['UART.STM32F7_USART', 'SPI.STM32SPI']):
                 irq_names = ['IRQ']
             elif (compat in ['nuvoton,npcx-uart']):
