@@ -1,0 +1,2 @@
+internal_mem: Memory.MappedMemory @ sysbus 0xff8c0000
+    size: 0x30000
