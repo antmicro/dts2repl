@@ -178,6 +178,24 @@ def get_uart(dts_filename):
             return 'cpu0.uart'
     except Exception:
         pass
+    
+    # Then, chosen bootargs = "console=ttymxc1,115200";
+    # ttymxc<i> = serial<i+1>
+    try:
+        node = dt.get_node('/chosen')
+        bootargs = get_node_prop(node, 'bootargs')
+        TTYMXC_REGEX = re.compile(r"ttymxc(?P<num>[\d]+)")
+        node = TTYMXC_REGEX.search(bootargs)
+        cons_index = int(node.group('num'))
+        for node in dt.node_iter():
+            if not (node.name.lower().startswith('serial') or node.name.lower().startswith('uart')):
+                continue
+        
+            if not is_disabled(node) and 'reg' in node.props and cons_index == 0:
+                return name_mapper.get_name(node)
+            cons_index -= 1
+    except Exception:
+       pass
 
     # Finally, just return any non-disabled node that looks vaguely like a uart
     for node in dt.node_iter():
