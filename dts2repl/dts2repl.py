@@ -291,7 +291,7 @@ def get_node_prop(node, prop, default=None, inherit=False):
     val = node.props[prop]
     if prop in ('compatible', 'device_type', 'model'):
         return val.to_strings()
-    elif prop in ('interrupts', 'reg', 'ranges', 'alloc-ranges'):
+    elif prop in ('interrupts', 'reg', 'ranges', 'alloc-ranges', 'dma-ranges'):
         return val.to_nums()
     elif prop in ('#address-cells', '#size-cells', '#interrupt-cells', 'cc-num', 'clock-frequency',
                   'riscv,ndev'):
@@ -1404,7 +1404,14 @@ def generate(filename, override_system_clock_frequency=None):
                     count = "6"
                 indent.append(f'numberOfEvents: {count}')
         if model.startswith('Memory') and not any(i for i in indent if i.startswith('size:')):
-            if 'reg' in node.props:
+            if 'dma-ranges' in node.props:
+                # Device Tree Spec 2.3.9 (child-bus-address, parent-bus-address, length)
+                # we assume just a single triplet (although it could be a list of triplets)
+                dma_ranges = get_node_prop(node, 'dma-ranges')
+                regions = [RegistrationRegion([dma_ranges[1]])]
+                size = dma_ranges[2]
+                indent.append(f'size: {hex(size)}')
+            elif 'reg' in node.props:
                 _, size = next(get_reg(node))
                 # increase OCRAM size for imx6 platforms
                 # the device trees in U-Boot all have 0x20000, but some platforms
