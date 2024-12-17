@@ -85,6 +85,7 @@
     "atmel,sam-usart": "UART.SAM_USART",
     "atmel,sam-uart": { "type": "UART.SAM_USART", "uartOnlyMode": true },
     "atmel,sam0-uart": { "atmel,samd20": "UART.SAMD20_UART", "_": "UART.SAMD5_UART" },
+    "atmel,at91sam9260-usart": "UART.SAM_USART",
 
     "nuvoton,npcx-uart": "UART.NPCX_UART",
     "nuvoton,npcx-gpio": "GPIOPort.NPCX_GPIO",
