@@ -1049,6 +1049,11 @@ def generate(filename, override_system_clock_frequency=None):
 
         # special multi-registration address for GIC
         if model == 'IRQControllers.ARM_GenericInterruptController':
+            if 'fsl,lx2160aqds' in overlays:
+                # fsl,lx2160aqds don't have CPU in uboot's device tree
+                # we add gic together with cpu in fsl,lx2160aqds overlay
+                continue
+
             def arm_gic_get_region(addr, size, name):
                 if name == 'redistributor':
                     cpus = repl_file.get_blocks_by_type('cpu')
