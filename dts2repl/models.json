@@ -86,6 +86,7 @@
     "atmel,sam-uart": { "type": "UART.SAM_USART", "uartOnlyMode": true },
     "atmel,sam0-uart": { "atmel,samd20": "UART.SAMD20_UART", "_": "UART.SAMD5_UART" },
     "atmel,at91sam9260-usart": "UART.SAM_USART",
+    "atmel,at91sam9260-pit": { "type": "Python.PythonPeripheral", "size": 0xF, "initable": true, "filename": "scripts/pydev/flipflop.py" },
 
     "nuvoton,npcx-uart": "UART.NPCX_UART",
     "nuvoton,npcx-gpio": "GPIOPort.NPCX_GPIO",
