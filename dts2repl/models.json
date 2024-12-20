@@ -367,6 +367,7 @@
     "quicklogic,usbserialport-s3b": "UART.USBSerialPort_S3B",
 
     "ti,am4372-i2c": { "type": "Python.PythonPeripheral", "size": 0x1000, "initable": false, "script": "request.value = 0x1" },
+    "ti,am654-uart": "UART.NS16550",
     "ti,am4372-uart": "UART.NS16550",
     "ti,am3352-uart": "UART.NS16550",
     "ti,am335x-timer": { "type": "Timers.OMAP_Timer", "frequency": 4000000 },
