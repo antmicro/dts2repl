@@ -1331,7 +1331,7 @@ def generate(filename, override_system_clock_frequency=None):
                     continue
             elif 'alloc-ranges' in node.props:
                 addr, size = next(get_reg(node, 'alloc-ranges'))
-                regions = [RegistrationRegion([addr])]
+                regions = [RegistrationRegion(addr)]
                 indent.append(f'size: {hex(size)}')
             else:
                 logging.warning('Memory node {node.name} has no reg, skipping')
