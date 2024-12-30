@@ -188,9 +188,12 @@ def get_uart(dts_filename):
         node = TTYMXC_REGEX.search(bootargs)
         cons_index = int(node.group('num'))
         for node in dt.node_iter():
-            if not (node.name.lower().startswith('serial') or node.name.lower().startswith('uart')):
+            node_lower = node.name.lower()
+            if not (node_lower.startswith('serial') or
+                   (node_lower.startswith('uart') and not node_lower.endswith('grp')) 
+            ):
+            # HACK: in u-boot some pinctrl nodes are called "uartXgrp" and they shouldn't be taken into account
                 continue
-        
             if not is_disabled(node) and 'reg' in node.props and cons_index == 0:
                 return name_mapper.get_name(node)
             cons_index -= 1
