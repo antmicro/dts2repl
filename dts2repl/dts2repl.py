@@ -635,6 +635,8 @@ class ReplFile:
                 continue
             name = dts_node.labels[0] if any(dts_node.labels) else dts_node.name
             tag = TagBlock(name, offset, size)
+            if size == 0:
+                continue
             self.tags.append(tag)
             generated_any = True
         return generated_any
