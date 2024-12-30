@@ -81,6 +81,7 @@
     "raspberrypi,pico-uart": "UART.PL011",
 
     "allwinner,sun50i-h5-mbus": "Memory.MappedMemory",
+    "allwinner,sun50i-a64-mbus": "Memory.MappedMemory",
 
     "atmel,sam-usart": "UART.SAM_USART",
     "atmel,sam-uart": { "type": "UART.SAM_USART", "uartOnlyMode": true },
