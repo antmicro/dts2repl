@@ -1474,7 +1474,7 @@ def generate(filename, override_system_clock_frequency=None):
         elif compat == 'gaisler,irqmp':
             indent.append('0 -> cpu0@0 | cpu0@1 | cpu0@2')
             dependencies.add('cpu0')
-        elif 'interrupts' in node.props:
+        elif 'interrupts' in node.props and model != "Memory.MappedMemory":
             interrupt_parent = get_node_prop(node, 'interrupt-parent', inherit=True)
             if interrupt_parent is not None:
                 interrupt_cells = get_node_prop(interrupt_parent, '#interrupt-cells', default=2)
