@@ -1,0 +1,7 @@
+mbus: Memory.MappedMemory @ sysbus 0x0
+    size: 0x10000000
+
+otp: Python.PythonPeripheral @ sysbus 0xfe38c304
+    size: 0x4
+    initable: true
+    filename: "scripts/pydev/flipflop.py"
