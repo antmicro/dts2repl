@@ -14,11 +14,6 @@ nvic0: IRQControllers.NVIC @ {
     -> cpu0@0
     systickFrequency: 168000000
 
-timers5: Timers.STM32_Timer @ sysbus <0x40000C00, +0x400>
-    initialLimit: 0xffffffff
-    frequency: 250000000
-    -> nvic0@50
-
 sysbus:
     init add:
         ApplySVD @https://dl.antmicro.com/projects/renode/svd/STM32F40x.svd.gz
