@@ -1,0 +1,2 @@
+ddr: Memory.MappedMemory @ sysbus 0x0
+    size: 0xff000000
