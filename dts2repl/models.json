@@ -240,6 +240,8 @@
     "renesas,rzt2m-uart": "UART.Renesas_SCI",
     "renesas,rcar-scif": "UART.RCAR_UART",
     "renesas,rcar-hscif": "UART.RCAR_UART",
+    "renesas,scif": "UART.RCAR_UART",
+    "renesas,hscif": "UART.RCAR_UART",
     "renesas,ra-gpio" : { "renesas,r7fa2e1a|renesas,r7fa2l1a" : "GPIOPort.RenesasRA2_GPIO",
                           "renesas,r7fa4m1a" : "GPIOPort.RenesasRA4_GPIO",
                           "renesas,r7fa6m5b" : "GPIOPort.RenesasRA6_GPIO",
