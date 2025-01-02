@@ -1,0 +1,2 @@
+relocation: Memory.MappedMemory @ sysbus 0x7DF20000
+    size: 0x20e0000
