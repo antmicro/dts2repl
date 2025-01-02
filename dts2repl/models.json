@@ -224,6 +224,8 @@
     "nvidia,tegra114-i2c": "I2C.TegraI2CController",
     "nvidia,tegra124-i2c": "I2C.TegraI2CController",
 
+    "rockchip,rk3308-otp": { "type": "Python.PythonPeripheral", "size": 0x4000, "initable": true, "filename": "scripts/pydev/flipflop.py" },
+    "rockchip,rk3308-cru": { "type": "Python.PythonPeripheral", "size": 0x1000, "initable": true, "filename": "scripts/pydev/flipflop.py" },
     "rockchip,rk3568-cru": { "type": "Python.PythonPeripheral", "size": 0x1000, "initable": true, "filename": "scripts/pydev/flipflop.py" },
     "rockchip,rk3568-pmucru": { "type": "Python.PythonPeripheral", "size": 0x1000, "initable": true, "filename": "scripts/pydev/flipflop.py" },
     "rockchip,rk3568-i2c": { "type": "Python.PythonPeripheral", "size": 0x1000, "initable": true, "filename": "scripts/pydev/flipflop.py" },
