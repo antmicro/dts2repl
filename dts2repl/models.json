@@ -377,6 +377,7 @@
     "ti,am3352-uart": "UART.NS16550",
     "ti,am335x-timer": { "type": "Timers.OMAP_Timer", "frequency": 4000000 },
     "ti,am4372-timer": { "type": "Timers.OMAP_Timer", "frequency": 4000000 },
+    "ti,omap5430-timer": { "type": "Timers.OMAP_Timer", "frequency": 4000000 },
     "ti,am4-prcm": { "type": "Python.PythonPeripheral", "size": 0x11000, "initable": true, "filename": "scripts/pydev/rolling-bit.py" },
     "ti,cc13xx-cc26xx-uart": "UART.PL011",
     "ti,omap2-uart": "UART.NS16550",
