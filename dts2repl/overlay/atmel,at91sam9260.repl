@@ -1,0 +1,2 @@
+internal: Memory.MappedMemory @ sysbus 0x200000
+    size: 0x200000
