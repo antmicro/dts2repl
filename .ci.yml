@@ -42,7 +42,7 @@ Test Static release:
       - test.repl
       - test2.repl
 
-Compare repls:
+.compare_repls: &compare_repls
   stage: Test
   image: debian:bullseye
   variables:
@@ -60,8 +60,24 @@ Compare repls:
     - apt -qqy install automake autoconf cmake libtool g++ coreutils policykit-1 libgtk2.0-dev uml-utilities gtk-sharp2 wget jq git curl python3 python3-pip parallel xz-utils rename &> /dev/null
     - apt -qqy install mono-complete &> /dev/null
     - mono --version
-  before_script:    
-    - ./ci/prepare.sh
+  before_script:
+    - ./ci/prepare.sh # uses DASHBOARD_VARIANT
   script:
-    - ./ci/test.sh
+    - ./ci/test.sh # uses DASHBOARD_VARIANT
     - ./ci/process_test_results.sh
+
+Compare repls uboot:
+  <<: *compare_repls
+  variables:
+    RENODE_VERSION: "latest"
+    DEBIAN_FRONTEND: "noninteractive"
+    GET_CUSTOM_RENODE_REVISION: ""
+    DASHBOARD_VARIANT: "uboot"
+
+Compare repls zephyr:
+  <<: *compare_repls
+  variables:
+    RENODE_VERSION: "latest"
+    DEBIAN_FRONTEND: "noninteractive"
+    GET_CUSTOM_RENODE_REVISION: ""
+    DASHBOARD_VARIANT: "zephyr"
