@@ -1,0 +1,9 @@
+secureproxymain2: Python.PythonPeripheral @ sysbus 0x32400000
+    size: 0x100000
+    initable: true
+    filename: "scripts/pydev/flipflop.py"
+
+secureproxymain3: Python.PythonPeripheral @ sysbus 0x32800000
+    size: 0x100000
+    initable: true
+    filename: "scripts/pydev/flipflop.py"
