@@ -26,7 +26,7 @@
     "arm,cortex-a9": { "type": "CPU.ARMv7A", "cpuType": "cortex-a9" },
     "arm,cortex-a12": { "type": "CPU.ARMv7A", "cpuType": "cortex-a15" },
     "arm,cortex-a15": { "type": "CPU.ARMv7A", "cpuType": "cortex-a15" },
-    "arm,cortex-a17": { "type": "CPU.ARMv7A", "cpuType": "cortex-a15" },    
+    "arm,cortex-a17": { "type": "CPU.ARMv7A", "cpuType": "cortex-a15" },
     "arm,cortex-a35": { "type": "CPU.ARMv8A", "cpuType": "cortex-a53" },
     "arm,cortex-a53": { "type": "CPU.ARMv8A", "cpuType": "cortex-a53" },
     "arm,cortex-a55": { "type": "CPU.ARMv8A", "cpuType": "cortex-a55" },
@@ -172,7 +172,7 @@
     "marvell,mv64xxx-i2c": {"type": "Python.PythonPeripheral", "size": 0x100, "initable": false, "script": "request.value = 0xf8" },
     "marvell,mv78230-a0-i2c": {"type": "Python.PythonPeripheral", "size": 0x100, "initable": false, "script": "request.value = 0xf8" },
     "marvell,sheeva-v7": { "type": "CPU.ARMv7A", "cpuType": "cortex-a9" },
- 
+
     "amlogic,meson-gx-uart": "UART.NS16550",
 
     "openisa,ri5cy": "CPU.Ri5cy",
@@ -317,7 +317,7 @@
     "sifive,otp0": "Memory.MappedMemory",
     "sifive,rocket0": "CPU.RiscV32",
     "sifive,uart0": "UART.SiFive_UART",
-    
+
     "sensry,sy1xx" : "CPU.RiscV32",
 
     "sc,hrmem": "Memory.MappedMemory",
