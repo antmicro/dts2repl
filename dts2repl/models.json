@@ -392,6 +392,7 @@
     "ti,omap3-uart": "UART.NS16550",
     "ti,omap4-uart": "UART.NS16550",
     "ti,omap4-i2c": { "type": "Python.PythonPeripheral", "size": 0x1000, "initable": false, "script": "request.value = 0x1" },
+    "ti,omap5-dmm": { "type": "Python.PythonPeripheral", "size": 0x800, "initable": false, "script": "request.value = {0x40: 0x80640000}.get(request.offset, 0)" },
     "ti,stellaris-uart": "UART.PL011",
 
     "xlnx,xuartps": "UART.Cadence_UART",
