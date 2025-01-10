@@ -1220,7 +1220,11 @@ def generate(filename, override_system_clock_frequency=None):
         if model in ("CPU.ARMv8A", "CPU.ARMv8R", "CPU.ARMv7A", "CPU.ARMv7R"):
             # We use our CPU number as the CPU ID instead of the reg address
             # This relies on the fact that the name will have been changed to "cpu{n}"
-            indent.append(f'cpuId: {name.replace("cpu", "")}')
+            cpuIdx = int(name.replace("cpu", ""))
+            # For Cortex-A55 core number is stored in affinity level 1.
+            # For older cpus it's stored in affinity level 0.
+            cpuId = f'0x{(cpuIdx << 8):x}' if attribs.get('cpuType', '') == 'cortex-a55' else cpuIdx
+            indent.append(f'cpuId: {cpuId}')
             if not compat.startswith("arm,arm11") and not compat.startswith("arm,arm9") and not compat.startswith("arm,cortex-a8") and not main_compatible in ["beagle,beaglebone-ai64", "grinn,am335x-chiliboard"]:
                 indent.append('genericInterruptController: gic')
                 dependencies.add('gic')
