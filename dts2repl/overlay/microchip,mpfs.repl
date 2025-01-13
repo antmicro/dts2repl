@@ -8,3 +8,4 @@ mstimer: Timers.MPFS_Timer @ sysbus 0x20125000
     Timer1IRQ -> plic@82
     Timer2IRQ -> plic@83
 
+ddr_ctrlr: Miscellaneous.MPFS_DDRMock @ sysbus 0x3e001000
