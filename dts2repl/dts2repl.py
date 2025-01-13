@@ -585,8 +585,19 @@ class ReplFile:
         raise Exception(f'Unsupported block type {type}')
 
 
-    def add_block(self, block: ReplBlock) -> None:
+    def add_block(self, block: ReplBlock, skip_duplicates: bool = False) -> None:
         block.owner = self
+
+        # Check if the block already exists. If it does, skip it and display a warning.
+        # XXX: This should never happen during the parsing stage of the `dts` file!
+        # This mechanism is only intended to handle duplicates from overlay files.
+        # There are two exceptions to this rule:
+        # - `sysbus` named blocks, which are used for additional tags and SVDs,
+        # - blocks where the `model` field is None, which are used for overwriting values from DTS-generated blocks.
+        if skip_duplicates and self.get_block_by_name(block.name) and block.name != "sysbus" and block.model is not None:
+            logging.warning(f'Skipping duplicated block {block.name}!')
+            return
+
         self.blocks.append(block)
 
 
@@ -1535,7 +1546,7 @@ def generate(filename, override_system_clock_frequency=None):
             if overlay.lower() == file.lower():
                 repl_file.add_block(ReplBlock('', None, set(), set(), [f'// {compat} overlay']))
                 for overlay_block in parse_overlay(f'{overlay_path}/{file}'):
-                    repl_file.add_block(overlay_block)
+                    repl_file.add_block(overlay_block, skip_duplicates=True)
                 break
 
     # filter out unavailable blocks (with unsatisfied depends)
