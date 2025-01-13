@@ -1289,6 +1289,7 @@ def generate(filename, override_system_clock_frequency=None):
                    c.startswith('starfive,rocket') or
                    c == 'sifive,e31' or
                    c == 'sifive,u54' or
+                   c == 'sifive,u54-mc' or
                    c == 'espressif,riscv' or
                    c == 'qemu,riscv-virt'
                    for c in compatible) or "_xandes" in isa:
