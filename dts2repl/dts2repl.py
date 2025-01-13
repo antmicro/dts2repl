@@ -1544,6 +1544,7 @@ def generate(filename, override_system_clock_frequency=None):
         overlay = f'{compat}.repl'
         for file in overlay_files:
             if overlay.lower() == file.lower():
+                logging.info(f'Applying {overlay} overlay file')
                 repl_file.add_block(ReplBlock('', None, set(), set(), [f'// {compat} overlay']))
                 for overlay_block in parse_overlay(f'{overlay_path}/{file}'):
                     repl_file.add_block(overlay_block, skip_duplicates=True)
