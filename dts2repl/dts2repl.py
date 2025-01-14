@@ -506,11 +506,19 @@ class RedistributorRegistrationRegion:
 
 @dataclass
 class RegistrationRegion:
-    address: Optional[int] = None
+    addresses: list[int] = field(default_factory=list)
     size: Optional[int] = None
     region_name: Optional[str] = None
     registration_point: str = "sysbus"
     cpu: [Optional[str]] = None
+
+    def __post_init__(self):
+        if isinstance(self.addresses, list):
+            return
+        elif isinstance(self.addresses, int):
+            self.addresses = [self.addresses]
+        else:
+            raise ValueError()
 
     @property
     def has_address_and_size(self) -> bool:
@@ -521,6 +529,19 @@ class RegistrationRegion:
         if not self.has_address_and_size:
             return None
         return self.address + self.size
+
+    @property
+    def address(self) -> Optional[int]:
+        if len(self.addresses) == 0:
+            return None
+        return self.addresses[0]
+
+    @address.setter
+    def address(self, value: Optional[int]) -> None:
+        if value is None:
+            self.addresses = []
+            return
+        self.addresses = [value]
 
     @end.setter
     def end(self, value: int) -> None:
@@ -779,8 +800,6 @@ def get_prop_value(prop: dtlib.Property, fmt: str):
         yield tuple(values)
 
 
-# This regex does not handle multi-registration points correctly, in the case of such a registration
-# only the leading '{' is captured (see below)
 OVERLAY_NODE = re.compile(
     r"""
     ^                                   # Start of a line
@@ -799,6 +818,8 @@ OVERLAY_NODE = re.compile(
     re.VERBOSE,
 )
 
+# Warning: this will match multiple registration points where registration point matches [A-Za-z]+ (so no numbers)
+OVERLAY_MULTIPLE_REG = re.compile(r"(?P<registration_point>[A-Za-z]+)(\s+(?P<address>(0[xX])?[0-9a-fA-F]+))")
 
 def parse_overlay(path):
     with open(path) as f:
@@ -823,19 +844,26 @@ def parse_overlay(path):
         # properties (such as `timeProvider: clint`) could be used to derive additional
         # dependency information here
         registration_point = node.group('registration_point')
-        # We don't support properly parsing multi-registration points, we just treat them as
-        # a sysbus registration instead for dependency purposes
+    
+        # We treat multiple registration points as sysbus
+        addresses = []
         if registration_point == '{':
+            points = OVERLAY_MULTIPLE_REG.findall(non_comment_lines[0])
             registration_point = 'sysbus'
+            addresses = sorted([int(m[2], 0) for m in points]) # m[2] = address
+            
         region = None
         if registration_point:
             # Only creating entries actually provide the name
             provides.add(node.group('name'))
             depends.add(registration_point)
             if node.group('address'):
-                address = node.group('address')
-                address = int(address, 16 if address.lower().startswith('0x') else 10)
-                region = RegistrationRegion(address=address, registration_point=registration_point)
+                if len(addresses) == 0:
+                    addresses = [0]
+                addresses[0] = int(node.group('address'), 0)
+            
+            if len(addresses) != 0:
+                region = RegistrationRegion(addresses=addresses, registration_point=registration_point)
                 for line in part:
                     if 'size:' in line:
                         region.size = int(line.split()[1], 16)
@@ -1299,7 +1327,7 @@ def generate(filename, override_system_clock_frequency=None):
                 logging.warning(f"Parent of {node} is not an I2C controller! Dropping {model}")
                 continue
             i2c_addr = int(node.unit_addr, 16)
-            regions = [RegistrationRegion(address=i2c_addr, registration_point=i2c_name)]
+            regions = [RegistrationRegion(addresses=[i2c_addr], registration_point=i2c_name)]
 
         if model == 'Miscellaneous.LED':
             gpios = list(get_node_prop(node, 'gpios'))
@@ -1507,7 +1535,7 @@ def generate(filename, override_system_clock_frequency=None):
         # for proper multi-CPU support we will need to generate one for
         # each CPU with the proper interrupt connections
         if model == "Timers.ARM_GenericTimer":
-            regions = [RegistrationRegion(address=None, registration_point="cpu0")]
+            regions = [RegistrationRegion(addresses=[], registration_point="cpu0")]
 
         if model == 'IRQControllers.LAPIC':
             regions = [RegistrationRegion(addr, cpu='cpu0')]
