@@ -1,19 +1,7 @@
 #!/bin/bash
 set -euo pipefail
 
-if [[ "$DASHBOARD_VARIANT" == "zephyr" ]]; then
-    GCP_SIM_BASE="https://zephyr-dashboard.renode.io/zephyr_sim"
-    export DEMO_NAME=hello_world
-elif [[ "$DASHBOARD_VARIANT" == "uboot" ]]; then
-    GCP_SIM_BASE="https://u-boot-dashboard.renode.io/uboot_sim"
-    export DEMO_NAME=uboot
-else
-    exit 1
-fi
-
-LATEST_SIM=$(curl --fail -sS -G "$GCP_SIM_BASE"/latest)
-LATEST_RENODE=$(curl --fail -sS -G "$GCP_SIM_BASE"/"$LATEST_SIM"/latest)
-wget "$GCP_SIM_BASE"/"$LATEST_SIM"/"$LATEST_RENODE"/replkit.tar.xz
+wget "$GCP_SIM_BASE"/"$LATEST_SIM"/"$LATEST_SIM_RENODE"/replkit.tar.xz
 
 mkdir replkit
 tar xf replkit.tar.xz -C replkit >/dev/null

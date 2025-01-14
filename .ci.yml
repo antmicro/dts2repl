@@ -46,9 +46,9 @@ Test Static release:
   stage: Test
   image: debian:bullseye
   variables:
-    RENODE_VERSION: "latest"
     DEBIAN_FRONTEND: "noninteractive"
     GET_CUSTOM_RENODE_REVISION: ""
+    RENODE_VERSION: "" # defaults to the one used on appropriate dashboard
   artifacts:
     paths:
       - ci-output/repls
@@ -69,15 +69,15 @@ Test Static release:
 Compare repls uboot:
   <<: *compare_repls
   variables:
-    RENODE_VERSION: "latest"
     DEBIAN_FRONTEND: "noninteractive"
     GET_CUSTOM_RENODE_REVISION: ""
+    RENODE_VERSION: "" # defaults to renode used on uboot-dashboard
     DASHBOARD_VARIANT: "uboot"
 
 Compare repls zephyr:
   <<: *compare_repls
   variables:
-    RENODE_VERSION: "latest"
     DEBIAN_FRONTEND: "noninteractive"
     GET_CUSTOM_RENODE_REVISION: ""
+    RENODE_VERSION: "" # defaults to renode used on zephyr-dashboard
     DASHBOARD_VARIANT: "zephyr"
