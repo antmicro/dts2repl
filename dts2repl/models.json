@@ -260,6 +260,7 @@
     "renesas,smartbond-timer" : "Timers.RenesasDA14_GPT",
     "renesas,ra-clock-generation-circuit": { "type": "Python.PythonPeripheral", "size": 0x40, "initable": false, "script": "request.value = 0xFFFFFFFF" },
     "renesas,ra-system": { "type": "Python.PythonPeripheral", "size": 0x1000, "initable": false, "script": "flag = not locals().get('flag', False); request.value = 0xff if flag and request.offset in [0x3c, 0x55, 0x5e, 0x5f, 0x76] else 0x0" },
+    "renesas,r9a07g044-cpg": { "type": "Python.PythonPeripheral", "size": 0x10000, "initable": true, "filename": "scripts/pydev/flipflop.py" },
 
     "socionext,uniphier-uart": "UART.NS16550",
 
