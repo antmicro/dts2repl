@@ -1292,7 +1292,8 @@ def generate(filename, override_system_clock_frequency=None):
                    c == 'sifive,u54-mc' or
                    c == 'espressif,riscv' or
                    c == 'qemu,riscv-virt' or 
-                   c == 'openhwgroup,cva6'
+                   c == 'openhwgroup,cva6' or
+                   c == 'thead,c910'
                    for c in compatible) or "_xandes" in isa:
                 indent.append('privilegedArchitecture: PrivilegedArchitecture.Priv1_10')
             else:
