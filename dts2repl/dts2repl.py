@@ -1290,6 +1290,7 @@ def generate(filename, override_system_clock_frequency=None):
                    c == 'sifive,e31' or
                    c == 'sifive,u54' or
                    c == 'sifive,u54-mc' or
+                   c == 'sifive,u74-mc' or
                    c == 'espressif,riscv' or
                    c == 'qemu,riscv-virt' or 
                    c == 'openhwgroup,cva6' or
