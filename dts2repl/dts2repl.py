@@ -1147,6 +1147,15 @@ def generate(filename, override_system_clock_frequency=None):
                 # the microsecond timer is at offset 0x10 from the base of the timer block
                 addr += 0x10
 
+            # In nRF52 GPIO, registers are starting at offset 0x500.
+            # Other nRF SoCs use the same peripheral, but in their case there is no offset.
+            if dt.has_node('/soc'):
+                soc_compat = get_node_prop(dt.get_node('/soc'), 'compatible', [])
+            else:
+                soc_compat = []
+            if model == 'GPIOPort.NRF52840_GPIO' and 'nordic,nrf52' in soc_compat:
+                addr += 0x500
+
             if (
                 any(map(lambda x: x in compat,
                     ['stm32-gpio', 'stm32-timers', 'silabs,gecko', 'silabs,usart-uart', 'gaisler,irqmp',
