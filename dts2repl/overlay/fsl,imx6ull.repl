@@ -1,0 +1,6 @@
+timer: Timers.ARM_GenericTimer @ cpu0
+    frequency: 62500000
+    EL3PhysicalTimerIRQ->gic#0@29
+    EL1PhysicalTimerIRQ->gic#0@30
+    EL1VirtualTimerIRQ->gic#0@27
+    NonSecureEL2PhysicalTimerIRQ->gic#0@26
