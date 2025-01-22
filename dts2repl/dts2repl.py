@@ -139,15 +139,26 @@ def get_usb_cdc_acm_uart(dts_filename):
     except Exception:
         return None
 
-def get_uart(dts_filename):
+def get_uart(dts_filename, only_compatible = False):
     try:
         dt = dtlib.DT(dts_filename)
+        repl = generate(dts_filename)
     except FileNotFoundError:
         logging.error(f'File not found: "{dts_filename}"')
         return None
     except Exception:
-        logging.exception('Error while parsing DT')
+        logging.exception('Error while parsing DT or generating REPL file')
         return None
+
+    def verify_and_return_node(node):
+        name = name_mapper.get_name(node)
+        if only_compatible:
+            # Try to match the node name to a peripheral in repl
+            # it should mean that the UART is supported and can be used
+            UART_REGEX = re.compile(fr"\s*{name}:\s*.+")
+            if UART_REGEX.search(repl) is None:
+                raise Exception(f'get_uart strict mode exception: node {name} not found in generated REPL')
+        return name
 
     # The same caveat as in get_user_led0 applies: if we end up with a duplicate uart
     # name while generating the repl, all bets are off
@@ -156,14 +167,16 @@ def get_uart(dts_filename):
     # First, try to use the chosen zephyr,shell-uart
     try:
         chosen = dt.get_node('/chosen')
-        return name_mapper.get_name(chosen.props['zephyr,shell-uart'].to_path())
+        node = chosen.props['zephyr,shell-uart'].to_path()
+        return verify_and_return_node(node)
     except Exception:
         pass
 
     # Then, chosen stdout-path = &uart;
     try:
         chosen = dt.get_node('/chosen')
-        return name_mapper.get_name(chosen.props['stdout-path'].to_path())
+        node = chosen.props['stdout-path'].to_path()
+        return verify_and_return_node(node)
     except Exception:
         pass
 
@@ -171,7 +184,8 @@ def get_uart(dts_filename):
     try:
         chosen = dt.get_node('/chosen')
         alias = chosen.props['stdout-path'].to_string().split(':')[0]
-        return name_mapper.get_name(dt.get_node(alias))
+        node = dt.get_node(alias)
+        return verify_and_return_node(node)
     except Exception:
         pass
 
@@ -209,16 +223,19 @@ def get_uart(dts_filename):
             # HACK: in u-boot some pinctrl nodes are called "uartXgrp" and they shouldn't be taken into account
                 continue
             if not is_disabled(node) and 'reg' in node.props and cons_index == 0:
-                return name_mapper.get_name(node)
+                return verify_and_return_node(node)
             cons_index -= 1
     except Exception:
        pass
 
     # Finally, just return any non-disabled node that looks vaguely like a uart
-    for node in dt.node_iter():
-        if any(x in node.name.lower() for x in ('uart', 'usart', 'serial')):
-            if not is_disabled(node) and 'reg' in node.props:
-                return name_mapper.get_name(node)
+    try:
+        for node in dt.node_iter():
+            if any(x in node.name.lower() for x in ('uart', 'usart', 'serial')):
+                if not is_disabled(node) and 'reg' in node.props:
+                    return verify_and_return_node(node)
+    except Exception:
+       pass
 
     # No uart found
     return None
