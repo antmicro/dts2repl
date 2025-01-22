@@ -60,6 +60,9 @@ def parse_args():
     parser.add_argument('--flatten',
                         action='store_true',
                         help='Flatten dtsi files to one dts automatically. Only available when dtsi include dirs are provided')
+    parser.add_argument('--nonrecursive',
+                        action='store_true',
+                        help='Should flattening skip including directories recursively. Only used together with --flatten')
     parser.add_argument('--force-valid-aliases',
                     action='store_true',
                     help='Enables fatal errors when encountering invalid aliases')
@@ -69,6 +72,9 @@ def parse_args():
                         help='Override default system clock frequency.')
 
     args = parser.parse_args()
+
+    if args.nonrecursive and not args.flatten:
+        parser.error("--nonrecursive requires --flatten")
 
     logging.basicConfig(level=args.loglevel.upper())
     return args
@@ -1982,10 +1988,13 @@ def get_includes(dts_filename, dirs):
 def main():
     args = parse_args()
 
-    dirs = []
-    for top in args.include.split(','):
-        for root, _, _ in os.walk(top):
-            dirs.append(root)
+    dirs = args.include.split(',')
+
+    if not args.nonrecursive:
+        dirs = []
+        for top in args.include.split(','):
+            for root, _, _ in os.walk(top):
+                dirs.append(root)
 
     incl_dirs = ' '.join(f'-I {dir}' for dir in dirs)
 
