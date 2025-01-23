@@ -182,6 +182,7 @@
     "microchip,miv": "CPU.RiscV32",
     "microchip,coreuart": { "type": "UART.MiV_CoreUART", "clockFrequency": 66000000 },
     "microchip,mpfs-gpio": "GPIOPort.MPFS_GPIO",
+    "microchip,sam9x60-pit64b": { "type": "Python.PythonPeripheral", "size": 0xec, "initable": true, "filename": "scripts/pydev/counter.py" },
 
     "nuclei,bumblebee": "CPU.RiscV32",
     "espressif,riscv": "CPU.RiscV32",
