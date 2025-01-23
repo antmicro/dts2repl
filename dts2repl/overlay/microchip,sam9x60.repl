@@ -1,2 +1,7 @@
 sdramc: Memory.MappedMemory @ sysbus 0x20000000
     size: 0x10000000
+
+nand_controller: Python.PythonPeripheral @ sysbus 0xFFFFFC68
+    size: 0x10
+    initable: true
+    filename: "scripts/pydev/flipflop.py"
