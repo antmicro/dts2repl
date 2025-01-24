@@ -1,3 +1,0 @@
-sysbus:
-    init add:
-        Tag <0x402800d0 4> "DDR size (MiB)" 1024
