@@ -1112,7 +1112,7 @@ def generate(filename, override_system_clock_frequency=None):
 
             if (
                 any(map(lambda x: x in compat,
-                    ['stm32-gpio', 'stm32-timers', 'silabs,gecko', 'gaisler,irqmp',
+                    ['stm32-gpio', 'stm32-timers', 'silabs,gecko', 'silabs,usart-uart', 'gaisler,irqmp',
                      'gaisler,gptimer', 'gaisler,apbuart', 'xlnx,xuartps']))
                 or any(map(lambda x: x in model,
                     ['UART.STM32_UART', 'I2C.TegraI2CController']))
@@ -1548,7 +1548,7 @@ def generate(filename, override_system_clock_frequency=None):
                 irq_names = ['IRQ']
             elif (compat in ['nuvoton,npcx-uart']):
                 irq_names = ['IRQ', 'DMAReceive']
-            elif compat in ['silabs,gecko-uart', 'silabs,gecko-usart']:
+            elif compat in ['silabs,gecko-uart', 'silabs,gecko-usart', 'silabs,usart-uart']:
                 irq_names = ['ReceiveIRQ', 'TransmitIRQ']
             elif compat in ['gaisler,gptimer', 'ambiq,counter']:
                 irq_names = ['0']
