@@ -339,6 +339,8 @@
     "silabs,gecko-stimer": { "type": "Timers.EFR32xG24_SYSRTC", "irq_mappings": ["AppIRQ"] },
 
     "snps,dw-apb-uart": "UART.NS16550",
+    "snps,dw-apb-timer": { "type": "Python.PythonPeripheral", "size": 0x100, "initable": true, "filename": "scripts/pydev/rolling-bit.py" },
+
     "nuvoton,numaker-uart": "UART.NS16550",
     "nuvoton,npcm845-uart": "UART.NS16550",
 
