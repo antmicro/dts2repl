@@ -1,0 +1,3 @@
+cpu0: CPU.ARMv7A @ sysbus
+    cpuType: "cortex-a5"
+    cpuId: 0
