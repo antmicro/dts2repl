@@ -185,6 +185,8 @@
     "microchip,mpfs-gpio": "GPIOPort.MPFS_GPIO",
     "microchip,sam9x60-pit64b": { "type": "Python.PythonPeripheral", "size": 0xec, "initable": true, "filename": "scripts/pydev/counter.py" },
 
+    "mediatek,mt8365-uart": "UART.NS16550",
+
     "nuclei,bumblebee": "CPU.RiscV32",
     "espressif,riscv": "CPU.RiscV32",
     "espressif,esp32-uart": "UART.ESP32_UART",
