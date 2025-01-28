@@ -1,0 +1,20 @@
+cpu0: CPU.CortexM @ sysbus
+    cpuType: "cortex-m7"
+    numberOfMPURegions: 16
+    nvic: nvic
+
+nvic: IRQControllers.NVIC @ sysbus 0xE000E000
+    systickFrequency: 96_000_000
+    priorityMask: 0xF0
+    -> cpu0@0
+
+flashBank1: Memory.MappedMemory @ sysbus 0x08000000
+    size: 0x100000
+
+axiSram: Memory.MappedMemory @ sysbus 0x24000000
+    size: 0x80000
+
+pwrcfg: Python.PythonPeripheral @ sysbus 0x58024800
+    size: 0x400
+    initable: true
+    filename: "scripts/pydev/flipflop.py"
