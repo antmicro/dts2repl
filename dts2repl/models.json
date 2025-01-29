@@ -100,6 +100,7 @@
 
     "brcm,iproc-pcie-ep": {"type": "Python.PythonPeripheral", "size": 0x2100, "initable": false, "script": "request.value = 0x1" },
     "brcm,bcm2711-aux-uart": "UART.BCM2711_AUX_UART",
+    "brcm,bcm6345-uart": "UART.BCM2711_AUX_UART",
 
     "cdns,tensilica-xtensa-lx3": { "type": "CPU.Xtensa", "cpuType": "dc233c", "frequency": 100000000 },
     "cdns,ttc": "Timers.Cadence_TTC",
