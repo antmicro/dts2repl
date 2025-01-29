@@ -1,0 +1,7 @@
+page_table: Memory.MappedMemory @ sysbus 0x18000000
+    size: 0x5000
+
+immap: Python.PythonPeripheral @ sysbus 0x1000000
+    size: 0x1000000
+    initable: true
+    script: "request.value = 0x80000011"
