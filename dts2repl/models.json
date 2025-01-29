@@ -134,6 +134,7 @@
     "fsl,imx21-uart": "UART.MxcUart",
     "fsl,imx7ulp-lpuart" : "UART.MxcUart",
     "fsl,vf610-lpuart": "UART.ImxUart",
+    "fsl,vf610-i2c": { "type": "Python.PythonPeripheral", "size": 0x10000, "initable": true, "filename": "scripts/pydev/flipflop.py" },
 
     "infineon,xmc4xxx-uart": "UART.XMC4XXX_UART",
     "infineon,cat1-uart": "UART.Infineon_SCBUART",
