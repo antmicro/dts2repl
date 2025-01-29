@@ -171,6 +171,7 @@
     "marvell,armada370-nand-controller": { "type": "Python.PythonPeripheral", "size": 0x100, "initable": false, "script": "request.value = 0xffffffe1" },
     "marvell,armada-8k-nand-controller": { "type": "Python.PythonPeripheral", "size": 0x100, "initable": false, "script": "request.value = 0xffffffe1" },
     "marvell,armada-38x-uart": "UART.NS16550",
+    "marvell,armada-3700-uart": "UART.NS16550",
 
     "marvell,mbus-controller": "Python.PythonPeripheral",
     "marvell,mv64xxx-i2c": {"type": "Python.PythonPeripheral", "size": 0x100, "initable": false, "script": "request.value = 0xf8" },
