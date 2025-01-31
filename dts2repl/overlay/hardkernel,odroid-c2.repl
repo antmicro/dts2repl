@@ -1,0 +1,7 @@
+memory2: Memory.MappedMemory @ sysbus 0xFFFFFFFF00000000
+    size: 0xF0000000
+
+memory_controller: Python.PythonPeripheral @ sysbus 0xC8100220
+    size: 0x40
+    initable: true
+    script: "request.value=0x3FFFFFF"
