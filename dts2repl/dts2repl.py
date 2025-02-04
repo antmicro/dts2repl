@@ -1577,7 +1577,11 @@ def generate(filename, override_system_clock_frequency=None):
             gic_ver = compat.split(',')[-1]
             gic_renode_ver = {
                 'gic-v1': 'GICv1',
+                'cortex-a9-gic': 'GICv1',
                 'gic-v2': 'GICv2',
+                'gic-400': 'GICv2',
+                'cortex-a7-gic': 'GICv2',
+                'cortex-a15-gic': 'GICv2',
                 'gic-v3': 'GICv3',
                 'gic-v4': 'GICv4',
             }.get(gic_ver)
