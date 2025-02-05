@@ -228,6 +228,7 @@
     "nvidia,tegra30-timer": "Timers.TegraUsecTimer",
     "nvidia,tegra30-car": { "type": "Python.PythonPeripheral", "size": 0x1000, "initable": false, "script": "request.value = 0x3ff" },
     "nvidia,tegra30-mc": { "type": "Python.PythonPeripheral", "size": 0x400, "initable": false, "script": "request.value = 0x400" },
+    "nvidia,tegra30-sdhci": { "type": "Python.PythonPeripheral", "size": 0x200, "initable": true, "filename": "scripts/pydev/flipflop.py" },
     "nvidia,tegra30-i2c": "I2C.TegraI2CController",
     "nvidia,tegra20-uart": "UART.NS16550",
     "nvidia,tegra20-car": { "type": "Python.PythonPeripheral", "size": 0x1000, "initable": false, "script": "request.value = 0x3ff" },
