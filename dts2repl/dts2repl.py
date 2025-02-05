@@ -184,6 +184,14 @@ def get_uart(dts_filename):
             return 'cpu0.uart'
     except Exception:
         pass
+
+    # u-boot HACK: for "phytec,rk3288-pcm-947" hardcoded uart2 is used
+    try:
+        compats = get_node_prop(dt.get_node('/'), 'compatible', [])
+        if any(compat == "phytec,rk3288-pcm-947" for compat in compats): 
+            return "uart2"
+    except Exception:
+        pass
     
     # Then, chosen bootargs = "console=ttymxc1,115200";
     # ttymxc<i> = serial<i+1>
