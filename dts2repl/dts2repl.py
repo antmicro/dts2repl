@@ -1298,18 +1298,14 @@ def generate(filename, override_system_clock_frequency=None):
             if len(node.name.split("@")) >= 2:
                 hartid = int(node.name.split("@")[1], 16)
             indent.append(f'hartId: {hartid}')
-
             if any(c.startswith('riscv,sifive') or
                    c.startswith('starfive,rocket') or
-                   c == 'sifive,e31' or
-                   c == 'sifive,u54' or
-                   c == 'sifive,u54-mc' or
-                   c == 'sifive,u74-mc' or
-                   c == 'espressif,riscv' or
-                   c == 'qemu,riscv-virt' or 
-                   c == 'openhwgroup,cva6' or
-                   c == 'thead,c910'
-                   for c in compatible) or "_xandes" in isa:
+                   c in [
+                        'sifive,e31', 'sifive,u54', 'sifive,u54-mc', 'sifive,u74-mc',
+                        'espressif,riscv', 'qemu,riscv-virt', 'openhwgroup,cva6',
+                        'thead,c910', 'thead,c906'
+                   ] for c in compatible) \
+            or "_xandes" in isa:
                 indent.append('privilegedArchitecture: PrivilegedArchitecture.Priv1_10')
             else:
                 indent.append('privilegedArchitecture: PrivilegedArchitecture.Priv1_09')
