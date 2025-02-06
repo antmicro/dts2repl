@@ -1,0 +1,4 @@
+dram_controller: Python.PythonPeripheral @ sysbus 0x5A003000
+    size: 0x400
+    initable: true
+    script: "request.value = 0x11111111"
