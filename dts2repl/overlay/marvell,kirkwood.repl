@@ -1,3 +1,6 @@
 cpu0: CPU.ARMv7A @ sysbus
     cpuType: "cortex-a5"
     cpuId: 0
+
+memory2: Memory.MappedMemory @ sysbus 0xc8000000
+    size: 0x8000000
