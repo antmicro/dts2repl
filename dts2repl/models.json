@@ -247,6 +247,8 @@
     "rockchip,rk3308-otp": { "type": "Python.PythonPeripheral", "size": 0x4000, "initable": true, "filename": "scripts/pydev/flipflop.py" },
     "rockchip,rk3308-cru": { "type": "Python.PythonPeripheral", "size": 0x1000, "initable": true, "filename": "scripts/pydev/flipflop.py" },
     "rockchip,rk3568-cru": { "type": "Python.PythonPeripheral", "size": 0x1000, "initable": true, "filename": "scripts/pydev/flipflop.py" },
+    "rockchip,rk3588-cru": { "type": "Python.PythonPeripheral", "size": 0x5c000, "initable": true, "filename": "scripts/pydev/rolling-bit.py" },
+    "rockchip,rk3588-otp": { "type": "Python.PythonPeripheral", "size": 0x400, "initable": true, "filename": "scripts/pydev/flipflop.py" },
     "rockchip,rk3568-pmucru": { "type": "Python.PythonPeripheral", "size": 0x1000, "initable": true, "filename": "scripts/pydev/flipflop.py" },
     "rockchip,rk3568-i2c": { "type": "Python.PythonPeripheral", "size": 0x1000, "initable": true, "filename": "scripts/pydev/flipflop.py" },
     "rockchip,rk3288-grf" : { "type": "Python.PythonPeripheral", "size": 0x1000, "initable": true, "filename": "scripts/pydev/flipflop.py" },
