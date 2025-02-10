@@ -87,6 +87,8 @@
     "allwinner,sun50i-h5-mbus": "Memory.MappedMemory",
     "allwinner,sun50i-a64-mbus": "Memory.MappedMemory",
     "allwinner,sun4i-a10-timer": { "type": "Python.PythonPeripheral", "size": 0x90, "initable": true, "filename": "scripts/pydev/rolling-bit.py" },
+    "allwinner,sun8i-a23-timer": { "type": "Python.PythonPeripheral", "size": 0xa0, "initable": true, "filename": "scripts/pydev/rolling-bit.py" },
+    "allwinner,sun8i-h3-dw-hdmi": { "type": "Python.PythonPeripheral", "size": 0x10000, "initable": true, "filename": "scripts/pydev/flipflop.py" },
 
     "atmel,sam-usart": "UART.SAM_USART",
     "atmel,sam-uart": { "type": "UART.SAM_USART", "uartOnlyMode": true },
