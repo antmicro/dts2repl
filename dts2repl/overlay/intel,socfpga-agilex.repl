@@ -1,0 +1,5 @@
+dram: Memory.MappedMemory @ sysbus 0x7FA00000
+    size: 0xf00000
+
+dram2: Memory.MappedMemory @ sysbus 0x5FA00000
+    size: 0xf00000
