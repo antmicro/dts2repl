@@ -696,6 +696,14 @@ class ReplFile:
         self.blocks = available_blocks
 
 
+    def filter_64bit_reg_peripherals(self) -> None:
+        self.blocks = [
+            block for block in self.blocks
+            if block.region is None or 
+            all(address + (block.region.size if block.region.size is not None else 0) <= 0x100000000
+                for address in block.region.addresses)
+        ]
+
     def merge_registration_points_duplicates(self, sized: List[ReplBlock]):
         # merge overlapping memory with multiple registration points
         # NOTE: this is a simplified solution 
@@ -1026,6 +1034,7 @@ def generate(filename, override_system_clock_frequency=None):
 
     # get overlays
     overlays = get_overlays(dt)
+    address_space_32bit = False
 
     main_compatible = None
     for node in nodes:
@@ -1105,6 +1114,9 @@ def generate(filename, override_system_clock_frequency=None):
         regions = []
         indent = []
 
+        if model in ("CPU.ARMv7A"):
+            address_space_32bit = True 
+        
         # special handling of flash devices as those should be treated as memory
         if compat in [ 'nxp,imx-flexspi-nor', 'nxp,imx-flexspi-hyperflash', 'nxp,imx-flexspi-mx25um51345g', 'nxp,s32-qspi-nor' ]:
             # try to take the 2nd reg entry from the parent controller
@@ -1673,6 +1685,8 @@ def generate(filename, override_system_clock_frequency=None):
 
     # filter out unavailable blocks (with unsatisfied depends)
     repl_file.filter_available_blocks()
+    if address_space_32bit:
+        repl_file.filter_64bit_reg_peripherals()
 
     # set number of targets for CLINT if necessary
     # note that IRQ destinations don't create a dependency; this should pick up just CPUs because they get a dependency on the CLINT when we add timeProvider
