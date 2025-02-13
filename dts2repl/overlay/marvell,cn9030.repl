@@ -1,0 +1,4 @@
+cp0pcie0: Python.PythonPeripheral @ sysbus 0xf2600000
+    size: 0x10000
+    initable: true
+    filename: "scripts/pydev/flipflop.py"
