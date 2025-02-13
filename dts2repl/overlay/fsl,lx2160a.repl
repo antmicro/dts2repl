@@ -4,4 +4,43 @@ page_table: Memory.MappedMemory @ sysbus 0x18000000
 immap: Python.PythonPeripheral @ sysbus 0x1000000
     size: 0x1000000
     initable: true
-    script: "request.value = 0x80000011"
+    script: '''
+if request.offset == 0xe00218L:
+    request.value = 0
+else:
+    request.value = 0x80000011
+'''
+
+gic: IRQControllers.ARM_GenericInterruptController @ {
+        sysbus new Bus.BusMultiRegistration { address: 0x50041000; size: 0x1000; region: "distributor" };
+        sysbus new Bus.BusMultiRegistration { address: 0x50042000; size: 0x2000; region: "cpuInterface" }
+    }
+    [0, 1] -> gicIrqCombiner@[0, 1]
+
+cpu0: CPU.ARMv8A @ sysbus
+    cpuType: "cortex-a53"
+    cpuId: 0
+    genericInterruptController: gic
+
+ccn508: Python.PythonPeripheral @ {
+    sysbus 0x4200018;
+    sysbus 0x4210018;
+    sysbus 0x4220018;
+    sysbus 0x4230018;
+    sysbus 0x4240018;
+    sysbus 0x4250018;
+    sysbus 0x4260018;
+    sysbus 0x4270018
+}
+    size: 0x4
+    initable: true
+    script: '''
+if request.isInit:
+    lastVal = False
+else:
+    lastVal = not lastVal
+if not lastVal:
+    request.value = 0x4
+else:
+    request.value = 0xC
+'''
