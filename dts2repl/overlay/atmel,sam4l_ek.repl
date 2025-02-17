@@ -1,3 +1,4 @@
 sysbus:
     init add:
         Tag <0x400E0814, 0x400E0818> "pmc" 0xFFFFFFFF
+        Tag <0x400F0424, 0x400F0428> "rc32k_osc" 0xFFFFFFFF
