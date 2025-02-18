@@ -1,2 +1,6 @@
 memory: Memory.MappedMemory @ sysbus 0x40000000
     size: 0xc0000000
+
+sysbus:
+    init add:
+        Tag <0x007E0000 0x20000> "TCML" 0x1000
