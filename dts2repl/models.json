@@ -251,6 +251,7 @@
 
     "nvidia,tegra114-i2c": "I2C.TegraI2CController",
     "nvidia,tegra124-i2c": "I2C.TegraI2CController",
+    "nvidia,tegra124-car": { "type": "Python.PythonPeripheral", "size": 0x1000, "initable": false, "script": "request.value = 0x3ff" },
 
     "rockchip,rk3308-otp": { "type": "Python.PythonPeripheral", "size": 0x4000, "initable": true, "filename": "scripts/pydev/flipflop.py" },
     "rockchip,rk3308-cru": { "type": "Python.PythonPeripheral", "size": 0x1000, "initable": true, "filename": "scripts/pydev/flipflop.py" },
