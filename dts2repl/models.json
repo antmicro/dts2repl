@@ -145,6 +145,10 @@
     "fsl,vf610-lpuart": "UART.ImxUart",
     "fsl,vf610-i2c": { "type": "Python.PythonPeripheral", "size": 0x10000, "initable": true, "filename": "scripts/pydev/flipflop.py" },
     "fsl,etsec2": { "type": "Python.PythonPeripheral", "size": 0x1000, "initable": true, "filename": "scripts/pydev/flipflop.py" },
+    "fsl,imx8mm-usdhc": { "type": "Python.PythonPeripheral", "size": 0x10000, "initable": false, "script": "request.value = 0xE0FFFFF8" },
+    "fsl,imx8mm-i2c":  { "type": "Python.PythonPeripheral", "size": 0x1000, "initable": true, "filename": "scripts/pydev/flipflop.py" },
+    "fsl,imx8mm-anatop": { "type": "Python.PythonPeripheral", "size": 0x1000, "initable": true, "filename": "scripts/pydev/flipflop.py" },
+    "fsl,imx8mm-fec": { "type": "Python.PythonPeripheral", "size": 0x10000, "initable": true, "filename": "scripts/pydev/flipflop.py" },
 
     "infineon,xmc4xxx-uart": "UART.XMC4XXX_UART",
     "infineon,cat1-uart": "UART.Infineon_SCBUART",
