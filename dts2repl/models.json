@@ -377,6 +377,7 @@
     "snps,dw-apb-uart": "UART.NS16550",
     "snps,dw-apb-timer": { "type": "Python.PythonPeripheral", "size": 0x100, "initable": true, "filename": "scripts/pydev/rolling-bit.py" },
     "snps,dwc3": {"type": "Python.PythonPeripheral", "size": 0x10000, "initable": true, "script": "request.value = 0xFFFFFFFF" },
+    "snps,ddrc-3.80a": {"type": "Python.PythonPeripheral", "size": 0x400000, "initable": true, "script": "request.value = 0x1" },
 
     "nuvoton,numaker-uart": "UART.NS16550",
     "nuvoton,npcm845-uart": "UART.NS16550",
