@@ -421,14 +421,16 @@ class Property:
         """
         Returns the Node the phandle in the property points to.
 
-        Raises DTError if the property was not assigned with this syntax (has
-        Property.type Type.PHANDLE).
-
+        Raises DTError if the property was not assigned with this syntax 
+        (does not have Property.type Type.PHANDLE or Type.NUM).
+        Example:
             foo = < &bar >;
+        or
+            foo = < 0x03 >
         """
-        if self.type is not Type.PHANDLE:
+        if self.type is not Type.PHANDLE and self.type is not Type.NUM:
             _err("expected property '{0}' on {1} in {2} to be assigned with "
-                 "'{0} = < &foo >;', not '{3}'"
+                 "'{0} = < &foo >;' or '{0} = <0x01>', not '{3}'"
                  .format(self.name, self.node.path, self.node.dt.filename,
                          self))
 
