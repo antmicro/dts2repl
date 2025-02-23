@@ -190,6 +190,8 @@
 
     "openisa,ri5cy": "CPU.Ri5cy",
     "openisa,rv32m1-lpuart": { "type": "UART.NXP_LPUART", "fifoSize": 8 },
+    
+    "lowrisc,ibex": "CPU.IbexRiscV32",
 
     "microchip,miv": "CPU.RiscV32",
     "microchip,coreuart": { "type": "UART.MiV_CoreUART", "clockFrequency": 66000000 },
