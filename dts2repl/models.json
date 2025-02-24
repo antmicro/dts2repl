@@ -197,6 +197,7 @@
 
     "amlogic,meson-gx-uart": "UART.NS16550",
     "amlogic,meson-gx-ao-sysctrl": {"type": "Python.PythonPeripheral", "size": 0x100, "initable": false, "script": "request.value = 0x2000000" },
+    "amlogic,meson-gx-ao-secure": {"type": "Python.PythonPeripheral", "size": 0x140, "initable": false, "script": "request.value = 0x4000000" },
 
     "openisa,ri5cy": "CPU.Ri5cy",
     "openisa,rv32m1-lpuart": { "type": "UART.NXP_LPUART", "fifoSize": 8 },
