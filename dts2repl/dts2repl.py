@@ -1187,7 +1187,7 @@ def generate(filename, override_system_clock_frequency=None):
 
         # special multi-registration address for GIC
         if model == 'IRQControllers.ARM_GenericInterruptController':
-            if 'fsl,lx2160a' in overlays or 'fsl,ls2080a' in overlays:
+            if overlays & {'fsl,lx2160a', 'fsl,ls2080a', 'samsung,exynos5250'}:
                 # fsl,lx2160a/ls2080a don't have CPU in uboot's device tree
                 # we add gic together with cpu in the appropriate overlays
                 continue
