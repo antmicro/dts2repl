@@ -352,6 +352,7 @@
     "neorv32-cpu": "CPU.RiscV32",
     "neorv32-uart": "UART.NEORV32_UART",
     "neorv32-machine-timer": { "type": "Timers.NEORV32_MachineSystemTimer", "frequency": 100000000 },
+    "samsung,exynos4210-uart": "UART.NS16550",
 
     "sifive,dtim0": "Memory.MappedMemory",
     "sifive,l2lim0": "Memory.MappedMemory",
