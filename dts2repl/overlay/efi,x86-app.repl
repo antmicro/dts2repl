@@ -1,0 +1,14 @@
+flash: Memory.MappedMemory @ sysbus 0x0
+    size: 0x2000000
+
+intcloapic0: IRQControllers.LAPIC @ {
+    sysbus new Bus.BusPointRegistration { address: 0xfee00000; cpu: cpu0}
+}
+    id: 0
+
+cpu0: CPU.X86 @ sysbus
+    cpuType: "x86"
+    lapic: intcloapic0
+
+serial: UART.NS16550 @ sysbus 0xe00003f8
+    wideRegisters: true
