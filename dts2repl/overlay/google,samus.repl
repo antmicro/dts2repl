@@ -1,0 +1,10 @@
+intcloapic0: IRQControllers.LAPIC @ {
+    sysbus new Bus.BusPointRegistration { address: 0xfee00000; cpu: cpu0}
+}
+    id: 0
+
+serial: UART.NS16550 @ sysbus 0xe00003f8
+    wideRegisters: true
+
+memory: Memory.MappedMemory @ sysbus 0xff800000
+    size: 0x800000
