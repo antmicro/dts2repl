@@ -219,6 +219,7 @@
     "intel,x86_64": { "type": "CPU.X86_64", "cpuType": "x86_64" },
     "intel,apollo-lake": { "type": "CPU.X86_64", "cpuType": "x86_64" },
     "intel,core-i3-gen5": { "type": "CPU.X86", "cpuType": "x86" },
+    "intel,core-gen3": { "type": "CPU.X86", "cpuType": "x86" },
     "intel,loapic": "IRQControllers.LAPIC",
     "intel,hpet": "Timers.HPET",
     "ite,riscv-ite": "CPU.RiscV32",
