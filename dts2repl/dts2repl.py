@@ -231,7 +231,10 @@ def get_uart(dts_filename, only_compatible = False):
     # Finally, just return any non-disabled node that looks vaguely like a uart
     try:
         for node in dt.node_iter():
-            if any(x in node.name.lower() for x in ('uart', 'usart', 'serial')):
+            compats = get_node_prop(node, 'compatible')
+            if any(x in node.name.lower() for x in ('uart', 'usart', 'serial')): 
+                if 'clkuart' in node.name.lower():
+                    continue   
                 if not is_disabled(node) and 'reg' in node.props:
                     return verify_and_return_node(node)
     except Exception:
