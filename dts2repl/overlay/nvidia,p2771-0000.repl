@@ -1,0 +1,4 @@
+cpu0: CPU.ARMv8A @ sysbus
+    cpuType: "cortex-a53"
+    cpuId: 0
+    genericInterruptController: gic
