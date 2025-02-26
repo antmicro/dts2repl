@@ -1,0 +1,5 @@
+memory: Memory.MappedMemory @ sysbus 0x80000000
+    size: 0x80000000
+
+ocram: Memory.MappedMemory @ sysbus 0x00900000
+    size: 0x00048000
