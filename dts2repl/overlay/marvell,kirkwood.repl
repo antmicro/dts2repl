@@ -4,3 +4,7 @@ cpu0: CPU.ARMv7A @ sysbus
 
 memory2: Memory.MappedMemory @ sysbus 0xc8000000
     size: 0x8000000
+
+sysbus:
+    init add:
+        Tag <0xF1001504 4> "sdram_bank[bank].win_sz" 0x1
