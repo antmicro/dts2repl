@@ -174,7 +174,7 @@
     "litex,clk": "Miscellaneous.LiteX_MMCM_CSR32",
     "litex,timer0": { "fomu": { "type" : "Timers.LiteX_Timer", "frequency": 100000000 }, "_": { "type": "Timers.LiteX_Timer_CSR32", "frequency": 100000000 } },
     "litex,uart0": "UART.LiteX_UART",
-    "litex,uart": "UART.LiteX_UART",    
+    "litex,uart": "UART.LiteX_UART",
     "litex,vexriscv-standard": "CPU.RiscV32",
 
     "memory": "Memory.MappedMemory",
@@ -201,13 +201,14 @@
 
     "openisa,ri5cy": "CPU.Ri5cy",
     "openisa,rv32m1-lpuart": { "type": "UART.NXP_LPUART", "fifoSize": 8 },
-    
+
     "lowrisc,ibex": "CPU.IbexRiscV32",
 
     "microchip,miv": "CPU.RiscV32",
     "microchip,coreuart": { "type": "UART.MiV_CoreUART", "clockFrequency": 66000000 },
     "microchip,mpfs-gpio": "GPIOPort.MPFS_GPIO",
     "microchip,sam9x60-pit64b": { "type": "Python.PythonPeripheral", "size": 0xec, "initable": true, "filename": "scripts/pydev/counter.py" },
+    "microchip,sama7g5-pmc": { "type": "Python.PythonPeripheral", "size": 0x200, "initable": false, "script": "request.value = 0x0001FFFF" },
 
     "mediatek,mt8365-uart": "UART.NS16550",
 
