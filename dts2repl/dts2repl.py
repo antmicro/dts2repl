@@ -1797,6 +1797,7 @@ def process_node(node, node_type, mcu, overlays, get_snippets, skip_disabled):
         "label": label or "",
         "model": model or "",
         "compats": compats.copy(),
+        "parent_node": node.parent.name,
     }
 
     result["size"] = hex(size)
