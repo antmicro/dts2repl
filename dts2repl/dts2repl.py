@@ -703,7 +703,7 @@ class ReplFile:
         self.blocks = [
             block for block in self.blocks
             if block.region is None or 
-            all(address + (block.region.size if block.region.size is not None else 0) <= 0x100000000
+            all((block.region.end or address) <= 0x100000000
                 for address in block.region.addresses)
         ]
 
