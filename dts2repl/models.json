@@ -151,6 +151,7 @@
     "fsl,imx8mm-i2c":  { "type": "Python.PythonPeripheral", "size": 0x1000, "initable": true, "filename": "scripts/pydev/flipflop.py" },
     "fsl,imx8mm-anatop": { "type": "Python.PythonPeripheral", "size": 0x1000, "initable": true, "filename": "scripts/pydev/flipflop.py" },
     "fsl,imx8mm-fec": { "type": "Python.PythonPeripheral", "size": 0x10000, "initable": true, "filename": "scripts/pydev/flipflop.py" },
+    "fsl,imx8mm-gpio": { "type": "Python.PythonPeripheral", "size": 0x10000, "initable": false, "script": "request.value = 0xFFFFFFFF" },
     "fsl,imx8mp-ocotp": { "type": "Python.PythonPeripheral", "size": 0x10000, "initable": true, "filename": "scripts/pydev/flipflop.py" },
     "nxp,imx8mp-fspi": { "type": "Python.PythonPeripheral", "size": 0x10000, "initable": true, "filename": "scripts/pydev/flipflop.py" },
     "fsl,imx8mp-fec": { "type": "Python.PythonPeripheral", "size": 0x10000, "initable": true, "filename": "scripts/pydev/flipflop.py" },
