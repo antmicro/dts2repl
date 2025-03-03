@@ -1453,6 +1453,11 @@ def generate(filename, override_system_clock_frequency=None):
                 port_index = int((gpio_addr - gpio_base_addr - 0x1700) / 0x4)
                 num = port_index * 32 + num
                 gpio = gpio.parent
+            
+            gpio_model = get_model(gpio)
+            if not gpio_model or not gpio_model.startswith("GPIO"):
+                # don't add invalid GPIO connections
+                continue
 
             active_low = (gpio_flags & 1) == 1
             if active_low:
