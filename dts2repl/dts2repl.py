@@ -228,7 +228,7 @@ def get_uart(dts_filename, only_compatible = False):
     except Exception:
        pass
 
-    # Finally, just return any non-disabled node that looks vaguely like a uart
+    # Try to return any non-disabled node that looks vaguely like a uart
     try:
         for node in dt.node_iter():
             compats = get_node_prop(node, 'compatible')
@@ -239,6 +239,12 @@ def get_uart(dts_filename, only_compatible = False):
                     return verify_and_return_node(node)
     except Exception:
        pass
+
+    # Last check, search the generated repl itself for something UART look-alike
+    UART_BACKUP_REGEX=re.compile(r"(?P<name>[0-9A-Za-z]+):\s+UART.")   
+    node = UART_BACKUP_REGEX.search(repl)
+    if node is not None:
+        return node.group('name')
 
     # No uart found
     return None
