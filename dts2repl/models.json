@@ -273,6 +273,9 @@
     "rockchip,rk3568-i2c": { "type": "Python.PythonPeripheral", "size": 0x1000, "initable": true, "filename": "scripts/pydev/flipflop.py" },
     "rockchip,rk3288-grf" : { "type": "Python.PythonPeripheral", "size": 0x1000, "initable": true, "filename": "scripts/pydev/flipflop.py" },
     "rockchip,rk3288-i2c": "I2C.RockchipI2C",
+    "rockchip,rk3399-pmucru": { "type": "Python.PythonPeripheral", "size": 0x1000, "initable": true, "filename": "scripts/pydev/rolling-bit.py" },
+    "rockchip,rk3399-i2c": "I2C.RockchipI2C",
+    "rockchip,rk3399-sdhci-5.1": { "type": "Python.PythonPeripheral", "size": 0x10000, "initable": true, "filename": "scripts/pydev/rolling-bit.py" },
 
     "renesas.smartbond-gpio": "GPIOPort.RenesasDA14_GPIO",
     "renesas,smartbond-i2c": "I2C.RenesasDA_I2C",
