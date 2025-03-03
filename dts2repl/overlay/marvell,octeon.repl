@@ -1,0 +1,15 @@
+memory: Memory.MappedMemory @ sysbus 0x0
+    size: 0x10000000
+
+gic: IRQControllers.ARM_GenericInterruptController @ {
+        sysbus new Bus.BusMultiRegistration { address: 0x50041000; size: 0x1000; region: "distributor" };
+        sysbus new Bus.BusMultiRegistration { address: 0x50042000; size: 0x2000; region: "cpuInterface" }
+    }
+    [0, 1] -> gicIrqCombiner@[0, 1]
+
+cpu0: CPU.ARMv8A @ sysbus
+    cpuType: "cortex-a53"
+    cpuId: 0
+    genericInterruptController: gic
+
+uart0: UART.BCM2711_AUX_UART @ sysbus 0x87e028000000
