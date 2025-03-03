@@ -123,6 +123,8 @@
     "fsl,imx6q-gpmi-nand": { "type": "Python.PythonPeripheral", "size": 0x4000, "initable": true, "filename": "scripts/pydev/flipflop.py" },
     "fsl,imx6q-ccm": "Python.PythonPeripheral",
     "fsl,imx6q-usbphy": { "type": "Python.PythonPeripheral", "size": 0x1000, "initable": true, "filename": "scripts/pydev/flipflop.py" },
+    "fsl,imx6q-i2c": { "type": "Python.PythonPeripheral", "size": 0x4000, "initable": true, "filename": "scripts/pydev/flipflop.py" },
+    "fsl,imx6q-gpio": { "type": "Python.PythonPeripheral", "size": 0x4000, "initable": false, "script": "request.value = 0xFFFFFFFF" },
     "fsl,imx6sl-ccm": "Python.PythonPeripheral",
     "fsl,imx6sll-ccm": "Python.PythonPeripheral",
     "fsl,imx6sx-ccm": "Python.PythonPeripheral",
