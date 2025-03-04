@@ -368,7 +368,7 @@ def get_node_prop(node, prop, default=None, inherit=False):
     elif prop in ('interrupts', 'reg', 'ranges', 'alloc-ranges', 'dma-ranges', 'phandle'):
         return val.to_nums()
     elif prop in ('#address-cells', '#size-cells', '#interrupt-cells', 'cc-num', 'clock-frequency',
-                  'riscv,ndev', 'ngpios'):
+                  'riscv,ndev', 'ngpios', 'port'):
         return val.to_num()
     elif prop in ('interrupt-parent',):
         return val.to_node()
@@ -425,7 +425,7 @@ def renode_model_overlay(compat, mcu, overlays):
         # let's look for a special match notation containing multiple entries separated with '|' or a '_' else entry
         for entry in models_entry:
             for subentry in entry.split("|"):
-                if subentry == "_" or subentry in overlays:
+                if subentry == "_" or any(subentry in o for o in overlays):
                     model, attribs, irq_mappings = _try_decode(models_entry[entry])
                     return model, compat, attribs, irq_mappings
 
@@ -525,6 +525,7 @@ class NameMapper:
         "Miscellaneous.SiLabs.EFR32xG2_HFXO_2": "hfxo",
         "Miscellaneous.SiLabs.EFR32xG2_HFXO_3": "hfxo",
         "Miscellaneous.MAX32650_GCR": "gcr",
+        "GPIOPort.RenesasRA_GPIOMisc": "portMisc"
     }
 
     def __init__(self):
@@ -1519,6 +1520,33 @@ def generate(filename, override_system_clock_frequency=None, manual_overlays=Non
             ngpios = get_node_prop(node, 'ngpios', 32)
             indent.append(f'numberOfPins: {ngpios}')
 
+        if model == 'GPIOPort.RenesasRA_GPIOMisc':
+            if any("ra8" in o.lower() for o in overlays):
+                indent.append("version: Version.RA8")
+
+            # In current implementation some part of RenesasRA_GPIOMisc registers are
+            # implemented inside RenesasRAx_GPIO peripheral (because each register is related to each gpio).
+            # So we have to add offset to GPIOMisc (as these memory regions are attached to gpio peripherals)
+            if regions:
+                regions[0].address += 0x500
+
+
+        if model in ["GPIOPort.RenesasRA2_GPIO", "GPIOPort.RenesasRA4_GPIO", "GPIOPort.RenesasRA6_GPIO", "GPIOPort.RenesasRA8_GPIO"]:
+            indent.append("pfsMisc: portMisc")
+            dependencies.add("portMisc")
+
+            port_number = int(get_node_prop(node, 'port'))
+            number_of_connections = int(get_node_prop(node, 'ngpios'))
+            indent.append(f"portNumber: {hex(port_number)}")
+            indent.append(f"numberOfConnections: {number_of_connections}")
+
+            for n in nodes:
+                if 'renesas,ra-pinctrl-pfs' in get_node_prop(n, 'compatible', []):
+                    renesas_pinctrl_addr = int(n.unit_addr, 16)
+                    regions += [RegistrationRegion(renesas_pinctrl_addr + port_number * 0x40, 0x40, "pinConfiguration")]
+                    break
+
+
         # additional parameters for python peripherals
         if compat.startswith('fsl,imx6') and compat.endswith('-anatop'):
             indent.append('size: 0x1000')
@@ -1813,7 +1841,7 @@ def generate(filename, override_system_clock_frequency=None, manual_overlays=Non
                 num = port_index * 32 + num
                 gpio = gpio.parent
 
-            gpio_model = get_model(gpio)
+            gpio_model = get_model(gpio, mcu_compat, overlays)
             if not gpio_model or not gpio_model.startswith("GPIO"):
                 # don't add invalid GPIO connections
                 continue
