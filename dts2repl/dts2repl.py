@@ -368,7 +368,7 @@ def get_node_prop(node, prop, default=None, inherit=False):
     elif prop in ('interrupts', 'reg', 'ranges', 'alloc-ranges', 'dma-ranges', 'phandle'):
         return val.to_nums()
     elif prop in ('#address-cells', '#size-cells', '#interrupt-cells', 'cc-num', 'clock-frequency',
-                  'riscv,ndev'):
+                  'riscv,ndev', 'ngpios'):
         return val.to_num()
     elif prop in ('interrupt-parent',):
         return val.to_node()
