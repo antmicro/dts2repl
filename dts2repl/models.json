@@ -338,6 +338,7 @@
                           "renesas,r7fa4m1a" : "GPIOPort.RenesasRA4_GPIO",
                           "renesas,r7fa6m5b" : "GPIOPort.RenesasRA6_GPIO",
                           "renesas,r7fa8m1a" : "GPIOPort.RenesasRA8_GPIO" },
+    "renesas,ra-pinctrl-pfs": "GPIOPort.RenesasRA_GPIOMisc",
     "renesas,ra-i2c" : "I2C.RenesasRA_IIC",
     "renesas,rcar-gen3-i2c": { "type": "Python.PythonPeripheral", "size": 0x40, "initable": true, "script": "request.Value = 0x59" },
     "renesas,rcar-gen3-iic": { "type": "Python.PythonPeripheral", "size": 0x425, "initable": true, "script": "request.Value = 0x1" },
