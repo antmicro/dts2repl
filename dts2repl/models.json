@@ -431,6 +431,7 @@
                             "_": "Network.SynopsysEthernetMAC" },
     "st,stm32-i2c-v1": "I2C.STM32F4_I2C",
     "st,stm32-i2c-v2": "I2C.STM32F7_I2C",
+    "st,stm32mp13-rcc": { "type": "Python.PythonPeripheral", "size": 0x1000, "initable": false, "script": "request.value = 0xffffffff" },
     "st,stm32mp15-i2c": { "type": "Python.PythonPeripheral", "size": 0x400, "initable": true, "filename": "scripts/pydev/flipflop.py" },
     "st,stm32mp157-syscfg": { "type": "Python.PythonPeripheral", "size": 0x400, "initable": true, "filename": "scripts/pydev/flipflop.py" },
     "st,stm32-hsem-mailbox": "Miscellaneous.STM32H7_HardwareSemaphore",
