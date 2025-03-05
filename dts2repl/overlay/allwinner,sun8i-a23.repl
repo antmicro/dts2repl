@@ -1,2 +1,1 @@
-ddr: Memory.MappedMemory @ sysbus 0x40000000
-    size: 0x80000000
+allwinner,sun8i-a33.repl
