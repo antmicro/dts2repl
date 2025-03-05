@@ -1,7 +1,1 @@
-memory: Memory.MappedMemory @ sysbus 0x80000000
-    size: 0x10000000
-
-cpu0: CPU.ARMv8A @ sysbus
-    cpuType: "cortex-a53"
-    cpuId: 0
-    genericInterruptController: gic
+fsl,ls1012a.repl
