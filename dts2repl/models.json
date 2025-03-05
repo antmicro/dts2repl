@@ -157,6 +157,7 @@
     "fsl,imx8mp-ocotp": { "type": "Python.PythonPeripheral", "size": 0x10000, "initable": true, "filename": "scripts/pydev/flipflop.py" },
     "nxp,imx8mp-fspi": { "type": "Python.PythonPeripheral", "size": 0x10000, "initable": true, "filename": "scripts/pydev/flipflop.py" },
     "fsl,imx8mp-fec": { "type": "Python.PythonPeripheral", "size": 0x10000, "initable": true, "filename": "scripts/pydev/flipflop.py" },
+    "fsl,imx8mn-fec": { "type": "Python.PythonPeripheral", "size": 0x10000, "initable": true, "filename": "scripts/pydev/flipflop.py" },
 
     "infineon,xmc4xxx-uart": "UART.XMC4XXX_UART",
     "infineon,cat1-uart": "UART.Infineon_SCBUART",
