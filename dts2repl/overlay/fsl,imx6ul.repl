@@ -1,0 +1,5 @@
+ddr: Memory.MappedMemory @ sysbus 0x88000000
+    size: 0x8000000
+
+cpu0_timer: Timers.ARM_GenericTimer @ cpu0
+    frequency: 62500000
