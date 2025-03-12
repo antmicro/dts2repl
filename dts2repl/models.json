@@ -317,6 +317,7 @@
     "nxp,s32-qspi-nor": "Memory.MappedMemory",
     "nxp,imx-flexspi-hyperflash": "Memory.MappedMemory",
     "nxp,imx-flexspi-mx25um51345g": "Memory.MappedMemory",
+    "nxp,xspi-mx25um51345g": "Memory.MappedMemory",
     "nxp,imx-gpio": { "type": "GPIOPort.IMXRT_GPIO", "irq_mappings": ["IRQ", null] },
     "nxp,imx-itcm": "Memory.MappedMemory",
     "nxp,imx-lpspi": "SPI.IMXRT_LPSPI",
