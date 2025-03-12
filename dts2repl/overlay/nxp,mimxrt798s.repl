@@ -1,0 +1,6 @@
+sysbus:
+    init add:
+        Tag <0x4018412c 0x4> "XSPI0_DLLSR_NON_SECURE" 0xffffffff 
+        Tag <0x4018512c 0x4> "XSPI1_DLLSR_NON_SECURE" 0xffffffff
+        Tag <0x5018412c 0x4> "XSPI0_DLLSR_SECURE" 0xffffffff 
+        Tag <0x5018512c 0x4> "XSPI1_DLLSR_SECURE" 0xffffffff 
