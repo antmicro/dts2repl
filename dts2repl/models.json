@@ -230,6 +230,7 @@
     "intel,core-gen3": { "type": "CPU.X86", "cpuType": "x86" },
     "intel,loapic": "IRQControllers.LAPIC",
     "intel,hpet": "Timers.HPET",
+    "intel,sedi-uart": { "type": "UART.NS16550", "wideRegisters": true },
     "ite,riscv-ite": "CPU.RiscV32",
 
     "neorv-sysinfo": { "type": "Python.PythonPeripheral", "size": 0x20, "initable": false, "script": "request.value = 0xFFFFFFFF" },
