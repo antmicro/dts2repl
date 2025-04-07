@@ -1126,6 +1126,14 @@ def generate(filename, override_system_clock_frequency=None):
         if model in ("CPU.ARMv7A"):
             address_space_32bit = True 
         
+        # special handling of 'st,stm32-ethernet' compat. Sometimes the 'mac' node is a child of the 'ethernet' node,
+        # and has no address specified. If possible, extract the addr from the parent node.
+        if compat == 'st,stm32-ethernet' and not addr:
+            if not (parent := node.parent):
+                logging.warn(f'Unable to find address for {compat}. Dropping {model}')
+                continue
+            _, _, addr = parent.name.partition('@')
+
         # special handling of flash devices as those should be treated as memory
         if compat in [ 'nxp,imx-flexspi-nor', 'nxp,imx-flexspi-hyperflash', 'nxp,imx-flexspi-mx25um51345g', 'nxp,s32-qspi-nor', 'nxp,xspi-mx25um51345g' ]:
             # try to take the 2nd reg entry from the parent controller
