@@ -1123,7 +1123,7 @@ def generate(filename, override_system_clock_frequency=None):
         regions = []
         indent = []
 
-        if model in ("CPU.ARMv7A"):
+        if model in ("CPU.ARMv7A",):
             address_space_32bit = True 
         
         # special handling of 'st,stm32-ethernet' compat. Sometimes the 'mac' node is a child of the 'ethernet' node,
