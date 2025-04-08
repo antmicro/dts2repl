@@ -232,6 +232,7 @@
     "intel,apollo-lake": { "type": "CPU.X86_64", "cpuType": "x86_64" },
     "intel,core-i3-gen5": { "type": "CPU.X86", "cpuType": "x86" },
     "intel,core-gen3": { "type": "CPU.X86", "cpuType": "x86" },
+    "intel,bartlett-lake": { "type": "CPU.X86_64", "cpuType": "x86_64" },
     "intel,loapic": "IRQControllers.LAPIC",
     "intel,hpet": "Timers.HPET",
     "intel,sedi-uart": { "type": "UART.NS16550", "wideRegisters": true },
