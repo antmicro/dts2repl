@@ -1,13 +1,3 @@
-dcdcIf: Python.PythonPeripheral @ sysbus 0x50094024
-    size: 0x4
-    initable: true
-    filename: "scripts/pydev/flipflop.py"
-
-hfxoStatus: Python.PythonPeripheral @ sysbus 0x5000c058
-    size: 0x4
-    initable: true
-    filename: "scripts/pydev/flipflop.py"
-
 emuVscaleEm: Python.PythonPeripheral @ sysbus 0x50004084
     size: 0x4
     initable: true

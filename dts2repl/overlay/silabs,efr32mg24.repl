@@ -5,11 +5,6 @@ sysbus:
     init add:
         Tag <0x50094028 4> "dcdcStatus" 0xFFFFFFFF
 
-hfxoStatus: Python.PythonPeripheral @ sysbus 0x5A004058
-    size: 0x4
-    initable: true
-    filename: "scripts/pydev/flipflop.py"
-
 emuVscaleEm: Python.PythonPeripheral @ sysbus 0x50004084
     size: 0x4
     initable: true

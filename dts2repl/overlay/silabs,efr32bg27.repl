@@ -1,8 +1,3 @@
-HFX0_STATUS: Python.PythonPeripheral @ sysbus 0x5000C058
-    size: 0x4
-    initable: true
-    filename: "scripts/pydev/flipflop.py"
-
 sysbus:
     init add:
         Tag <0x50094034 4> "DCDC_IF" 0xFFFFFFFF

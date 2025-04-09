@@ -488,6 +488,8 @@ class NameMapper:
         "IRQControllers.GaislerMIC": "irqmp",
         "IRQControllers.NVIC": "nvic0",
         "IRQControllers.PlatformLevelInterruptController": "plic",
+        "Miscellaneous.SiLabs.EFR32xG2_HFXO_2": "hfxo",
+        "Miscellaneous.SiLabs.EFR32xG2_HFXO_3": "hfxo",
     }
 
     def __init__(self):
@@ -1276,6 +1278,9 @@ def generate(filename, override_system_clock_frequency=None):
         if model == 'Timers.RenesasDA_Watchdog':
             indent.append('nvic: nvic0')
             dependencies.add('nvic0')
+        if model == 'Miscellaneous.SiLabs.EFR32xG2_CMU_3':
+            indent.append('hfxo: hfxo')
+            dependencies.add('hfxo')
 
         # additional parameters for python peripherals
         if compat.startswith('fsl,imx6') and compat.endswith('-anatop'):
