@@ -1,0 +1,1 @@
+ipc_shm: Miscellaneous.NRF_SharedMemory @ { sysbus 0x2f88fce0; sysbus 0x2f88fd60 }
