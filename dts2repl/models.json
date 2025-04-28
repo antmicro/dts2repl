@@ -242,6 +242,7 @@
     "nordic,nrf-gpio": "GPIOPort.NRF52840_GPIO",
     "nordic,nrf-rng": "Miscellaneous.NRF52840_RNG",
     "nordic,nrf-rtc": "Timers.NRF52840_RTC",
+    "nordic,nrf-grtc": { "type": "Timers.NRF54H20_GRTC", "irq_mappings": ["IRQ"] },
     "nordic,nrf-spi": "SPI.NRF52840_SPI",
     "nordic,nrf-timer": "Timers.NRF52840_Timer",
     "nordic,nrf-twi": "I2C.NRF52840_I2C",
