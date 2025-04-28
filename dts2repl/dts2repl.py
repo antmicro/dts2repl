@@ -334,7 +334,7 @@ def get_node_prop(node, prop, default=None, inherit=False):
     val = node.props[prop]
     if prop in ('compatible', 'device_type', 'model'):
         return val.to_strings()
-    elif prop in ('interrupts', 'reg', 'ranges', 'alloc-ranges', 'dma-ranges'):
+    elif prop in ('interrupts', 'reg', 'ranges', 'alloc-ranges', 'dma-ranges', 'phandle'):
         return val.to_nums()
     elif prop in ('#address-cells', '#size-cells', '#interrupt-cells', 'cc-num', 'clock-frequency',
                   'riscv,ndev'):
@@ -1203,6 +1203,23 @@ def generate(filename, override_system_clock_frequency=None):
             child = next((n for n in node.nodes.values() if not is_disabled(n)), None)
             if child:
                 name = name_mapper.get_name(child)
+
+        if 'nordic,nrf-vevif-task' in compat:
+            ipc = dt.get_node('/ipc')
+            if ipc == None:
+                continue
+            for ipc_node in (i for i in ipc.nodes.values() if not is_disabled(i)):
+                mboxes = parse_phandles_and_nums(dt, ipc_node, "mboxes")
+                if get_node_prop(node, 'phandle')[0] in mboxes:
+                    bellboard = next((n for n in nodes \
+                                        if (get_node_prop(n, 'phandle') != None \
+                                        and get_node_prop(n, 'phandle')[0] == mboxes[0])), None)
+                    if bellboard != None and get_node_prop(bellboard, 'phandle')[0] in mboxes:
+                        target_name = bellboard.labels[0].replace('_','')
+                        # indexes come from the parent "zephyr,ipc-icmsg" node, from the `mboxes` prop:
+                        # mboxes = < &cpusec_bellboard 0xc >, < &cpuapp_bellboard 0x0 >;
+                        indent.append(f'{mboxes[3]}->{target_name}@{mboxes[1]}')
+                    break
 
         # special multi-registration address for GIC
         if model == 'IRQControllers.ARM_GenericInterruptController':
