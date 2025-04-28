@@ -233,6 +233,8 @@
     "intel,sedi-uart": { "type": "UART.NS16550", "wideRegisters": true },
     "ite,riscv-ite": "CPU.RiscV32",
 
+    "issi,is25lp128": "Memory.MappedMemory",
+
     "neorv-sysinfo": { "type": "Python.PythonPeripheral", "size": 0x20, "initable": false, "script": "request.value = 0xFFFFFFFF" },
 
     "nordic,nrf-clock": "Miscellaneous.NRF_CLOCK",

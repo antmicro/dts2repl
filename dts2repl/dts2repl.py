@@ -1135,7 +1135,7 @@ def generate(filename, override_system_clock_frequency=None):
             _, _, addr = parent.name.partition('@')
 
         # special handling of flash devices as those should be treated as memory
-        if compat in [ 'nxp,imx-flexspi-nor', 'nxp,imx-flexspi-hyperflash', 'nxp,imx-flexspi-mx25um51345g', 'nxp,s32-qspi-nor', 'nxp,xspi-mx25um51345g' ]:
+        if compat in [ 'nxp,imx-flexspi-nor', 'nxp,imx-flexspi-hyperflash', 'nxp,imx-flexspi-mx25um51345g', 'nxp,s32-qspi-nor', 'nxp,xspi-mx25um51345g', 'issi,is25lp128' ]:
             # try to take the 2nd reg entry from the parent controller
             if not node.parent:
                 logging.info(f'Parent node for {name} of type {compat} not found. Skipping...')
