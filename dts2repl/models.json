@@ -246,7 +246,7 @@
     "nordic,nrf-timer": "Timers.NRF52840_Timer",
     "nordic,nrf-twi": "I2C.NRF52840_I2C",
     "nordic,nrf-uart": "UART.NRF52840_UART",
-    "nordic,nrf-uarte": { "type": "UART.NRF52840_UART", "easyDMA": true },
+    "nordic,nrf-uarte": { "nordic,nrf54h20dk_nrf54h20-cpuapp|nordic,nrf54h20dk_nrf54h20-cpurad": "UART.NRF54H20_UARTE", "_": { "type": "UART.NRF52840_UART", "easyDMA": true } },
     "nordic,nrf-watchdog": "Timers.NRF52840_Watchdog",
     "nordic,nrf-usbd": "USB.NRF_USBD",
     "nordic,nrf91-flash-controller": { "type": "Python.PythonPeripheral", "size": 0x1000, "initable": true, "filename": "scripts/pydev/rolling-bit.py" },
