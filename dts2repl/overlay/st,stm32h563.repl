@@ -2,3 +2,4 @@ sysbus:
     init add:
         ApplySVD @https://dl.antmicro.com/projects/renode/svd/STM32H563.svd.gz
         Tag <0x44020824 4> "PWR_DBPCR" 0xFFFFFFFF
+        Tag <0x40030404 4> "ICACHE_SR_IDLE" 0x0

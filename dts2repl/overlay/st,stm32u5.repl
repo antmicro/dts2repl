@@ -11,3 +11,4 @@ sysbus:
         Tag <0x46020C00 4> "RCC_CR" 0xFFFFFFFF
         Tag <0x46020CF0 4> "RCC_BDCR" 0xFFFFFFFF
         Tag <0x46020828 4> "PWR_DBPR" 0xFFFFFFFF
+        Tag <0x40030404 4> "ICACHE_SR_IDLE" 0x0
