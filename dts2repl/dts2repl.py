@@ -1656,6 +1656,8 @@ def generate(filename, override_system_clock_frequency=None):
                 irq_names = ['TxInterrupt', 'RxInterrupt']
             elif compat in ['ambiq,stimer']:
                 irq_names = ['IRQA', 'IRQB', 'IRQC', 'IRQD', 'IRQE', 'IRQF', 'IRQG', 'IRQH', 'IRQI']
+            elif compat in ['nordic,nrf-bellboard-rx']:
+                irq_names = ['0']
             elif compat in ['renesas,rzt2m-uart']:
                 irq_names = ['// RxErrIRQ', 'RxIRQ', 'TxIRQ', 'TxEndIRQ']
             else:
