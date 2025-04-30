@@ -54,6 +54,7 @@ Test Static release:
       - ci-output/repls
       - ci-output/robot-results
       - ci-output/regressions
+      - renode-build.log
     when: always
   before_get_sources:
     - apt -qqy update &> /dev/null
