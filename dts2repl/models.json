@@ -207,8 +207,9 @@
     "amlogic,meson-gx-ao-sysctrl": {"type": "Python.PythonPeripheral", "size": 0x100, "initable": false, "script": "request.value = 0x2000000" },
     "amlogic,meson-gx-ao-secure": {"type": "Python.PythonPeripheral", "size": 0x140, "initable": false, "script": "request.value = 0x4000000" },
 
+    "openisa,rv32m1-intmux": "IRQControllers.NXP_INTMUX",
     "openisa,ri5cy": "CPU.Ri5cy",
-    "openisa,zero-ri5cy": "CPU.Ri5cy",
+    "openisa,zero-ri5cy": { "type": "CPU.Ri5cy", "hartId": 0 },
     "openisa,rv32m1-lpuart": { "type": "UART.NXP_LPUART", "fifoSize": 8 },
     "openisa,rv32m1-lptmr": { "type": "UART.LowPower_Timer" },
 

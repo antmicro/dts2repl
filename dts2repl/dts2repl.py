@@ -1371,10 +1371,13 @@ def generate(filename, override_system_clock_frequency=None):
                 indent.append('timeProvider: clint')
                 dependencies.add('clint')
                 indent.append('allowUnalignedAccesses: true')
-            hartid = 0
-            if len(node.name.split("@")) >= 2:
-                hartid = int(node.name.split("@")[1], 16)
-            indent.append(f'hartId: {hartid}')
+            # If no hartId is defined (from models.json), attempt to generate
+            # it from CPU node index in DTS file.
+            if not any('hartId: ' in s for s in indent):
+                hartid = 0
+                if len(node.name.split("@")) >= 2:
+                    hartid = int(node.name.split("@")[1], 16)
+                indent.append(f'hartId: {hartid}')
             if any(c.startswith('riscv,sifive') or
                    c.startswith('starfive,rocket') or
                    c in [
@@ -1449,13 +1452,27 @@ def generate(filename, override_system_clock_frequency=None):
         if model == "Timers.NEORV32_MachineSystemTimer":
             indent.append('-> cpu0@23')
 
-        # XXX: This differs from the DTS, as the 'intmux' interrupt controller is not simulated.
-        if compat == "openisa,rv32m1-lptmr" and name == "lptmr0":
-            indent.append("-> cpu0@24")
 
-        # XXX: This differs from the DTS, as the 'intmux' interrupt controller is not simulated.
-        if compat == "openisa,rv32m1-lpuart" and name == "lpuart0":
-            indent.append("IRQ -> cpu0@17")
+        if compat == "openisa,rv32m1-intmux":
+            interruptNumbers = [
+                get_node_prop(entry, "interrupts", 0)[0]
+                for entry in node.nodes.values()
+                if 'openisa,rv32m1-intmux-ch' in get_node_prop(entry, "compatible", False)
+            ]
+            indent.append(f"{list(range(len(interruptNumbers)))} -> cpu0@{interruptNumbers}")
+
+
+        if compat in ["openisa,rv32m1-lptmr", "openisa,rv32m1-lpuart"]:
+            interrupt_parent = get_node_prop(node, "interrupt-parent")
+            interrupt_number = get_node_prop(node, "interrupts", 0)[0]
+
+            if "openisa,rv32m1-intmux" in get_node_prop(interrupt_parent.parent, "compatible", ""):
+                channel_match = re.match(r"intmux(\d)_ch(\d)", interrupt_parent.labels[0])
+                if channel_match:
+                    indent.append(f"IRQ -> intmux{channel_match.group(1)}#{channel_match.group(2)}@{interrupt_number}")
+            else:
+                indent.append(f"IRQ -> cpu0@{interrupt_number}")
+
 
         i2c_sensors = [
             'Sensors.TMP103',

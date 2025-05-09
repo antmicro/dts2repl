@@ -32,5 +32,4 @@ sysbus:
         Tag <0x4002C304 4> "FIRCDIV" 0x00010101
         Tag <0x4002C500 4> "LPFFLCSR" 0xFFFFFFFF
         Tag <0x4002C208 4> "SIRCFFG" 0x1
-        Tag <0x4004F004 4> "intmux0_channel0_source" 0xDC
         SilenceRange <0xE004100C 4>
