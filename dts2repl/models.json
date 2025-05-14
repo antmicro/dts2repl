@@ -256,7 +256,7 @@
 
     "neorv-sysinfo": { "type": "Python.PythonPeripheral", "size": 0x20, "initable": false, "script": "request.value = 0xFFFFFFFF" },
 
-    "nordic,nrf-clock": "Miscellaneous.NRF_CLOCK",
+    "nordic,nrf-clock": { "nordic,nrf54h20dk_nrf54h20-cpuapp|nordic,nrf54h20dk_nrf54h20-cpurad|nordic,nrf54l15dk_nrf54l05-cpuapp|nordic,nrf54l15dk_nrf54l10-cpuapp|nordic,nrf54l15dk_nrf54l15-cpuapp|nordic,nrf54l09pdk_nrf54l09-cpuapp|nordic,nrf54l20pdk_nrf54l20-cpuapp|ezurio,bl54l15_dvk_nrf54l10-cpuapp|ezurio,bl54l15_dvk_nrf54l15-cpuapp|ezurio,bl54l15u_dvk_nrf54l15-cpuapp": "Miscellaneous.NRF54L_CLOCK", "_": { "type": "Miscellaneous.NRF_CLOCK" } },
     "nordic,nrf-ecb": "Miscellaneous.NRF52840_ECB",
     "nordic,nrf-gpio": "GPIOPort.NRF52840_GPIO",
     "nordic,nrf-rng": "Miscellaneous.NRF52840_RNG",
