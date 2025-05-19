@@ -98,6 +98,7 @@
     "atmel,sama5d2-pmc": { "type": "Python.PythonPeripheral", "size": 0x160, "initable": true, "filename": "scripts/pydev/flipflop.py" },
     "atmel,sama5d2-tcb": { "type": "Python.PythonPeripheral", "size": 0x20, "initable": true, "filename": "scripts/pydev/counter.py" },
     "atmel,sama5d2-i2c": { "type": "Python.PythonPeripheral", "size": 0x160, "initable": true, "filename": "scripts/pydev/flipflop.py" },
+    "atmel,sam-flash-controller": { "type": "Python.PythonPeripheral", "size": 0x200, "initable": true, "filename": "scripts/pydev/flipflop.py" },
     "atmel,at91sam9260-usart": "UART.SAM_USART",
     "atmel,at91sam9260-pit": { "type": "Python.PythonPeripheral", "size": 0xF, "initable": true, "filename": "scripts/pydev/flipflop.py" },
 
