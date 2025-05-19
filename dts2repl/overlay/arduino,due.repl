@@ -1,0 +1,7 @@
+// the EEFC node is currently disabled in the Zephyr DT file
+// this overlay can be removed once the issue is resolved in Zephyr
+eefc: Python.PythonPeripheral @ sysbus 0x400e0a00
+    size: 0x200
+    initable: true
+    filename: "scripts/pydev/flipflop.py"
+
