@@ -9,3 +9,7 @@ itim64: Timers.NPCX_ITIM @ sysbus 0x400BE000
     is64Bit: true
     apb2Frequency: 15000000
     -> nvic0@58
+
+sysbus:
+    init add:
+        Tag <0x400BC004 0x4> "NPCX_ITCTSXX_ITEN" 0xFF
