@@ -85,6 +85,30 @@ def dump(obj):
         print("obj.%s = %r" % (attr, getattr(obj, attr)))
 
 
+def get_psci_method(dts_filename):
+    # This function will check if PSCI node is present in the DTS
+    # and return a string representing the PSCI call method, or None if the node is not present
+    try:
+        dt = dtlib.DT(dts_filename)
+    except FileNotFoundError:
+        logging.error(f'File not found: "{dts_filename}"')
+        return None
+    except Exception:
+        logging.exception('Error while parsing DT')
+        return None
+
+    def _try_get_psci_method(node_name):
+        try:
+            psci = dt.get_node(node_name)
+            return psci.props['method'].to_string()
+        except Exception:
+            return None
+
+    psci_method = _try_get_psci_method('/psci') or _try_get_psci_method('/firmware/psci')
+    if psci_method is None:
+        logging.warning('No psci node found')
+    return psci_method
+
 def get_cpu_dep_chain(arch, dts_filename, zephyr_path, chain):
     next_include = ''
     if os.path.exists(dts_filename):
