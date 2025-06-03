@@ -233,7 +233,7 @@ def get_uart(dts_filename, only_compatible = False):
         for node in dt.node_iter():
             compats = get_node_prop(node, 'compatible')
             if any(x in node.name.lower() for x in ('uart', 'usart', 'serial')): 
-                if 'clkuart' in node.name.lower():
+                if any(keyword in node.name.lower() for keyword in ('clkuart', 'serial-flash')):
                     continue   
                 if not is_disabled(node) and 'reg' in node.props:
                     return verify_and_return_node(node)
