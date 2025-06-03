@@ -1,0 +1,3 @@
+sysbus:
+    init add:
+        Tag <0xf8010004 0x4> "UART_WRITE_AVAILABILITY_MASK" 0xFF0000

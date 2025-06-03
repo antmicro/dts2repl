@@ -119,6 +119,7 @@
     "cfi-flash": "Memory.MappedMemory",
 
     "ene,kb1200-uart": { "type": "UART.KB1200_UART" },
+    "efinix,sapphire-uart0": {"type": "UART.TrivialUart", "irq_mappings": [null]},
 
     "fsl,imx6q-anatop": "Python.PythonPeripheral",
     "fsl,imx6sx-anatop": "Python.PythonPeripheral",
