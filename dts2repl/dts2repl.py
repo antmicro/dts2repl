@@ -1106,6 +1106,23 @@ def generate(filename, override_system_clock_frequency=None):
 
         # get model name and addr
         _, _, addr = node.name.partition('@')
+
+        # Attempt to retrieve the first element from the "reg" property 
+        # and verify whether the `unit-address` matches it. If not,
+        # display a warning and prefer the addr from reg.
+        try:
+            first_address_in_reg = list(get_reg(node))[0][0]
+            addr_int = translate_address(int(addr, 16), node)
+
+            if first_address_in_reg != addr_int:
+                logging.warning(
+                    f'node: {node.name} unit-address ({hex(addr_int)}) does not match node.reg[0] ({hex(first_address_in_reg)}), '
+                    'using address from node.reg[0]'
+                )
+                addr = format(first_address_in_reg, 'X')
+        except:
+            pass
+
         name = name_mapper.get_name(node)
 
         logging.info(f'Node {node.name} mapped to {name}...')
