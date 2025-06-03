@@ -1800,8 +1800,7 @@ def generate(filename, override_system_clock_frequency=None):
     # set number of targets for CLINT if necessary
     # note that IRQ destinations don't create a dependency; this should pick up just CPUs because they get a dependency on the CLINT when we add timeProvider
     clint_block = repl_file.get_block_by_name('clint')
-    if clint_block:
-        clint_targets = len(clint_block.get_depending_blocks())
+    if clint_block and (clint_targets := len(clint_block.get_depending_blocks())):
         clint_block.content += [f'    numberOfTargets: {clint_targets}']
 
     repl_file.merge_overlapping_blocks()
