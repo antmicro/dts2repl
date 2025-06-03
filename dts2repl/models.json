@@ -369,6 +369,8 @@
     "nxp,s32-siul2-eirq": { "type": "Miscellaneous.S32K3XX_SystemIntegrationUnitLite2", "irq_mappings": ["IRQ1", "IRQ2", "IRQ3", "IRQ4" ] },
     "nxp,os-timer": { "type": "Timers.NXP_OsTimer", "frequency": 1000000 },
 
+    "openhwgroup,cva6": "CPU.RiscV32",
+    
     "riscv": "CPU.RiscV32",
     "andestech,andescore-v5": "CPU.RiscV32",
     "riscv,plic1": { "type": "IRQControllers.PlatformLevelInterruptController", "numberOfContexts": 16, "prioritiesEnabled": true },
