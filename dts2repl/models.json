@@ -187,6 +187,7 @@
 
     "memory": "Memory.MappedMemory",
     "mmio-sram": "Memory.MappedMemory",
+    "ddram": "Memory.MappedMemory",
     "jedec,spi-nor": "Memory.MappedMemory",
     "shared-dma-pool": "Memory.MappedMemory",
 
