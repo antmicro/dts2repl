@@ -1,0 +1,4 @@
+sysbus:
+    init add:
+        Tag <0x30360000 0x4> "PLL1_SPOOF" 0xFFFFFFFF
+        Tag <0x30360014 0x4> "PLL2_SPOOF" 0xFFFFFFFF
