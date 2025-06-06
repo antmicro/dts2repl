@@ -1,0 +1,3 @@
+sysbus:
+    init add:
+        Tag <0x40261524 0x4> "CY_SYSCLK_ECOSTAT_STABLE" 0x2
