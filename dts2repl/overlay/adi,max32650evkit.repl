@@ -1,0 +1,3 @@
+sysbus:
+    init add:
+        Tag <0x4002A100 0x4> "ICC_CACHE_CTRL" 0xFFFFFFFF

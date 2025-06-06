@@ -490,6 +490,7 @@ class NameMapper:
         "IRQControllers.PlatformLevelInterruptController": "plic",
         "Miscellaneous.SiLabs.EFR32xG2_HFXO_2": "hfxo",
         "Miscellaneous.SiLabs.EFR32xG2_HFXO_3": "hfxo",
+        "Miscellaneous.MAX32650_GCR": "gcr",
     }
 
     def __init__(self):
@@ -1323,6 +1324,12 @@ def generate(filename, override_system_clock_frequency=None):
         if model == 'Miscellaneous.SiLabs.EFR32xG2_CMU_3':
             indent.append('hfxo: hfxo')
             dependencies.add('hfxo')
+        if model == 'Miscellaneous.MAX32650_GCR':
+            indent.append('nvic: nvic0')
+            dependencies.add('nvic0')
+        if model == 'UART.MAX32650_UART':
+            indent.append('gcr: gcr')
+            dependencies.add('gcr')
 
         # additional parameters for python peripherals
         if compat.startswith('fsl,imx6') and compat.endswith('-anatop'):

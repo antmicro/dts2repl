@@ -3,8 +3,20 @@
     "serial-flash": "Memory.MappedMemory",
     "nordic,mram": "Memory.MappedMemory",
 
-    "adi,max32-uart": "UART.MAX32655_UART",
-    "adi,max32-gcr": {"type": "Python.PythonPeripheral", "size": 0x400, "initable": false, "script": "request.value = 0xFFFFFFFF if request.offset == 0x8 else 0x0" },
+    "adi,max32-uart": {
+        "adi,max32650evkit|adi,ad_swiot1l_sl|adi,max32650fthr": { "type": "UART.MAX32650_UART" },
+        "_": "UART.MAX32655_UART"
+    },
+
+    "adi,max32-gcr": {
+        "adi,max32650evkit|adi,ad_swiot1l_sl|adi,max32650fthr": { "type": "Miscellaneous.MAX32650_GCR" },
+        "_": {
+            "type": "Python.PythonPeripheral",
+            "size": 0x400,
+            "initable": false,
+            "script": "request.value = 0xFFFFFFFF if request.offset == 0x8 else 0x0"
+        }
+    },
 
     "altr,jtag-uart": "UART.AlteraJTAG_UART",
 
