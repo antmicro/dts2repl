@@ -1,0 +1,4 @@
+sysbus:
+    init add:
+        Tag <0x44020814 0x20> "LL_PWR_ACTIVE_VOS" 0xFFFFFFFF
+
