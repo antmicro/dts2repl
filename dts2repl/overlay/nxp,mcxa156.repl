@@ -1,0 +1,4 @@
+RST_SPOOF: Python.PythonPeripheral @ sysbus 0x40091000
+    size: 0x1000
+    initable: true
+    filename: "scripts/pydev/flipflop.py"
