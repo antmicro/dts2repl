@@ -361,7 +361,7 @@
     "nxp,gpt-hw-timer": "Timers.IMX_GPTimer",
     "nxp,kinetis-lpuart": { "nxp,k6x|nxp,k8x": { "type": "UART.NXP_LPUART", "hasGlobalRegisters": false, "fifoSize": 4 }, "_" : "UART.NXP_LPUART" },
     "nxp,lpuart": {
-        "nxp,k6x|nxp,k8x|nxp,mcxc444": { "type": "UART.NXP_LPUART", "hasGlobalRegisters": false, "fifoSize": 4 },
+        "nxp,k6x|nxp,k8x|nxp,mcxc444|nxp,mcxc242": { "type": "UART.NXP_LPUART", "hasGlobalRegisters": false, "fifoSize": 4 },
         "_" : "UART.NXP_LPUART"
     },
     "nxp,kinetis-mcg": "Miscellaneous.K6xF_MCG",
