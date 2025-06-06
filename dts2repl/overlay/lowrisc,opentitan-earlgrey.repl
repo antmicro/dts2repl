@@ -1,4 +1,4 @@
-cpu0: CPU.IbexRiscV32 @ sysbus
+cpu0:
     hartId: 0
     cpuType: "rv32imacb_zicsr_zifencei"
     timeProvider: empty
