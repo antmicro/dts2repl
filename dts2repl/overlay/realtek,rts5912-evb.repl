@@ -1,0 +1,3 @@
+sysbus:
+    init add:
+        Tag <0x4000C504 0x4> "SPOOF_rtmr" 0xFFFFFFFF
