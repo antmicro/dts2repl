@@ -1621,6 +1621,7 @@ def generate(filename, override_system_clock_frequency=None):
                 indent.append(f'architectureVersion: IRQControllers.ARM_GenericInterruptControllerVersion.{gic_renode_ver}')
             else:
                 logging.warning(f'Unknown GIC version for compatible "{compat}"')
+            dependencies.add('cpu0')
         elif compat == 'gaisler,irqmp':
             indent.append('0 -> cpu0@0 | cpu0@1 | cpu0@2')
             dependencies.add('cpu0')
