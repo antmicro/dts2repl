@@ -6,3 +6,8 @@ pwrVosRdy: Python.PythonPeripheral @ sysbus 0x58024818
 
 cpu0:
     numberOfMPURegions: 16
+
+sysbus:
+    init add:
+        Tag <0x58024800 4> "PWR_CR1_DBP_SET" 0x100
+        
