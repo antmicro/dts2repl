@@ -1,0 +1,8 @@
+sysbus:
+    init add:
+        Tag <0x50004000 0x4000> "emu"
+
+emuIf: Python.PythonPeripheral @ sysbus 0x50004064
+    size: 0x4
+    initable: true
+    filename: "scripts/pydev/flipflop.py"
