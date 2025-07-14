@@ -6,3 +6,4 @@ eth: Network.LiteX_Ethernet_CSR32 @ {
         sysbus new Bus.BusMultiRegistration { address: 0x60009000; size: 0x800; region: "phy" };
         sysbus new Bus.BusMultiRegistration { address: 0xe0009000; size: 0x800; region: "phy" } // shadow
     }
+    -> cpu0@3
