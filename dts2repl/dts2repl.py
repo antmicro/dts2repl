@@ -1669,7 +1669,7 @@ def generate(filename, override_system_clock_frequency=None):
             if 'riscv,cpu-intc' in irq_dest_compatible:
                 irq_dest_nodes[i] = irq_dest_node.parent
             # treat the VexRiscv intc as the CPU itself
-            if 'vexriscv-intc0' in irq_dest_compatible:
+            if 'litex,vexriscv-intc0' in irq_dest_compatible:
                 irq_dest_nodes[i] = mcu
 
         # assign IRQ signals (but not when using TrivialUart or PythonPeripheral)
