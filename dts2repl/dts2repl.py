@@ -202,11 +202,11 @@ def get_uart(dts_filename, only_compatible = False):
     # u-boot HACK: for "phytec,rk3288-pcm-947" hardcoded uart2 is used
     try:
         compats = get_node_prop(dt.get_node('/'), 'compatible', [])
-        if any(compat == "phytec,rk3288-pcm-947" for compat in compats): 
+        if any(compat == "phytec,rk3288-pcm-947" for compat in compats):
             return "uart2"
     except Exception:
         pass
-    
+
     # Then, chosen bootargs = "console=ttymxc1,115200";
     # ttymxc<i> = serial<i+1>
     try:
@@ -218,7 +218,7 @@ def get_uart(dts_filename, only_compatible = False):
         for node in dt.node_iter():
             node_lower = node.name.lower()
             if not (node_lower.startswith('serial') or
-                   (node_lower.startswith('uart') and not node_lower.endswith('grp')) 
+                   (node_lower.startswith('uart') and not node_lower.endswith('grp'))
             ):
             # HACK: in u-boot some pinctrl nodes are called "uartXgrp" and they shouldn't be taken into account
                 continue
@@ -232,16 +232,16 @@ def get_uart(dts_filename, only_compatible = False):
     try:
         for node in dt.node_iter():
             compats = get_node_prop(node, 'compatible')
-            if any(x in node.name.lower() for x in ('uart', 'usart', 'serial')): 
+            if any(x in node.name.lower() for x in ('uart', 'usart', 'serial')):
                 if any(keyword in node.name.lower() for keyword in ('clkuart', 'serial-flash')):
-                    continue   
+                    continue
                 if not is_disabled(node) and 'reg' in node.props:
                     return verify_and_return_node(node)
     except Exception:
        pass
 
     # Last check, search the generated repl itself for something UART look-alike
-    UART_BACKUP_REGEX=re.compile(r"(?P<name>[0-9A-Za-z]+):\s+UART.")   
+    UART_BACKUP_REGEX=re.compile(r"(?P<name>[0-9A-Za-z]+):\s+UART.")
     node = UART_BACKUP_REGEX.search(repl)
     if node is not None:
         return node.group('name')
@@ -345,7 +345,7 @@ def get_node_prop(node, prop, default=None, inherit=False):
         return get_interrupts_extended(val)
     elif prop in ('gpios',):
         fmt = 'pnn'
-        while len(fmt) * 4 < len(val.value): 
+        while len(fmt) * 4 < len(val.value):
             fmt += 'n'
         return get_prop_value(val, fmt)
     else:
@@ -711,14 +711,14 @@ class ReplFile:
     def filter_64bit_reg_peripherals(self) -> None:
         self.blocks = [
             block for block in self.blocks
-            if block.region is None or 
+            if block.region is None or
             all((block.region.end or address) <= 0x100000000
                 for address in block.region.addresses)
         ]
 
     def merge_registration_points_duplicates(self, sized: List[ReplBlock]):
         # merge overlapping memory with multiple registration points
-        # NOTE: this is a simplified solution 
+        # NOTE: this is a simplified solution
         # 1. will work for this case:
         # memory: Memory.MappedMemory @ { sysbus 0x0; sysbus 0x80000000 }
         #   size: 0x40000000
@@ -732,7 +732,7 @@ class ReplFile:
         # memory: Memory.MappedMemory @ { sysbus 0x0; sysbus 0x80000000 }
         #   size: 0x40000000
         # memory: Memory.MappedMemory @ { sysbus 0xb16b00b5; sysbus 0x80000000 }
-        #   size: 0x40000000 
+        #   size: 0x40000000
         # 0xb16b00b5 will be dropped and it'll output
         # memory: Memory.MappedMemory @ { sysbus 0x0; sysbus 0x80000000 }
         #   size: 0x40000000
@@ -748,7 +748,7 @@ class ReplFile:
             for target_block in sized_memory:
                 target_region = target_block.region
                 if (
-                    block.region.size == target_region.size 
+                    block.region.size == target_region.size
                     and set(block.region.addresses) & set(target_region.addresses)
                     and len(block.region.addresses) < len(target_region.addresses)
                 ):
@@ -942,14 +942,14 @@ def parse_overlay(path):
         # properties (such as `timeProvider: clint`) could be used to derive additional
         # dependency information here
         registration_point = node.group('registration_point')
-    
+
         # We treat multiple registration points as sysbus
         addresses = []
         if registration_point == '{':
             points = OVERLAY_MULTIPLE_REG.findall(non_comment_lines[0])
             registration_point = 'sysbus'
             addresses = sorted([int(m[2], 0) for m in points]) # m[2] = address
-            
+
         region = None
         if registration_point:
             # Only creating entries actually provide the name
@@ -959,7 +959,7 @@ def parse_overlay(path):
                 if len(addresses) == 0:
                     addresses = [0]
                 addresses[0] = int(node.group('address'), 0)
-            
+
             if len(addresses) != 0:
                 region = RegistrationRegion(addresses=addresses, registration_point=registration_point)
                 for line in part:
@@ -1108,7 +1108,7 @@ def generate(filename, override_system_clock_frequency=None):
         # get model name and addr
         _, _, addr = node.name.partition('@')
 
-        # Attempt to retrieve the first element from the "reg" property 
+        # Attempt to retrieve the first element from the "reg" property
         # and verify whether the `unit-address` matches it. If not,
         # display a warning and prefer the addr from reg.
         try:
@@ -1144,8 +1144,8 @@ def generate(filename, override_system_clock_frequency=None):
         indent = []
 
         if model in ("CPU.ARMv7A",):
-            address_space_32bit = True 
-        
+            address_space_32bit = True
+
         # special handling of 'st,stm32-ethernet' compat. Sometimes the 'mac' node is a child of the 'ethernet' node,
         # and has no address specified. If possible, extract the addr from the parent node.
         if compat == 'st,stm32-ethernet' and not addr:
@@ -1540,7 +1540,7 @@ def generate(filename, override_system_clock_frequency=None):
                 port_index = int((gpio_addr - gpio_base_addr - 0x1700) / 0x4)
                 num = port_index * 32 + num
                 gpio = gpio.parent
-            
+
             gpio_model = get_model(gpio)
             if not gpio_model or not gpio_model.startswith("GPIO"):
                 # don't add invalid GPIO connections
@@ -1724,7 +1724,7 @@ def generate(filename, override_system_clock_frequency=None):
                 if irq_name is None:
                     continue
                 if irq in visited_irqs:
-                    # some u-boot peripherals contain duplicated irqs in device trees e.g. 
+                    # some u-boot peripherals contain duplicated irqs in device trees e.g.
                     # https://github.com/u-boot/u-boot/blob/69bd83568c57813cd23bc2d100c066a17e7e349d/dts/upstream/src/riscv/microchip/mpfs-icicle-kit.dts#L86
                     continue
                 # assume very large IRQ numbers which have all bits set (i.e. 2^n - 1) are invalid
