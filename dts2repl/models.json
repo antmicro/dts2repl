@@ -332,7 +332,7 @@
     "renesas,ra-sci" :  { "renesas,ra8|renesas,ra8m1" : { "type" : "UART.RenesasRA8M1_SCI", "frequency": 48000000, "irq_mappings": ["ReceiveIRQ", "TransmitIRQ", "TransmitEndIRQ", null] },
                           "_": { "type" : "SCI.RenesasRA6M5_SCI", "frequency": 48000000, "enableManchesterMode" : false, "enableFIFO" : true, "irq_mappings": ["ReceiveIRQ", "TransmitIRQ", "TransmitEndIRQ", null ] } },
     "renesas,scif-r9a07g044" : { "type": "SCI.RenesasRZG_SCIFA", "frequency": 100000000, "irq_mappings": ["0", "2", "3", "1", "4"] },
-    "renesas,rz-scif-uart": { "type": "SCI.RenesasRZG_SCIFA", "frequency": 100000000, "irq_mappings": ["0", "2", "3", "1", "4"] },
+    "renesas,rz-scif-uart": { "type": "SCI.RenesasRZG_SCIFA", "frequency": 100000000, "irq_mappings": ["0", "1", "2", "3", "4"] },
     "renesas,ra-timer" : "Timers.RenesasRA_GPT",
     "renesas,smartbond-timer" : "Timers.RenesasDA14_GPT",
     "renesas,ra-clock-generation-circuit": { "type": "Python.PythonPeripheral", "size": 0x40, "initable": false, "script": "request.value = 0xFFFFFFFF" },
