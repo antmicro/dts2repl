@@ -1,4 +1,1 @@
-sysbus:
-    init add:
-        Tag <0x4008010C 4> "OSC_ID" 0xFFFFFFFF
-        Tag <0x40007400 4> "MCHP_RTMR_BASE" 0xFFFFFFFF
+microchip,mec172xnsz.repl
