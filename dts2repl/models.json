@@ -329,6 +329,7 @@
     "renesas,rcar-gen3-i2c": { "type": "Python.PythonPeripheral", "size": 0x40, "initable": true, "script": "request.value = 0x59" },
     "renesas,rcar-gen3-iic": { "type": "Python.PythonPeripheral", "size": 0x425, "initable": true, "script": "request.value = 0x1" },
     "renesas,ra-interrupt-controller-unit" : "IRQControllers.RenesasRA_ICU",
+    "renesas,rz-sci": {"type":"UART.Renesas_SCI", "irq_mappings": [null, "RxIRQ", "TxIRQ", "TxEndIRQ"]},
     "renesas,ra-sci" :  { "renesas,ra8|renesas,ra8m1" : { "type" : "UART.RenesasRA8M1_SCI", "frequency": 48000000, "irq_mappings": ["ReceiveIRQ", "TransmitIRQ", "TransmitEndIRQ", null] },
                           "_": { "type" : "SCI.RenesasRA6M5_SCI", "frequency": 48000000, "enableManchesterMode" : false, "enableFIFO" : true, "irq_mappings": ["ReceiveIRQ", "TransmitIRQ", "TransmitEndIRQ", null ] } },
     "renesas,scif-r9a07g044" : { "type": "SCI.RenesasRZG_SCIFA", "frequency": 100000000, "irq_mappings": ["0", "2", "3", "1", "4"] },
