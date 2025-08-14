@@ -1,0 +1,4 @@
+sysbus:
+    init add:
+        Tag <0x58024800 4> "PWR_CR1_DBP_SET" 0x100
+        Tag <0x58024814 4> "CSR4.VOSRDY" 0x2
