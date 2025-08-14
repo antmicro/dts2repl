@@ -1,13 +1,7 @@
-pwrVosRdy: Python.PythonPeripheral @ sysbus 0x58024818
-    size: 0x4
-    initable: false
-    //  Bit 13 - D3CR.VOSRDY
-    script: "request.value = 0x2000"
-
 cpu0:
     numberOfMPURegions: 16
 
 sysbus:
     init add:
         Tag <0x58024800 4> "PWR_CR1_DBP_SET" 0x100
-        
+        Tag <0x58024818 4> "D3CR.VOSRDY" 0x2000
