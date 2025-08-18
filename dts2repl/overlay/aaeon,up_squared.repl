@@ -16,7 +16,7 @@ else:
 '''
 
 sysbus:
-    init:
+    init add:
         Tag <0xE0000020 1> "PIC1_CMD"
         Tag <0xE0000021 1> "PIC1_DATA"
         Tag <0xE00000A0 1> "PIC2_CMD"

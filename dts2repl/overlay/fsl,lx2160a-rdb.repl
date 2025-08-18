@@ -6,7 +6,7 @@ reserved: Memory.MappedMemory @ sysbus 0x16000000
     size: 0x8000000
 
 sysbus:
-    init:
+    init add:
         Tag <0x1E00740 0x4> "TP_ITYP0" 0x0
         Tag <0x1E0074C 0x4> "TP_ITYP1" 0x1
         Tag <0x1E00100 0x4> "RCWSR1" 0x0

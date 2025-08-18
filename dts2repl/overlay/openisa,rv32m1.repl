@@ -25,7 +25,7 @@ if request.isWrite: regs[request.offset >> 2] = request.value
 '''
 
 sysbus: 
-    init:
+    init add:
         ApplySVD @https://dl.antmicro.com/projects/renode/svd/RV32M1_RI5CY.svd.gz
         Tag <0x4002C200 4> "SIRCCSR" 0xFFFFFFFF          
         Tag <0x4002C300 4> "FIRCCSR" 0xFFFFFFFF          
