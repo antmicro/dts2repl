@@ -1,0 +1,4 @@
+sysbus:
+    init add:
+        Tag <0x4002A100 0x4> "MXC_ICC_RevA_Enable" 0xFFFFFFFF
+
