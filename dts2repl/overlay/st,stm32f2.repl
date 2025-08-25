@@ -3,6 +3,3 @@ pwr: Python.PythonPeripheral @ sysbus 0x40007000
     initable: true
     filename: "scripts/pydev/flipflop.py"
 
-sysbus:
-    init add:
-        ApplySVD @https://dl.antmicro.com/projects/renode/svd/STM32F40x.svd.gz
