@@ -1,5 +1,5 @@
-PWR_VOSR: Python.PythonPeripheral @ sysbus 0x4602080C
-    size: 0x4
+pwr: Python.PythonPeripheral @ sysbus 0x46020800
+    size: 0x400
     initable: true
     filename: "scripts/pydev/flipflop.py"
 
