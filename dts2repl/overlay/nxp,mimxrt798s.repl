@@ -1,6 +1,11 @@
+xspi1:
+    init:
+        // HAL: First 0x1000 of XSPI controllers is a configuration range.
+        // From dts2repl perspective this is just memory, so tags can't be used.
+        // Configuration must be overridden by writing directly to memory.
+        WriteDoubleWord 0x12C 0xFFFFFFFF
+
 sysbus:
     init add:
         Tag <0x4018412c 0x4> "XSPI0_DLLSR_NON_SECURE" 0xffffffff 
-        Tag <0x4018512c 0x4> "XSPI1_DLLSR_NON_SECURE" 0xffffffff
         Tag <0x5018412c 0x4> "XSPI0_DLLSR_SECURE" 0xffffffff 
-        Tag <0x5018512c 0x4> "XSPI1_DLLSR_SECURE" 0xffffffff 
