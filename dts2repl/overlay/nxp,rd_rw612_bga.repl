@@ -6,5 +6,6 @@ resetController: Python.PythonPeripheral @ sysbus 0x50020000
 sysbus:
     init add:
         Tag <0x50031028 0x4> "PMU CAU_SLP_CTRL" 0xffffffff
+        Tag <0x5003103C 0x4> "PMU CTRL_X32K_RDY" 0xffffffff
         Tag <0x50003088 0x4> "SYSCTL2 PLL_CTRL" 0xffffffff
 
