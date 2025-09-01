@@ -1,0 +1,23 @@
+sysbus:
+    init add:        
+        Tag <0x445b1004 0x4> "busybit" 1
+        Tag <0x445B101C 0x4> "status" 0
+        Tag <0x445B1020 0x4> "content" 0xFF
+
+mu2msg: Python.PythonPeripheral @ sysbus 0x445B1014
+    size: 0x8 
+    initable: true
+    script: '''
+len = [12, 16, 8, 8, 8, 8, 8, 8, 8, 8]
+hdr = [20481, 20486, 25606, 25606, 25606, 25606, 25606, 25606, 25606, 25606]
+if request.isInit:
+    i_len = 0
+    i_hdr = 0
+elif request.isRead: 
+    if request.offset == int('0x0', 16): # len
+        request.value = len[i_len]
+        i_len = (i_len+1)%10
+    elif request.offset == int('0x4', 16): # hdr
+        request.value = hdr[i_hdr]
+        i_hdr = (i_hdr+1)%10
+'''
