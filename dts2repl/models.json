@@ -188,6 +188,7 @@
                        "_": "UART.GD32_UART" },
 
     "gpio-leds": "Miscellaneous.LED",
+    "gpio-keys":"Miscellaneous.Button",
 
     "ingenic,jz4780-uart": "UART.NS16550",
     "microchip,xec-uart": "UART.NS16550",

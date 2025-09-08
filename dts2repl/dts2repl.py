@@ -1066,10 +1066,15 @@ def generate(filename, override_system_clock_frequency=None):
         if compatible and 'gpio-leds' in compatible:
             logging.debug(f'Skipping LED parent node {node.name}')
             continue
+        elif compatible and 'gpio-keys' in compatible:
+            logging.debug(f'Skipping Button parent node {node.name}')
+            continue
         else:
             parent_compat = get_node_prop(node.parent, 'compatible', []) if node.parent else []
             # if the paren't compat string is the one for LEDs, move it down to each individual LED
             if 'gpio-leds' in parent_compat:
+                compatible = parent_compat
+            if 'gpio-keys' in parent_compat:
                 compatible = parent_compat
 
         if compatible is None:
@@ -1526,7 +1531,7 @@ def generate(filename, override_system_clock_frequency=None):
             i2c_addr = int(node.unit_addr, 16)
             regions = [RegistrationRegion(addresses=[i2c_addr], registration_point=i2c_name)]
 
-        if model == 'Miscellaneous.LED':
+        if model in ['Miscellaneous.LED', 'Miscellaneous.Button']:
             gpios = list(get_node_prop(node, 'gpios'))
             if not gpios:
                 logging.info(f'LED {node.name} has no gpios property, skipping...')
