@@ -29,4 +29,3 @@ sysbus:
         Tag <0xE0000CFC 4> "PCI_DATA"
         Tag <0xE0000070 1> "CMOS_ADDRESS"
         Tag <0xE0000071 1> "CMOS_DATA"
-        GenerateACPITable 0xe0000

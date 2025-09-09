@@ -667,6 +667,7 @@ class RegistrationRegion:
 class ReplFile:
     blocks: List[ReplBlock] = field(default_factory=list)
     tags: List[TagBlock] = field(default_factory=list)
+    init_elements: List[str] = field(default_factory=list)
 
 
     def get_block_by_name(self, name: str) -> Optional[ReplBlock]:
@@ -712,6 +713,8 @@ class ReplFile:
             generated_any = True
         return generated_any
 
+    def add_sysbus_init_element(self, init_element: str) -> None:
+        self.init_elements.append(init_element)
 
     def filter_available_blocks(self) -> None:
         available_blocks = []
@@ -867,6 +870,9 @@ class ReplFile:
             body = 'sysbus:\n    init:\n'
             for tag in grouped_tags:
                 body += 8 * ' ' + str(tag) + '\n'
+            if any(self.init_elements):
+                for init_elem in self.init_elements:
+                    body += 8 * ' ' + init_elem + '\n'
             body += '\n'
         body += '\n'.join([str(b) + '\n' for b in self.blocks])
         return body
@@ -1170,6 +1176,7 @@ def generate(filename, override_system_clock_frequency=None, manual_overlays=Non
                 logging.debug(f'main compat string is = {main_compatible}')
                 break
 
+    is_acpi_table_generated = False
     for node in nodes:
         # those memory peripherals sometimes require changing the sysbus address of this peripheral
         is_heuristic_memory = False
@@ -1621,20 +1628,30 @@ def generate(filename, override_system_clock_frequency=None, manual_overlays=Non
             lapic_name = f'intcloapic{cpu_number}'
             indent.append(f'lapic: {lapic_name}')
             dependencies.add(lapic_name)
+            
+            # Add ACPI Table only if there is more than 1 CPU
+            if len(node.parent.nodes) > 1:
+                if not is_acpi_table_generated:
+                    is_acpi_table_generated = True
+                    repl_file.add_sysbus_init_element("GenerateACPITable 0xe0000")
 
         if model == "CPU.Sparc":
             sysbus_endianness = ReplBlock('sysbus', None, {'sysbus'}, set(), ['sysbus:', '    Endianess: Endianess.BigEndian'])
             repl_file.add_block(sysbus_endianness)
 
         # Create 'model_name' only visible to 'cpu_name' at 'offset'
-        def create_per_cpu_model(cpu_name, model_name, csharp_model_name, offset, arguments):
+        def create_per_cpu_model(cpu_name, model_name, csharp_model_name, offset, arguments, irq):
             cpu_number = cpu_name[-1]
             model_name = f'{model_name}{cpu_number}'
             region = RegistrationRegion.to_repl([RegistrationRegion(offset, cpu=f'cpu{cpu_number}')])
             block = f'{model_name}: {csharp_model_name} @ {region}'
-            arguments = [f'    {key}: {val}' for key, val in arguments.items()]
-
-            repl_block = ReplBlock(model_name, csharp_model_name, {cpu_name}, {model_name}, [block, *arguments])
+            parsed_args = []
+            
+            if irq is not None:
+                parsed_args += [(f"    -> cpu{cpu_number}@{irq}")]
+            
+            parsed_args += [f'    {key}: {val}' for key, val in arguments.items()]
+            repl_block = ReplBlock(model_name, csharp_model_name, {cpu_name}, {model_name}, [block, *parsed_args])
             repl_file.add_block(repl_block)
 
         # For CortexM and x86_64 multi core systems, we generate the IRQ controllers
@@ -1643,11 +1660,10 @@ def generate(filename, override_system_clock_frequency=None, manual_overlays=Non
 
         # fake NVICs for multi-core ARM systems
         if model in ("CPU.CortexM") and name != "cpu0":
-            create_per_cpu_model(name, "nvic", "IRQControllers.NVIC", 0xe000e000, {})
+            create_per_cpu_model(name, "nvic", "IRQControllers.NVIC", 0xe000e000, {}, None)
 
-        # fake LAPICs for multi-core x86_64 systems
-        if model in ("CPU.X86_64") and name != "cpu0":
-            create_per_cpu_model(name, "intcloapic", "IRQControllers.LAPIC", 0xfee00000, {"id": name[-1]})
+        if model in ("CPU.X86_64"):
+            create_per_cpu_model(name, "intcloapic", "IRQControllers.LAPIC", 0xfee00000, { "id": name[-1] }, 0)
 
         # additional parameters for STM32F4_RCC
         if model == 'Miscellaneous.STM32F4_RCC':
@@ -1657,7 +1673,6 @@ def generate(filename, override_system_clock_frequency=None, manual_overlays=Non
         # Temporary solution until Zephyr merges model name in dts
         if model == "Timers.NEORV32_MachineSystemTimer":
             indent.append('-> cpu0@23')
-
 
         if compat == "openisa,rv32m1-intmux":
             interruptNumbers = [
@@ -1807,13 +1822,6 @@ def generate(filename, override_system_clock_frequency=None, manual_overlays=Non
             irq_dests = [(d, ps) for d, ps in get_node_prop(node, 'interrupts-extended') if len(ps) == 1]
             irq_dest_nodes = [d for d, _ in irq_dests]
             irq_numbers = [ps[0] for _, ps in irq_dests]
-        elif model == 'IRQControllers.LAPIC':
-            # Each CPU has it's own LAPIC
-            name += '0'
-            provides = {name}
-            indent.append('IRQ -> cpu0@0')
-            indent.append('id: 0')
-            dependencies.add('cpu0')
         elif 'virtio' in compat:
             _, irq_num, _, _ = get_node_prop(node.parent, "interrupts")
             irq_numbers.append(irq_num)
@@ -1882,9 +1890,6 @@ def generate(filename, override_system_clock_frequency=None, manual_overlays=Non
         # we generate it, when we parse the CPU nodes, by performing a look ahead into the tree
         if model == "Timers.ARM_GenericTimer":
             continue
-
-        if model == 'IRQControllers.LAPIC':
-            regions = [RegistrationRegion(addr, cpu='cpu0')]
 
         # devices other than CPUs require an address to register on the sysbus
         if any(r.registration_point == 'sysbus' and r.address is None for r in regions) and not model.startswith('CPU.'):
