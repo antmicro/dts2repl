@@ -1531,7 +1531,42 @@ def generate(filename, override_system_clock_frequency=None):
             i2c_addr = int(node.unit_addr, 16)
             regions = [RegistrationRegion(addresses=[i2c_addr], registration_point=i2c_name)]
 
-        if model in ['Miscellaneous.LED', 'Miscellaneous.Button']:
+        # handle Button
+        if model == 'Miscellaneous.Button':
+            gpios = list(get_node_prop(node, 'gpios'))
+            if not gpios:
+                logging.info(f'LED {node.name} has no gpios property, skipping...')
+                continue
+            gpio, num, gpio_flags = gpios[0][:3]
+            gpio_compat = get_node_prop(gpio, 'compatible', [])
+            if 'nxp,s32-gpio' in gpio_compat:
+                # We have to translate gpio pin to pad
+                gpio_addr = int(gpio.unit_addr, 16)
+                gpio_base_addr = gpio_addr & ~0xFFFF
+                port_index = int((gpio_addr - gpio_base_addr - 0x1700) / 0x4)
+                num = port_index * 32 + num
+                gpio = gpio.parent
+
+            gpio_model = get_model(gpio)
+            if not gpio_model or not gpio_model.startswith("GPIO"):
+                # don't add invalid GPIO connections
+                continue
+
+            active_low = (gpio_flags & 1) == 1
+            if active_low:
+                indent.append('invert: true')
+            gpio_name = name_mapper.get_name(gpio)
+            regions = [RegistrationRegion(num, registration_point=gpio_name)]
+
+            indent.append(f'-> {name}@{num}')
+
+            # gpio_connection = ReplBlock(gpio_name, None, {gpio_name, name}, set(),
+            #                             [f'{gpio_name}:', f'    {num} -> {name}@0'])
+            # repl_file.add_block(gpio_connection)
+
+
+        # handle LED
+        if model == 'Miscellaneous.LED':
             gpios = list(get_node_prop(node, 'gpios'))
             if not gpios:
                 logging.info(f'LED {node.name} has no gpios property, skipping...')
