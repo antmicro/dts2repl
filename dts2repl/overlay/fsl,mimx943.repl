@@ -14,10 +14,10 @@ if request.IsInit:
     i_len = 0
     i_hdr = 0
 elif request.IsRead:
-    if request.Offset == int('0x0', 16): # len
+    if request.Offset == 0x0: # len
         request.Value = len[i_len]
         i_len = (i_len+1)%10
-    elif request.Offset == int('0x4', 16): # hdr
+    elif request.Offset == 0x4: # hdr
         request.Value = hdr[i_hdr]
         i_hdr = (i_hdr+1)%10
 '''
