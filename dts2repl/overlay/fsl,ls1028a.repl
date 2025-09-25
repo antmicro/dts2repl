@@ -10,7 +10,7 @@ ocram: Memory.MappedMemory @ sysbus 0x18000000
 csrs: Python.PythonPeripheral @ sysbus 0x1e00300
     size: 0x100000
     initable: true
-    script: "request.value = 0x8f000011"
+    script: "request.Value = 0x8f000011"
 
 sysbus:
     init add:

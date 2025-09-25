@@ -8,4 +8,4 @@ sysbus:
 unknown5: Python.PythonPeripheral @ sysbus 0x50044010
     size: 0x4
     initable: true
-    script: "count = 0 if request.isInit else (count + 1);request.value = 0x2000000 if count < 2 else 0x5000000"
+    script: "count = 0 if request.IsInit else (count + 1);request.Value = 0x2000000 if count < 2 else 0x5000000"

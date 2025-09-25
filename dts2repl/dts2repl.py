@@ -1342,27 +1342,27 @@ def generate(filename, override_system_clock_frequency=None):
             indent.append('// 0x180: tempsense0')
             indent.append('// 0x260: digprog, report mx6sl (0x60)')
             indent.append('// 0x280: digprog_sololite, report mx6sl (0x60)')
-            indent.append('script: "request.value = {0x10: 0x80000000, 0xe0: 0x80000000, 0x100: 0xffffffff, 0x150: 0x80, 0x180: 0x4, 0x260: 0x600000, 0x280: 0x600000}.get(request.offset, 0)"')
+            indent.append('script: "request.Value = {0x10: 0x80000000, 0xe0: 0x80000000, 0x100: 0xffffffff, 0x150: 0x80, 0x180: 0x4, 0x260: 0x600000, 0x280: 0x600000}.get(request.Offset, 0)"')
         elif compat == 'fsl,imx6q-mmdc':
             indent.append('size: 0x4000')
             indent.append('initable: false')
             indent.append('// 0x0: ctl')
             indent.append('// 0x18: misc')
             indent.append('// these settings mean 256 MB of DRAM')
-            indent.append('script: "request.value = {0x0: 0x4000000, 0x18: 0x0}.get(request.offset, 0)"')
+            indent.append('script: "request.Value = {0x0: 0x4000000, 0x18: 0x0}.get(request.Offset, 0)"')
         elif compat.startswith('fsl,imx') and compat.endswith('-ccm'):
             indent.append('size: 0x4000')
             indent.append('initable: false')
             indent.append('// 0x14: cbcdr')
             indent.append('// 0x18: cbcmr')
             indent.append('// 0x1c: cscmr1')
-            indent.append('script: "request.value = {0x14: 3<<8 | 7<<10, 0x18: 2<<12, 0x1c: 0x3f}.get(request.offset, 0)"')
+            indent.append('script: "request.Value = {0x14: 3<<8 | 7<<10, 0x18: 2<<12, 0x1c: 0x3f}.get(request.Offset, 0)"')
         elif compat == 'marvell,mbus-controller':
             indent.append('size: 0x200')
             indent.append('initable: false')
             indent.append('// 0x180: win_bar')
             indent.append('// 0x184: win_sz')
-            indent.append('script: "request.value = {0x180: 0x0, 0x184: 0xf000001}.get(request.offset, 0)"')
+            indent.append('script: "request.Value = {0x180: 0x0, 0x184: 0xf000001}.get(request.Offset, 0)"')
         elif compat == 'xlnx,zynqmp-ipi-mailbox':
             # the address of the Xilinx ZynqMP IPI mailbox is defined in its child node
             for child in node.nodes.values():

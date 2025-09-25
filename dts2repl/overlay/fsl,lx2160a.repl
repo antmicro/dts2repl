@@ -5,10 +5,10 @@ immap: Python.PythonPeripheral @ sysbus 0x1000000
     size: 0x1000000
     initable: true
     script: '''
-if request.offset == 0xe00218L:
-    request.value = 0
+if request.Offset == 0xe00218L:
+    request.Value = 0
 else:
-    request.value = 0x80000011
+    request.Value = 0x80000011
 '''
 
 gic: IRQControllers.ARM_GenericInterruptController @ {
@@ -35,12 +35,12 @@ ccn508: Python.PythonPeripheral @ {
     size: 0x4
     initable: true
     script: '''
-if request.isInit:
+if request.IsInit:
     lastVal = False
 else:
     lastVal = not lastVal
 if not lastVal:
-    request.value = 0x4
+    request.Value = 0x4
 else:
-    request.value = 0xC
+    request.Value = 0xC
 '''
