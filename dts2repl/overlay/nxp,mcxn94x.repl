@@ -1,0 +1,17 @@
+spc: Python.PythonPeripheral @ sysbus 0x50045000
+    size: 0x1000
+    initable: true
+    filename: "scripts/pydev/flipflop.py"
+
+scg_rccr: Python.PythonPeripheral @ sysbus 0x50044010
+    size: 0x4
+    initable: true
+    script: "count = 0 if request.IsInit else (count + 1);request.Value = 0x2000000 if count < 2 else 0x5000000"
+
+sysbus:
+    init add:
+        Tag <0x50044100 0x4> "SCG_SOSCCSR_SOSCVLD" 0x1000000
+        Tag <0x50044100 0x4> "SCG_SOSCCSR_SOSCVLD" 0x1000000
+        Tag <0x50044300 0x4> "SPC_FIRCCSR_FIRCVLD" 0x1000000
+        Tag <0x50044500 0x4> "APPL_LOCK_0" 0x1000000
+        Tag <0x50044600 0x4> "APPL_LOCK_1" 0x1000000
