@@ -188,6 +188,10 @@
                        "_": "UART.GD32_UART" },
 
     "gpio-leds": "Miscellaneous.LED",
+    
+    "virtio,console": "Miscellaneous.VirtIOMMIOConsole",
+    "virtio,entropy": "Miscellaneous.VirtIOMMIOEntropy",
+
 
     "ingenic,jz4780-uart": "UART.NS16550",
     "microchip,xec-uart": "UART.NS16550",

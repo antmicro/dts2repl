@@ -1172,7 +1172,10 @@ def generate(filename, override_system_clock_frequency=None):
 
         # special handling of 'st,stm32-ethernet' compat. Sometimes the 'mac' node is a child of the 'ethernet' node,
         # and has no address specified. If possible, extract the addr from the parent node.
-        if compat == 'st,stm32-ethernet' and not addr:
+        # MMIO Virtio Devices have their address (and interrupts) defined in the parent-node
+        # If there ever is a PCI implementation for virtio devices, additional compat-strings, or the parents compat string
+        # would also have to be checked
+        if compat in ('st,stm32-ethernet', 'virtio,console', 'virtio,entropy') and not addr:
             if not (parent := node.parent):
                 logging.warning(f'Unable to find address for {compat}. Dropping {model}')
                 continue
@@ -1686,6 +1689,10 @@ def generate(filename, override_system_clock_frequency=None):
             indent.append('IRQ -> cpu0@0')
             indent.append('id: 0')
             dependencies.add('cpu0')
+        elif 'virtio' in compat:
+            _, irq_num, _, _ = get_node_prop(node.parent, "interrupts")
+            irq_numbers.append(irq_num)
+            irq_dest_nodes.append(get_node_prop(node, 'interrupt-parent', inherit=True))
 
         for i, irq_dest_node in enumerate(irq_dest_nodes):
             irq_dest_compatible = get_node_prop(irq_dest_node, 'compatible', [])
