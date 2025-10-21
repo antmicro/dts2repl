@@ -498,7 +498,7 @@ def get_interrupts_extended(val):
         dest = phandle2node[cells[0]]
         interrupt_cells = get_node_prop(dest, '#interrupt-cells')
         if not interrupt_cells:
-            logging.warn(f'Failed to parse interrupts_extended for {node.path}: {dest.path} has no #interrupt-cells')
+            logging.warning(f'Failed to parse interrupts_extended for {node.path}: {dest.path} has no #interrupt-cells')
             return
         params = cells[1:1 + interrupt_cells]
         cells = cells[1 + interrupt_cells:]
@@ -545,7 +545,7 @@ class NameMapper:
             # peripherals like interrupt controllers
             name = NameMapper.OVERRIDES[model]
             if name in self._counter:
-                logging.warn(f'Node {node.path} had duplicate overridden name {name}')
+                logging.warning(f'Node {node.path} had duplicate overridden name {name}')
 
         # "timer" becomes "timer1", "timer2", etc
         # if we have "timer" -> "timer1" but there was already a peripheral named "timer1",
@@ -1174,7 +1174,7 @@ def generate(filename, override_system_clock_frequency=None):
         # and has no address specified. If possible, extract the addr from the parent node.
         if compat == 'st,stm32-ethernet' and not addr:
             if not (parent := node.parent):
-                logging.warn(f'Unable to find address for {compat}. Dropping {model}')
+                logging.warning(f'Unable to find address for {compat}. Dropping {model}')
                 continue
             _, _, addr = parent.name.partition('@')
 
@@ -1329,11 +1329,11 @@ def generate(filename, override_system_clock_frequency=None):
             children = node.nodes.values()
             child = next(iter(children), None)
             if child == None:
-                logging.warn(f'{model} should have exactly one flash child node, but got none. Dropping {model}')
+                logging.warning(f'{model} should have exactly one flash child node, but got none. Dropping {model}')
                 repl_file.try_generate_tag(node)
                 continue
             if len(children) > 1:
-                logging.warn(f'{model} should have only one flash assigned, but got: {[c.name for c in children]}. Selecting {child.name}.')
+                logging.warning(f'{model} should have only one flash assigned, but got: {[c.name for c in children]}. Selecting {child.name}.')
             child_name = name_mapper.get_name(child)
             indent.append(f'flash: {child_name}')
             dependencies.add(child_name)
