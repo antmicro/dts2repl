@@ -70,6 +70,10 @@ def parse_args():
                         action='store',
                         default=None,
                         help='Override default system clock frequency.')
+    parser.add_argument('--manual-overlay',
+                        action='append',
+                        metavar='STRING',
+                        help='Manual overlay string. Can be used multiple times.')
 
     args = parser.parse_args()
 
@@ -1050,11 +1054,20 @@ def get_overlays(dt):
     return set(soc + platform)
 
 
-def generate(filename, override_system_clock_frequency=None):
+def generate(filename, override_system_clock_frequency=None, manual_overlays=None):
     name_mapper = NameMapper()
     dt = get_dt(filename)
     if dt is None:
         return ''
+
+    if manual_overlays is None:
+        manual_overlays = set()
+    elif isinstance(manual_overlays, str):
+        manual_overlays = {manual_overlays}
+    elif isinstance(manual_overlays, list):
+        manual_overlays = set(manual_overlays)
+    elif not isinstance(manual_overlays, set):
+        raise TypeError("Optional parameter 'manual_overlays' must be one of: None, str, list, or set.")
 
     # `sysbus` and `none` are registration points provided by Renode itself
     repl_file = ReplFile()
@@ -1069,7 +1082,7 @@ def generate(filename, override_system_clock_frequency=None):
     logging.debug(f'mcu_compat: {mcu_compat}')
 
     # get overlays
-    overlays = get_overlays(dt)
+    overlays = get_overlays(dt) | manual_overlays
     address_space_32bit = False
 
     main_compatible = None
@@ -2206,7 +2219,13 @@ def main():
     if args.output == "-":
        args.output = "/dev/stdout"
     with open(args.output, 'w') as f:
-        f.write(generate(args.filename, args.override_system_clock_frequency))
+        f.write(
+            generate(
+                args.filename,
+                args.override_system_clock_frequency,
+                args.manual_overlay,
+            )
+        )
 
 if __name__ == "__main__":
     main()
