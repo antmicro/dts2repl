@@ -1238,7 +1238,7 @@ def generate(filename, override_system_clock_frequency=None, manual_overlays=Non
                 soc_compat = get_node_prop(dt.get_node('/soc'), 'compatible', [])
             else:
                 soc_compat = []
-            if model == 'GPIOPort.NRF52840_GPIO' and 'nordic,nrf52' in soc_compat:
+            if model == 'GPIOPort.NRF52840_GPIO' and ('nordic,nrf52' in soc_compat or 'nrf52' in overlays):
                 addr += 0x500
 
             if (
