@@ -1,6 +1,13 @@
+SCG0CSR_CLK_SPOOF: Python.PythonPeripheral @ sysbus 0x4008F010
+    size: 0x4
+    initable: true
+    script: '''
+if request.IsInit: tick = False
+if request.IsRead: request.Value = 0x3000000 if tick else 0x2000000; tick = not tick
+'''
+
 sysbus:
     init add:
         Tag <0x40090040 0x4> "SRAMCTL_ACK" 0x80000000
-        Tag <0x4008F300 0x4> "FIRCCSR_VALID" 0x1000000
+        Tag <0x4008F300 0x4> "FIRCCSR_VALID" 0x81000000
         Tag <0x4008F200 0x4> "SIRCCSR_VALID" 0x1000000
-        Tag <0x4008F010 0x4> "SCG0CSR_CLK_SPOOF" 0x03000000
