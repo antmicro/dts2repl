@@ -419,7 +419,10 @@
     "silabs,gecko-leuart": "UART.LEUART",
     "silabs,gecko-uart": "UART.EFM32_UART",
     "silabs,gecko-usart": { "silabs,efr32bg22|silabs,efr32mg24|silabs,efr32mg21|silabs,efr32bg27": "UART.EFR32xG22_USART", "_": "UART.EFR32_USART" },
-    "silabs,usart-uart": { "silabs,efr32bg22|silabs,efr32mg24|silabs,efr32mg21|silabs,efr32bg27": "UART.EFR32xG22_USART", "_": "UART.EFR32_USART" },
+    "silabs,usart-uart": {
+        "silabs,efr32bg22|silabs,efr32mg24|silabs,efr32mg21|silabs,efr32bg27|silabs,mgm240sd22vna": "UART.EFR32xG22_USART",
+        "_": "UART.EFR32_USART"
+    },
     "silabs,gecko-gpio-port": "GPIOPort.EFR32_GPIOPort",
     "silabs,gecko-burtc": "Timers.EFR32xG2_BURTC",
     "silabs,si32-usart": "UART.SI32_USART",

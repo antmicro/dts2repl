@@ -1,0 +1,5 @@
+UNKNOWN: Python.PythonPeripheral @ sysbus 0x50004084
+    size: 0x4
+    initable: true
+    filename: "scripts/pydev/counter.py"
+
