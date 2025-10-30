@@ -462,9 +462,12 @@
     "st,stm32wba-flash-controller": "MTD.STM32WBA_FlashController",
 
     "st,stm32-nv-flash": "Memory.MappedMemory",
-    "st,stm32-rcc": { "st,stm32g0|st,stm32g4|st,stm32l1|st,stm32l4|st,stm32l5" : {"type": "Python.PythonPeripheral", "size": 0x400, "initable": true, "filename": "scripts/pydev/flipflop.py" },
-                      "st,stm32l0" : "Miscellaneous.STM32L0_RCC",
-                      "_" : "Miscellaneous.STM32F4_RCC" },
+    "st,stm32-rcc": {
+        "st,stm32g0|st,stm32g4|st,stm32l1|st,stm32l4|st,stm32l5" : {"type": "Python.PythonPeripheral", "size": 0x400, "initable": true, "filename": "scripts/pydev/flipflop.py" },
+        "st,stm32f1|st,stm32f3": { "type": "Python.PythonPeripheral", "size": 0x400, "initable": true, "filename": "scripts/pydev/rolling-bit.py" },
+        "st,stm32l0": "Miscellaneous.STM32L0_RCC",
+        "_" : "Miscellaneous.STM32F4_RCC"
+    },
     "st,stm32-rng": "Miscellaneous.STM32F4_RNG",
     "st,stm32-rtc": "Timers.STM32F4_RTC",
     "st,stm32-spi": "SPI.STM32SPI",
