@@ -52,18 +52,6 @@ try_build() {
     git submodule update --init --recursive || exit 1
 
     git fetch --all 1>/dev/null 2>/dev/null
-    RENODE_HASH=$(git rev-parse HEAD)
-
-    git branch -a --contains "$RENODE_VERSION" | grep 'renode_github'
-    if [ $? -ne 0 ]; then
-        printf "\033[0;31mRENODE COMMIT %s IS *NOT* PRESENT ON THE PUBLIC GITHUB\033[0m\n" "$RENODE_HASH"
-    fi
-
-    git branch -r --contains "$RENODE_HASH" | grep 'renode_github/master'
-    if [ $? -eq 0 ]; then
-        PUBLIC_MASTER=true
-        printf "\033[0;32mRENODE COMMIT %s IS PRESENT ON THE PUBLIC GITHUB MASTER BRANCH\033[0m\n" "$RENODE_HASH"
-    fi
 
     ./build.sh --net 1>../renode-build.log 2>&1 || return $?
     pip install -r tests/requirements.txt
