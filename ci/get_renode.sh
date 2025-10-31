@@ -18,7 +18,7 @@ try_download() {
         return 1
     fi
 
-    curl -kLsf -o 'renode-portable.tar.gz' https://dl.antmicro.com/projects/renode/builds/sha/renode-"$VERSION"+git"${RENODE_VERSION:0:9}".linux-portable.tar.gz
+    curl -kLsf -o 'renode-portable.tar.gz' https://builds.renode.io/sha/renode-"$VERSION"+git"${RENODE_VERSION:0:9}".linux-portable.tar.gz
 
     if [ $? -eq 0 ]; then
         echo "Precompiled package for renode commit ${RENODE_VERSION} downloaded."
