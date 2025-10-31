@@ -18,7 +18,7 @@ try_download() {
         return 1
     fi
 
-    curl -kLsf -o 'renode-portable.tar.gz' https://builds.renode.io/sha/renode-"$VERSION"+git"${RENODE_VERSION:0:9}".linux-portable.tar.gz
+    curl -kLsf -o 'renode-portable.tar.gz' https://builds.renode.io/sha/renode-"$VERSION"+git"${RENODE_VERSION:0:9}".linux-portable-dotnet.tar.gz
 
     if [ $? -eq 0 ]; then
         echo "Precompiled package for renode commit ${RENODE_VERSION} downloaded."
@@ -65,7 +65,7 @@ try_build() {
         printf "\033[0;32mRENODE COMMIT %s IS PRESENT ON THE PUBLIC GITHUB MASTER BRANCH\033[0m\n" "$RENODE_HASH"
     fi
 
-    ./build.sh 1>../renode-build.log 2>&1 || return $?
+    ./build.sh --net 1>../renode-build.log 2>&1 || return $?
     pip install -r tests/requirements.txt
 
     cd ..
