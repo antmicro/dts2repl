@@ -29,11 +29,12 @@ cd ci-output
                 CMDLINE+=("--$key=$value")
             done
         fi
-        echo "Generating for $NAME"
+        echo -n "Generating for $NAME"
         if [ ${#CMDLINE[@]} -eq 0  ]; then
+            echo
             dts2repl ../../dts/"$NAME".dts --output "$NAME".repl
         else 
-            echo "with custom command-line $CMDLINE"
+            echo " with custom command-line ${CMDLINE[*]}"
             dts2repl ../../dts/"$NAME".dts --output "$NAME".repl "${CMDLINE[@]}"
         fi
     }
