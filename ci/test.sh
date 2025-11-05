@@ -14,6 +14,7 @@ cd ci-output
     cd repls/generated
 
     # shellcheck disable=SC2317
+    # shellcheck disable=SC2329
     generate() {
         file=$1
 
