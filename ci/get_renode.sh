@@ -28,7 +28,7 @@ try_download() {
         RENODE_LOCATION=$(realpath renode-portable)
         echo "Renode portable is now in ${RENODE_LOCATION}"
         echo ${RENODE_LOCATION} > ${CI_PROJECT_DIR}/renode-location
-        pip install -r renode-portable/tests/requirements.txt
+        pip install -r renode-portable/tests/requirements.txt > /dev/null
         return 0
     else
         echo "No package with version ${RENODE_VERSION} found! (failed to download package)"
@@ -54,7 +54,7 @@ try_build() {
     git fetch --all 1>/dev/null 2>/dev/null
 
     ./build.sh --net 1>../renode-build.log 2>&1 || return $?
-    pip install -r tests/requirements.txt
+    pip install -r tests/requirements.txt > /dev/null
 
     cd ..
     return 0
