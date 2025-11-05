@@ -20,10 +20,4 @@ fi
 mv replkit/*.version .
 
 # Remove the leftovers
-rm replkit/*.repl
-rm replkit/*.dts
-
-rmdir replkit 2>/dev/null || {
-    echo replkit had unexpected files:
-    ls -l replkit
-}
+rm -r replkit
