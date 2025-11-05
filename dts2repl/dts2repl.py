@@ -48,7 +48,7 @@ def parse_args():
                         default='warning',
                         help='Provide logging level. Example --loglevel debug, default=warning',
                         choices=['info', 'warning', 'debug', 'error'])
-    parser.add_argument('--output',
+    parser.add_argument('-o', '--output',
                         default='output.repl',
                         help='Output filename')
     parser.add_argument('--include',
