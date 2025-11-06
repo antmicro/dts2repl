@@ -24,10 +24,20 @@ cd ci-output
 
         # Assemble cmdline based on config
         if [ -f "$CONFIG" ]; then
-            for key in $(jq 'keys[]' "$CONFIG" | tr -d '"'); do
-                value=$(jq --arg v "$key" '.[$v]' "$CONFIG" | tr -d '"')
-                CMDLINE+=("--$key=$value")
-            done
+            while IFS= read -r key; do
+                value=$(jq -c --arg k "$key" '.[$k]' "$CONFIG")
+                if [[ "$value" =~ ^\[.*\]$ ]]; then
+                    # List handling
+                    # { item: [value1, value 2] } -> --item value1 --item value2
+                    for item in $(jq -r --arg k "$key" '.[$k][]' "$CONFIG"); do
+                        CMDLINE+=("--$key" "$item")
+                    done
+                else
+                    # Scalar handling:
+                    # { item: value } -> --item=value
+                    CMDLINE+=("--$key" "$(jq -r --arg k "$key" '.[$k]' "$CONFIG")")
+                fi
+            done < <(jq -r 'keys[]' "$CONFIG")
         fi
         echo -n "Generating for $NAME"
         if [ ${#CMDLINE[@]} -eq 0  ]; then
