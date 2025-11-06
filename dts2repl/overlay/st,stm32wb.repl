@@ -1,0 +1,6 @@
+sysbus:
+    init add:
+        Tag <0x5800148C 4> "HSEM_UNLOCK1" 0x80000400
+        Tag <0x58001494 4> "HSEM_UNLOCK2" 0x80000400
+        Tag <0x580014A0 4> "HSEM_UNLOCK3" 0x80000400
+        Tag <0x58000400 0x4> "PWR_CR1" 0x100
