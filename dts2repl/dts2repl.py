@@ -70,7 +70,7 @@ def parse_args():
                         action='store',
                         default=None,
                         help='Override default system clock frequency.')
-    parser.add_argument('--manual-overlay',
+    parser.add_argument('--manual-overlay', '--manual-overlays',
                         action='append',
                         metavar='STRING',
                         help='Manual overlay string. Can be used multiple times.')
