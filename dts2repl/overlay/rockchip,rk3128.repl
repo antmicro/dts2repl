@@ -1,2 +1,0 @@
-cpu0_timer: Timers.ARM_GenericTimer @ cpu0
-    frequency: 62500000

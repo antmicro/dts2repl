@@ -17,14 +17,6 @@ dcfg: Python.PythonPeripheral @ sysbus 0x1EE0000
     initable: true
     script: "request.Value = 0x1100008f"
 
-timer: Timers.ARM_GenericTimer @ cpu0
-    frequency: 62500000
-    defaultCounterFrequencyRegister: 62500000
-    EL3PhysicalTimerIRQ->gic#0@29
-    EL1PhysicalTimerIRQ->gic#0@30
-    EL1VirtualTimerIRQ->gic#0@27
-    NonSecureEL2PhysicalTimerIRQ->gic#0@26
-
 sysbus:
     init add:
         Tag <0x43100e0 0x4> "TMU CSR" 0x280
