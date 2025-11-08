@@ -70,6 +70,10 @@ def parse_args():
                         action='store',
                         default=None,
                         help='Override default system clock frequency.')
+    parser.add_argument('--manual-overlay', '--manual-overlays',
+                        action='append',
+                        metavar='STRING',
+                        help='Manual overlay string. Can be used multiple times.')
 
     args = parser.parse_args()
 
@@ -84,6 +88,30 @@ def dump(obj):
     for attr in dir(obj):
         print("obj.%s = %r" % (attr, getattr(obj, attr)))
 
+
+def get_psci_method(dts_filename):
+    # This function will check if PSCI node is present in the DTS
+    # and return a string representing the PSCI call method, or None if the node is not present
+    try:
+        dt = dtlib.DT(dts_filename)
+    except FileNotFoundError:
+        logging.error(f'File not found: "{dts_filename}"')
+        return None
+    except Exception:
+        logging.exception('Error while parsing DT')
+        return None
+
+    def _try_get_psci_method(node_name):
+        try:
+            psci = dt.get_node(node_name)
+            return psci.props['method'].to_string()
+        except Exception:
+            return None
+
+    psci_method = _try_get_psci_method('/psci') or _try_get_psci_method('/firmware/psci')
+    if psci_method is None:
+        logging.warning('No psci node found')
+    return psci_method
 
 def get_cpu_dep_chain(arch, dts_filename, zephyr_path, chain):
     next_include = ''
@@ -474,7 +502,7 @@ def get_interrupts_extended(val):
         dest = phandle2node[cells[0]]
         interrupt_cells = get_node_prop(dest, '#interrupt-cells')
         if not interrupt_cells:
-            logging.warn(f'Failed to parse interrupts_extended for {node.path}: {dest.path} has no #interrupt-cells')
+            logging.warning(f'Failed to parse interrupts_extended for {node.path}: {dest.path} has no #interrupt-cells')
             return
         params = cells[1:1 + interrupt_cells]
         cells = cells[1 + interrupt_cells:]
@@ -521,7 +549,7 @@ class NameMapper:
             # peripherals like interrupt controllers
             name = NameMapper.OVERRIDES[model]
             if name in self._counter:
-                logging.warn(f'Node {node.path} had duplicate overridden name {name}')
+                logging.warning(f'Node {node.path} had duplicate overridden name {name}')
 
         # "timer" becomes "timer1", "timer2", etc
         # if we have "timer" -> "timer1" but there was already a peripheral named "timer1",
@@ -1026,11 +1054,20 @@ def get_overlays(dt):
     return set(soc + platform)
 
 
-def generate(filename, override_system_clock_frequency=None):
+def generate(filename, override_system_clock_frequency=None, manual_overlays=None):
     name_mapper = NameMapper()
     dt = get_dt(filename)
     if dt is None:
         return ''
+
+    if manual_overlays is None:
+        manual_overlays = set()
+    elif isinstance(manual_overlays, str):
+        manual_overlays = {manual_overlays}
+    elif isinstance(manual_overlays, list):
+        manual_overlays = set(manual_overlays)
+    elif not isinstance(manual_overlays, set):
+        raise TypeError("Optional parameter 'manual_overlays' must be one of: None, str, list, or set.")
 
     # `sysbus` and `none` are registration points provided by Renode itself
     repl_file = ReplFile()
@@ -1045,7 +1082,7 @@ def generate(filename, override_system_clock_frequency=None):
     logging.debug(f'mcu_compat: {mcu_compat}')
 
     # get overlays
-    overlays = get_overlays(dt)
+    overlays = get_overlays(dt) | manual_overlays
     address_space_32bit = False
 
     main_compatible = None
@@ -1153,9 +1190,12 @@ def generate(filename, override_system_clock_frequency=None):
 
         # special handling of 'st,stm32-ethernet' compat. Sometimes the 'mac' node is a child of the 'ethernet' node,
         # and has no address specified. If possible, extract the addr from the parent node.
-        if compat == 'st,stm32-ethernet' and not addr:
+        # MMIO Virtio Devices have their address (and interrupts) defined in the parent-node
+        # If there ever is a PCI implementation for virtio devices, additional compat-strings, or the parents compat string
+        # would also have to be checked
+        if compat in ('st,stm32-ethernet', 'virtio,console', 'virtio,entropy') and not addr:
             if not (parent := node.parent):
-                logging.warn(f'Unable to find address for {compat}. Dropping {model}')
+                logging.warning(f'Unable to find address for {compat}. Dropping {model}')
                 continue
             _, _, addr = parent.name.partition('@')
 
@@ -1203,7 +1243,7 @@ def generate(filename, override_system_clock_frequency=None):
                 soc_compat = get_node_prop(dt.get_node('/soc'), 'compatible', [])
             else:
                 soc_compat = []
-            if model == 'GPIOPort.NRF52840_GPIO' and 'nordic,nrf52' in soc_compat:
+            if model == 'GPIOPort.NRF52840_GPIO' and ('nordic,nrf52' in soc_compat or 'nrf52' in overlays):
                 addr += 0x500
 
             if (
@@ -1310,11 +1350,11 @@ def generate(filename, override_system_clock_frequency=None):
             children = node.nodes.values()
             child = next(iter(children), None)
             if child == None:
-                logging.warn(f'{model} should have exactly one flash child node, but got none. Dropping {model}')
+                logging.warning(f'{model} should have exactly one flash child node, but got none. Dropping {model}')
                 repl_file.try_generate_tag(node)
                 continue
             if len(children) > 1:
-                logging.warn(f'{model} should have only one flash assigned, but got: {[c.name for c in children]}. Selecting {child.name}.')
+                logging.warning(f'{model} should have only one flash assigned, but got: {[c.name for c in children]}. Selecting {child.name}.')
             child_name = name_mapper.get_name(child)
             indent.append(f'flash: {child_name}')
             dependencies.add(child_name)
@@ -1347,27 +1387,27 @@ def generate(filename, override_system_clock_frequency=None):
             indent.append('// 0x180: tempsense0')
             indent.append('// 0x260: digprog, report mx6sl (0x60)')
             indent.append('// 0x280: digprog_sololite, report mx6sl (0x60)')
-            indent.append('script: "request.value = {0x10: 0x80000000, 0xe0: 0x80000000, 0x100: 0xffffffff, 0x150: 0x80, 0x180: 0x4, 0x260: 0x600000, 0x280: 0x600000}.get(request.offset, 0)"')
+            indent.append('script: "request.Value = {0x10: 0x80000000, 0xe0: 0x80000000, 0x100: 0xffffffff, 0x150: 0x80, 0x180: 0x4, 0x260: 0x600000, 0x280: 0x600000}.get(request.Offset, 0)"')
         elif compat == 'fsl,imx6q-mmdc':
             indent.append('size: 0x4000')
             indent.append('initable: false')
             indent.append('// 0x0: ctl')
             indent.append('// 0x18: misc')
             indent.append('// these settings mean 256 MB of DRAM')
-            indent.append('script: "request.value = {0x0: 0x4000000, 0x18: 0x0}.get(request.offset, 0)"')
+            indent.append('script: "request.Value = {0x0: 0x4000000, 0x18: 0x0}.get(request.Offset, 0)"')
         elif compat.startswith('fsl,imx') and compat.endswith('-ccm'):
             indent.append('size: 0x4000')
             indent.append('initable: false')
             indent.append('// 0x14: cbcdr')
             indent.append('// 0x18: cbcmr')
             indent.append('// 0x1c: cscmr1')
-            indent.append('script: "request.value = {0x14: 3<<8 | 7<<10, 0x18: 2<<12, 0x1c: 0x3f}.get(request.offset, 0)"')
+            indent.append('script: "request.Value = {0x14: 3<<8 | 7<<10, 0x18: 2<<12, 0x1c: 0x3f}.get(request.Offset, 0)"')
         elif compat == 'marvell,mbus-controller':
             indent.append('size: 0x200')
             indent.append('initable: false')
             indent.append('// 0x180: win_bar')
             indent.append('// 0x184: win_sz')
-            indent.append('script: "request.value = {0x180: 0x0, 0x184: 0xf000001}.get(request.offset, 0)"')
+            indent.append('script: "request.Value = {0x180: 0x0, 0x184: 0xf000001}.get(request.Offset, 0)"')
         elif compat == 'xlnx,zynqmp-ipi-mailbox':
             # the address of the Xilinx ZynqMP IPI mailbox is defined in its child node
             for child in node.nodes.values():
@@ -1702,6 +1742,10 @@ def generate(filename, override_system_clock_frequency=None):
             indent.append('IRQ -> cpu0@0')
             indent.append('id: 0')
             dependencies.add('cpu0')
+        elif 'virtio' in compat:
+            _, irq_num, _, _ = get_node_prop(node.parent, "interrupts")
+            irq_numbers.append(irq_num)
+            irq_dest_nodes.append(get_node_prop(node, 'interrupt-parent', inherit=True))
 
         for i, irq_dest_node in enumerate(irq_dest_nodes):
             irq_dest_compatible = get_node_prop(irq_dest_node, 'compatible', [])
@@ -2215,7 +2259,13 @@ def main():
     if args.output == "-":
        args.output = "/dev/stdout"
     with open(args.output, 'w') as f:
-        f.write(generate(args.filename, args.override_system_clock_frequency))
+        f.write(
+            generate(
+                args.filename,
+                args.override_system_clock_frequency,
+                args.manual_overlay,
+            )
+        )
 
 if __name__ == "__main__":
     main()

@@ -18,7 +18,7 @@ try_download() {
         return 1
     fi
 
-    curl -kLsf -o 'renode-portable.tar.gz' https://dl.antmicro.com/projects/renode/builds/sha/renode-"$VERSION"+git"${RENODE_VERSION:0:9}".linux-portable.tar.gz
+    curl -kLsf -o 'renode-portable.tar.gz' https://builds.renode.io/sha/renode-"$VERSION"+git"${RENODE_VERSION:0:9}".linux-portable-dotnet.tar.gz
 
     if [ $? -eq 0 ]; then
         echo "Precompiled package for renode commit ${RENODE_VERSION} downloaded."
@@ -28,7 +28,7 @@ try_download() {
         RENODE_LOCATION=$(realpath renode-portable)
         echo "Renode portable is now in ${RENODE_LOCATION}"
         echo ${RENODE_LOCATION} > ${CI_PROJECT_DIR}/renode-location
-        pip install -r renode-portable/tests/requirements.txt
+        pip install -r renode-portable/tests/requirements.txt > /dev/null
         return 0
     else
         echo "No package with version ${RENODE_VERSION} found! (failed to download package)"
@@ -52,21 +52,9 @@ try_build() {
     git submodule update --init --recursive || exit 1
 
     git fetch --all 1>/dev/null 2>/dev/null
-    RENODE_HASH=$(git rev-parse HEAD)
 
-    git branch -a --contains "$RENODE_VERSION" | grep 'renode_github'
-    if [ $? -ne 0 ]; then
-        printf "\033[0;31mRENODE COMMIT %s IS *NOT* PRESENT ON THE PUBLIC GITHUB\033[0m\n" "$RENODE_HASH"
-    fi
-
-    git branch -r --contains "$RENODE_HASH" | grep 'renode_github/master'
-    if [ $? -eq 0 ]; then
-        PUBLIC_MASTER=true
-        printf "\033[0;32mRENODE COMMIT %s IS PRESENT ON THE PUBLIC GITHUB MASTER BRANCH\033[0m\n" "$RENODE_HASH"
-    fi
-
-    ./build.sh 1>../renode-build.log 2>&1 || return $?
-    pip install -r tests/requirements.txt
+    ./build.sh --net 1>../renode-build.log 2>&1 || return $?
+    pip install -r tests/requirements.txt > /dev/null
 
     cd ..
     return 0

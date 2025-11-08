@@ -1,5 +1,5 @@
 #!/bin/bash
-set -exuo pipefail
+set -euo pipefail
 
 
 # Print which dts2repl commits are being compared
@@ -14,6 +14,7 @@ cd ci-output
     cd repls/generated
 
     # shellcheck disable=SC2317
+    # shellcheck disable=SC2329
     generate() {
         file=$1
 
@@ -23,16 +24,27 @@ cd ci-output
 
         # Assemble cmdline based on config
         if [ -f "$CONFIG" ]; then
-            for key in $(jq 'keys[]' "$CONFIG" | tr -d '"'); do
-                value=$(jq --arg v "$key" '.[$v]' "$CONFIG" | tr -d '"')
-                CMDLINE+=("--$key=$value")
-            done
+            while IFS= read -r key; do
+                value=$(jq -c --arg k "$key" '.[$k]' "$CONFIG")
+                if [[ "$value" =~ ^\[.*\]$ ]]; then
+                    # List handling
+                    # { item: [value1, value 2] } -> --item value1 --item value2
+                    for item in $(jq -r --arg k "$key" '.[$k][]' "$CONFIG"); do
+                        CMDLINE+=("--$key" "$item")
+                    done
+                else
+                    # Scalar handling:
+                    # { item: value } -> --item=value
+                    CMDLINE+=("--$key" "$(jq -r --arg k "$key" '.[$k]' "$CONFIG")")
+                fi
+            done < <(jq -r 'keys[]' "$CONFIG")
         fi
-        echo "Generating for $NAME"
+        echo -n "Generating for $NAME"
         if [ ${#CMDLINE[@]} -eq 0  ]; then
+            echo
             dts2repl ../../dts/"$NAME".dts --output "$NAME".repl
         else 
-            echo "with custom command-line $CMDLINE"
+            echo " with custom command-line ${CMDLINE[*]}"
             dts2repl ../../dts/"$NAME".dts --output "$NAME".repl "${CMDLINE[@]}"
         fi
     }
