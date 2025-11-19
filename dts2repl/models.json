@@ -370,6 +370,7 @@
         "nxp,k6x|nxp,k8x|nxp,mcxc444|nxp,mcxc242": { "type": "UART.NXP_LPUART", "hasGlobalRegisters": false, "fifoSize": 4 },
         "_" : "UART.NXP_LPUART"
     },
+    "nxp,lp-flexcomm": "UART.NXP_FLEXCOMM",
     "nxp,kinetis-mcg": "Miscellaneous.K6xF_MCG",
     "nxp,kinetis-rnga": "Miscellaneous.K6xF_RNG",
     "nxp,kinetis-sim": "Miscellaneous.K6xF_SIM",

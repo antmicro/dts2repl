@@ -1346,6 +1346,22 @@ def generate(filename, override_system_clock_frequency=None, manual_overlays=Non
             if child:
                 name = name_mapper.get_name(child)
 
+        if compat == 'nxp,lp-flexcomm':
+            # get the name from the first enabled child
+            child = next((n for n in node.nodes.values() \
+                           if not is_disabled(n) \
+                           and get_node_prop(n, "compatible") == ["nxp,lpuart"]), None)
+            if child:
+                name = name_mapper.get_name(child)
+
+        if (
+            compat in ["nxp,lpi2c", "nxp,lpspi", "nxp,lpuart"]
+            and (p := node.parent)
+            and get_node_prop(p, "compatible") == ["nxp,lp-flexcomm"]
+        ):
+            logging.info(f'{compat} registered in nxp,lp-flexcomm container - skipping node')
+            continue
+
         if 'nordic,nrf-vevif-task' in compat:
             ipc = dt.get_node('/ipc')
             if ipc == None:
