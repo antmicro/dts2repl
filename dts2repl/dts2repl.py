@@ -1470,13 +1470,19 @@ def generate(filename, override_system_clock_frequency=None, manual_overlays=Non
             generic_timer = ReplBlock(timer_name, 'Timers.ARM_GenericTimer', {name}, {timer_name}, timer_lines)
             repl_file.add_block(generic_timer)
         if model in ("CPU.ARMv8A", "CPU.ARMv8R", "CPU.ARMv7A", "CPU.ARMv7R"):
-            # We use our CPU number as the CPU ID instead of the reg address
-            # This relies on the fact that the name will have been changed to "cpu{n}"
-            cpuIdx = int(name.replace("cpu", ""))
-            # For Cortex-A55 core number is stored in affinity level 1.
-            # For older cpus it's stored in affinity level 0.
-            cpuId = f'0x{(cpuIdx << 8):x}' if attribs.get('cpuType', '') == 'cortex-a55' else cpuIdx
-            indent.append(f'cpuId: {cpuId}')
+            # The CPUs will be renamed later, so the first one will have `cpu0` label. We depend on this fact extensively
+            # This logic is for getting correct cpuId (repesented by internal CPU registers, like MPIDR_EL1 on AArch64)
+
+            if 'reg' in node.props:
+                # Get the "reg" property as cpuId - there is no guarantee that CPUs are enabled in any specific order
+                cpuIdx = next(get_reg(node))[0]
+            else:                
+                # Only use our CPU number as the CPU ID instead of the reg address as a fallback
+                logging.warning('Could not find CPU id from DTS, falling back to automatic enumeration')
+                cpuIdx = int(name.replace("cpu", ""))
+
+            indent.append(f'cpuId: 0x{cpuIdx:x}')
+
             if not any(compat.startswith(x) for x in ["arm,arm11", "arm,arm9", "arm,cortex-a8"])  \
             and not main_compatible in ["beagle,beaglebone-ai64", "beagle,beagley-ai", "grinn,am335x-chiliboard"]  \
             and not compat == "arm,cortex-a5":
