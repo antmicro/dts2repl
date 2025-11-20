@@ -1053,6 +1053,82 @@ def get_overlays(dt):
 
     return set(soc + platform)
 
+def parse_interrupts_property(node, compat, mcu_compat, overlays):
+    irq_local_indices = {}
+    irq_numbers = []
+    irq_dest_nodes = []
+    interrupt_parent = get_node_prop(node, 'interrupt-parent', inherit=True)
+    if interrupt_parent is not None:
+        interrupt_cells = get_node_prop(interrupt_parent, '#interrupt-cells', default=2)
+        irq_numbers = get_node_prop(node, 'interrupts')[::interrupt_cells]
+
+        if compat == 'renesas,ra-sci' and 'uart' in node.nodes and node.nodes['uart'].props['compatible'].to_string() == 'renesas,ra-uart-sci':
+            # there is a difference between IRQ description for 'renesas,ra-uart-sci' and 'renesas,ra-sci-uart' drivers!
+            # we need to use the last cell and additionally use upper two bytes of the value there
+            irq_numbers = get_node_prop(node, 'interrupts')[(interrupt_cells - 1)::interrupt_cells]
+            irq_numbers = [i >> 8 for i in irq_numbers]
+
+        irq_dest_nodes = [interrupt_parent] * len(irq_numbers)
+
+        # Handle GIC IRQ number remapping
+        parent_model = get_model(interrupt_parent, mcu_compat, overlays)
+        if parent_model == 'IRQControllers.ARM_GenericInterruptController':
+            irq_types = get_node_prop(node, 'interrupts')[0::interrupt_cells]
+            irq_numbers = get_node_prop(node, 'interrupts')[1::interrupt_cells]
+            # Add 16 and route to local receiver (currently always #0) for GIC_PPI
+            for i, t in enumerate(irq_types):
+                if t == 1:
+                    irq_numbers[i] += 16
+                    irq_local_indices[i] = 0
+    return irq_numbers, irq_local_indices, irq_dest_nodes
+
+def convert_attribs_to_str(attribs) -> List[str]:
+    ret = []
+    for attr in attribs:
+        if (isinstance(attribs[attr], str)):
+            ret.append("%s: \"%s\"" % (attr, attribs[attr]))
+        elif (isinstance(attribs[attr], bool)):
+            if attribs[attr]:
+                ret.append("%s: true" % (attr))
+            else:
+                ret.append("%s: false" % (attr))
+        else:
+            ret.append("%s: %s" % (attr, str(attribs[attr])))
+    return ret
+
+def generate_irq_connections(irq_names, irq_dest_nodes, irq_numbers, irq_local_indices, name_mapper, dest_local_as_hex=False) -> List[str]:
+    visited_irqs = set()
+    irqs = []
+    def _format_as_irq(irq_src_name: str, irq_dest_name: str, irq: str, irq_dest_local: str = None, dest_local_as_hex: bool = False):
+        irq_dest = irq_dest_name
+        if irq_dest_local is not None:
+            irq_dest += f'#{hex(irq_dest_local) if dest_local_as_hex else irq_dest_local}'
+        return f'{irq_src_name}->{irq_dest}@{irq}'
+
+    for i, (irq_name, irq_dest, irq) in enumerate(zip(irq_names, irq_dest_nodes, irq_numbers)):
+        if irq_name is None:
+            continue
+        if irq in visited_irqs:
+            # some u-boot peripherals contain duplicated irqs in device trees e.g.
+            # https://github.com/u-boot/u-boot/blob/69bd83568c57813cd23bc2d100c066a17e7e349d/dts/upstream/src/riscv/microchip/mpfs-icicle-kit.dts#L86
+            continue
+        # assume very large IRQ numbers which have all bits set (i.e. 2^n - 1) are invalid
+        if irq >= 0xfff and (irq & (irq + 1)) == 0:
+            continue
+        if is_disabled(irq_dest):
+            continue
+
+        irq_dest_name = name_mapper.get_name(irq_dest)
+        if i in irq_local_indices:
+            irqs += [_format_as_irq(irq_name, irq_dest_name, irq, irq_local_indices[i], dest_local_as_hex=dest_local_as_hex)]
+        else:
+            irqs += [_format_as_irq(irq_name, irq_dest_name, irq)]
+        visited_irqs.add(irq)
+        # IRQ destinations are not treated as dependencies, we filter
+        # out IRQ connections to missing peripherals at the end because
+        # it is better to have a peripheral missing an interrupt connection
+        # than no peripheral at all
+    return irqs
 
 def generate(filename, override_system_clock_frequency=None, manual_overlays=None):
     name_mapper = NameMapper()
@@ -1166,7 +1242,7 @@ def generate(filename, override_system_clock_frequency=None, manual_overlays=Non
         logging.info(f'Node {node.name} mapped to {name}...')
 
         # decide which Renode model to use
-        model, compat, attribs, irq_mappings = renode_model_overlay(compat, mcu_compat, overlays)
+        model, _, attribs, irq_mappings = renode_model_overlay(compat, mcu_compat, overlays)
         if model is None:
             # There is no model for the given "specialized" SoC compat string, but they might exist for other SoC variants
             logging.info(f'Node {node.name}, compat {compat} has no matching specific model - does the JSON have "_" clause? Skipping...')
@@ -1319,16 +1395,7 @@ def generate(filename, override_system_clock_frequency=None, manual_overlays=Non
             if node_reg and regions:
                 regions[0].address = node_reg[0]
 
-        for attr in attribs:
-            if (isinstance(attribs[attr], str)):
-                indent.append("%s: \"%s\"" % (attr, attribs[attr]))
-            elif (isinstance(attribs[attr], bool)):
-                if attribs[attr]:
-                    indent.append("%s: true" % (attr))
-                else:
-                    indent.append("%s: false" % (attr))
-            else:
-                indent.append("%s: %s" % (attr, str(attribs[attr])))
+        indent.extend(convert_attribs_to_str(attribs))
 
         # additional parameters for peripherals
         if model == 'IRQControllers.PlatformLevelInterruptController':
@@ -1461,17 +1528,11 @@ def generate(filename, override_system_clock_frequency=None, manual_overlays=Non
                 indent.append('privilegedArchitecture: PrivilegedArchitecture.Priv1_10')
             else:
                 indent.append('privilegedArchitecture: PrivilegedArchitecture.Priv1_09')
-        if model in ("CPU.ARMv8A", "CPU.ARMv8R", "CPU.ARMv7A", "CPU.ARMv7R") and name != "cpu0":
-            # We generate the cpu0 timer along with correct interrupt connections
-            # while processing the timer node in the dts, and we generate 'fake'
-            # timers for other cores here for now
-            timer_name = f'{name}_timer'
-            timer_lines = [f'{timer_name}: Timers.ARM_GenericTimer @ {name}', '    frequency: 62500000']
-            generic_timer = ReplBlock(timer_name, 'Timers.ARM_GenericTimer', {name}, {timer_name}, timer_lines)
-            repl_file.add_block(generic_timer)
+
         if model in ("CPU.ARMv8A", "CPU.ARMv8R", "CPU.ARMv7A", "CPU.ARMv7R"):
             # The CPUs will be renamed later, so the first one will have `cpu0` label. We depend on this fact extensively
             # This logic is for getting correct cpuId (repesented by internal CPU registers, like MPIDR_EL1 on AArch64)
+            generic_timer_compats = ("arm,armv7-timer", "arm,armv8-timer", "arm,armv8_timer")
 
             if 'reg' in node.props:
                 # Get the "reg" property as cpuId - there is no guarantee that CPUs are enabled in any specific order
@@ -1488,6 +1549,57 @@ def generate(filename, override_system_clock_frequency=None, manual_overlays=Non
             and not compat == "arm,cortex-a5":
                 indent.append('genericInterruptController: gic')
                 dependencies.add('gic')
+
+            # We try to generate GenericTimer for each core, with correct interrupt connections
+            # provided that we can find the node in DTS
+            # otherwise the timer is still generated but with no connections
+            timer_name = f'{name}_timer'
+            timer_lines = [f'{timer_name}: Timers.ARM_GenericTimer @ {name}']
+
+            found = False
+            try:
+                timer_node = dt.get_node('/timer')
+                # Additional check - is the compat correct?
+                found = get_node_prop(timer_node, 'compatible', [''])[0] in generic_timer_compats
+            except dtlib.DTError:
+                found = False
+
+            # Fallback - seach by compat not just node name, if we failed before
+            if not found:
+                candidates = [*filter(lambda node: get_node_prop(node, 'compatible', [''])[0] in generic_timer_compats, dt.node_iter())]
+                if len(candidates) > 1:
+                    logging.warning('More than one candidate ARM Architected per-core timer node found')
+                elif len(candidates) == 0:
+                    logging.warning('No ARM Architected per-core timers were found by compat')
+                else:
+                    timer_node = candidates[0]
+                    found = True
+
+            if found:
+                _, _, timer_attribs, timer_irq_mappings = renode_model_overlay(get_node_prop(timer_node, 'compatible', [''])[0], mcu_compat, overlays)
+                if timer_irq_mappings:
+                    generic_timer_irq_names = timer_irq_mappings
+
+                timer_name = name_mapper.get_name(timer_node)
+                irq_numbers, irq_local_indices, irq_dest_nodes = parse_interrupts_property(timer_node, '', mcu_compat, overlays)
+
+                irq_local_indices = {x: cpuIdx for x, _ in irq_local_indices.items()}
+                generic_timer_irq_names = ['EL3PhysicalTimerIRQ', 'EL1PhysicalTimerIRQ', 'EL1VirtualTimerIRQ', 'NonSecureEL2PhysicalTimerIRQ', 'NonSecureEL2VirtualTimerIRQ']
+                timer_lines.extend(
+                    ['    ' + str(x) for x in convert_attribs_to_str(timer_attribs)]
+                )
+                timer_lines.extend(
+                    ['    ' + str(x) for x in generate_irq_connections(generic_timer_irq_names, irq_dest_nodes, irq_numbers, irq_local_indices, name_mapper, dest_local_as_hex=True)]
+                )
+            else:
+                logging.warning('ARM Architected per-core timer (GenericTimer) will lack interrupt connections')
+                timer_lines.append('    frequency: 62500000')
+
+            # Only force the generation of the dummy GenericTimer on ARMv8, even if we can't find the node
+            if found or model in ("CPU.ARMv8A", "CPU.ARMv8R"):
+                generic_timer = ReplBlock(timer_name, 'Timers.ARM_GenericTimer', {name}, {timer_name}, timer_lines)
+                repl_file.add_block(generic_timer)
+
         if model in ("CPU.X86", "CPU.X86_64"):
             cpu_number = name[-1]
             lapic_name = f'intcloapic{cpu_number}'
@@ -1672,29 +1784,7 @@ def generate(filename, override_system_clock_frequency=None, manual_overlays=Non
             indent.append('0 -> cpu0@0 | cpu0@1 | cpu0@2')
             dependencies.add('cpu0')
         elif 'interrupts' in node.props and model != "Memory.MappedMemory":
-            interrupt_parent = get_node_prop(node, 'interrupt-parent', inherit=True)
-            if interrupt_parent is not None:
-                interrupt_cells = get_node_prop(interrupt_parent, '#interrupt-cells', default=2)
-                irq_numbers = get_node_prop(node, 'interrupts')[::interrupt_cells]
-
-                if compat == 'renesas,ra-sci' and 'uart' in node.nodes and node.nodes['uart'].props['compatible'].to_string() == 'renesas,ra-uart-sci':
-                    # there is a difference between IRQ description for 'renesas,ra-uart-sci' and 'renesas,ra-sci-uart' drivers!
-                    # we need to use the last cell and additionally use upper two bytes of the value there
-                    irq_numbers = get_node_prop(node, 'interrupts')[(interrupt_cells - 1)::interrupt_cells]
-                    irq_numbers = [i >> 8 for i in irq_numbers]
-
-                irq_dest_nodes = [interrupt_parent] * len(irq_numbers)
-
-                # Handle GIC IRQ number remapping
-                parent_model = get_model(interrupt_parent, mcu_compat, overlays)
-                if parent_model == 'IRQControllers.ARM_GenericInterruptController':
-                    irq_types = get_node_prop(node, 'interrupts')[0::interrupt_cells]
-                    irq_numbers = get_node_prop(node, 'interrupts')[1::interrupt_cells]
-                    # Add 16 and route to local receiver (currently always #0) for GIC_PPI
-                    for i, t in enumerate(irq_types):
-                        if t == 1:
-                            irq_numbers[i] += 16
-                            irq_local_indices[i] = 0
+            irq_numbers, irq_local_indices, irq_dest_nodes = parse_interrupts_property(node, compat, mcu_compat, overlays)
         elif 'interrupts-extended' in node.props:
             # For now we assume that there is only one parameter: the IRQ number, otherwise
             # we skip the interrupt
@@ -1743,8 +1833,6 @@ def generate(filename, override_system_clock_frequency=None, manual_overlays=Non
                 irq_names = ['IRQ']
             elif model == 'Timers.IMXRT_PWM':
                 irq_names = ['0', '1', '2']
-            elif model == 'Timers.ARM_GenericTimer':
-                irq_names = ['EL3PhysicalTimerIRQ', 'EL1PhysicalTimerIRQ', 'EL1VirtualTimerIRQ', 'NonSecureEL2PhysicalTimerIRQ', 'NonSecureEL2VirtualTimerIRQ']
             # the Renode model for these only has 1 IRQ
             elif (compat in ['arm,pl011', 'atmel,sam0-uart']
                   or model in ['UART.Cadence_UART', 'UART.NS16550', 'Timers.ARM_SP804_Timer']):
@@ -1769,34 +1857,15 @@ def generate(filename, override_system_clock_frequency=None, manual_overlays=Non
                 if irq_names == ['0'] and 'interrupt-controller' not in node.props:
                     irq_names = ['']
 
-            visited_irqs = set()
-            for i, (irq_name, irq_dest, irq) in enumerate(zip(irq_names, irq_dest_nodes, irq_numbers)):
-                if irq_name is None:
-                    continue
-                if irq in visited_irqs:
-                    # some u-boot peripherals contain duplicated irqs in device trees e.g.
-                    # https://github.com/u-boot/u-boot/blob/69bd83568c57813cd23bc2d100c066a17e7e349d/dts/upstream/src/riscv/microchip/mpfs-icicle-kit.dts#L86
-                    continue
-                # assume very large IRQ numbers which have all bits set (i.e. 2^n - 1) are invalid
-                if irq >= 0xfff and (irq & (irq + 1)) == 0:
-                    continue
-                if is_disabled(irq_dest):
-                    continue
-                irq_dest_name = name_mapper.get_name(irq_dest)
-                if i in irq_local_indices:
-                    irq_dest_name += f'#{irq_local_indices[i]}'
-                indent.append(f'{irq_name}->{irq_dest_name}@{irq}')
-                visited_irqs.add(irq)
-                # IRQ destinations are not treated as dependencies, we filter
-                # out IRQ connections to missing peripherals at the end because
-                # it is better to have a peripheral missing an interrupt connection
-                # than no peripheral at all
+            indent.extend(
+                [str(x) for x in generate_irq_connections(irq_names, irq_dest_nodes, irq_numbers, irq_local_indices, name_mapper)]
+            )
 
-        # the ARM generic timer is registered at cpu0 without an address
-        # for proper multi-CPU support we will need to generate one for
-        # each CPU with the proper interrupt connections
+        # this is a special case
+        # GenericTimer is expected to be registered at each CPU, but is represented by one node in DTS
+        # we generate it, when we parse the CPU nodes, by performing a look ahead into the tree
         if model == "Timers.ARM_GenericTimer":
-            regions = [RegistrationRegion(addresses=[], registration_point="cpu0")]
+            continue
 
         if model == 'IRQControllers.LAPIC':
             regions = [RegistrationRegion(addr, cpu='cpu0')]
@@ -1922,7 +1991,7 @@ def process_node(node, node_type, mcu, overlays, get_snippets, skip_disabled):
         label = node.labels[0]
 
     if compat in MODELS:
-        model, compat, _, _ = renode_model_overlay(compat, mcu, overlays)
+        model, _, _, _ = renode_model_overlay(compat, mcu, overlays)
 
     if node_type == "cpu":
         if id := node.unit_addr:
