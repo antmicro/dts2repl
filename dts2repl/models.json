@@ -430,6 +430,7 @@
     "silabs,series-clock": { "silabs,efr32mg21": { "type": "Python.PythonPeripheral", "size": 0x400, "initable": false, "script": "request.Value = {0x70: 0x1, 0x160: 0x2, 0x240: 0x1}.get(request.Offset, 0)" },
                              "_": { "type": "Miscellaneous.SiLabs.EFR32xG2_CMU_3", "irq_mappings": [null] }},
     "silabs,gecko-stimer": { "type": "Timers.EFR32xG24_SYSRTC", "irq_mappings": ["AppIRQ"] },
+    "silabs,sysrtc": { "type": "Timers.EFR32xG24_SYSRTC", "irq_mappings": ["AppIRQ"] },
     "silabs,eusart-spi": { "type": "UART.EFR32xG2_EUSART_2", "irq_mappings": ["ReceiveIRQ", "TransmitIRQ"] },
     "silabs,eusart-uart": { "type": "UART.EFR32xG2_EUSART_2", "irq_mappings": ["ReceiveIRQ", "TransmitIRQ"] },
     "silabs,hfxo": { "silabs,efr32mg21": {},
