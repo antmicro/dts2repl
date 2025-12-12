@@ -7,4 +7,5 @@ memory: Memory.MappedMemory @ sysbus 0x20000000
 
 sysbus:
     init add:
-        Tag <0xf0014030 4> "PMC_MCKR" 0x1
+        Tag <0xF0014068 4> "PMC_SR" 0xFFFFFFFF
+        Tag <0xF0014030 4> "PMC_MCKR" 0x1

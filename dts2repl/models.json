@@ -107,7 +107,6 @@
     "atmel,sam-usart": "UART.SAM_USART",
     "atmel,sam-uart": { "type": "UART.SAM_USART", "uartOnlyMode": true },
     "atmel,sam0-uart": { "atmel,samd20": "UART.SAMD20_UART", "_": "UART.SAMD5_UART" },
-    "atmel,sama5d2-pmc": { "type": "Python.PythonPeripheral", "size": 0x160, "initable": true, "filename": "scripts/pydev/flipflop.py" },
     "atmel,sama5d2-tcb": { "type": "Python.PythonPeripheral", "size": 0x20, "initable": true, "filename": "scripts/pydev/counter.py" },
     "atmel,sama5d2-i2c": { "type": "Python.PythonPeripheral", "size": 0x160, "initable": true, "filename": "scripts/pydev/flipflop.py" },
     "atmel,sam-flash-controller": { "type": "Python.PythonPeripheral", "size": 0x200, "initable": true, "filename": "scripts/pydev/flipflop.py" },
