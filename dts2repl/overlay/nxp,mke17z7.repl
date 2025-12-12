@@ -2,8 +2,13 @@ SCG_CSR: Python.PythonPeripheral @ sysbus 0x40064010
     size: 0x4
     initable: true
     script: '''
-if request.IsInit: lastVal = None
-if request.IsRead: request.Value = 0x2000000 if lastVal == None else 0x3000000; lastVal = request.Value
+# Spoof for the NXP FRDM clock initialization routines (SCS_CSR[27:24] = System Clock Source).
+# Cycles most significant byte of this register (0x0 -> 0xF, wraps) on every read.
+if request.IsInit:
+    lastMultiplier = 0
+if request.IsRead:
+    lastMultiplier = (lastMultiplier + 1) % 16
+    request.Value = lastMultiplier << 24
 '''
 
 sysbus:
@@ -11,3 +16,4 @@ sysbus:
         ApplySVD @https://dl.antmicro.com/projects/renode/svd/MKE17Z7.svd.gz
         Tag <0x40064200 4> "SCG_SIRCCSR" 0xFFFFFFFF
         Tag <0x40064300 4> "SCG_FIRCCSR" 0xFFFFFFFF
+        Tag <0x40064500 4> "UNKNOWN3" 0xFFFFFFFF
