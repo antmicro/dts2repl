@@ -4,3 +4,7 @@ cpu0: CPU.ARMv7A @ sysbus
 
 memory: Memory.MappedMemory @ sysbus 0x20000000
     size: 0x10000000
+
+sysbus:
+    init add:
+        Tag <0xf0014030 4> "PMC_MCKR" 0x1
