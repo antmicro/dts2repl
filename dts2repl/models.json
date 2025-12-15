@@ -112,6 +112,7 @@
     "atmel,sam-flash-controller": { "type": "Python.PythonPeripheral", "size": 0x200, "initable": true, "filename": "scripts/pydev/flipflop.py" },
     "atmel,at91sam9260-usart": "UART.SAM_USART",
     "atmel,at91sam9260-pit": { "type": "Python.PythonPeripheral", "size": 0xF, "initable": true, "filename": "scripts/pydev/flipflop.py" },
+    "atmel,at91sam9x5-hlcdc": { "type": "Python.PythonPeripheral", "size": 0x2000, "initable": true, "filename": "scripts/pydev/flipflop.py" },
 
     "nuvoton,npcx-uart": "UART.NPCX_UART",
     "nuvoton,npcx-gpio": "GPIOPort.NPCX_GPIO",
