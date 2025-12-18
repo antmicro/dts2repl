@@ -1,0 +1,3 @@
+sysbus:
+    init add:
+        Tag <0xF0018030 4> "PMC_MCKR" 0x1
