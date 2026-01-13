@@ -189,6 +189,7 @@
                        "_": "UART.GD32_UART" },
 
     "gpio-leds": "Miscellaneous.LED",
+    "gpio-keys": "Miscellaneous.Button",
     
     "virtio,console": "Miscellaneous.VirtIOMMIOConsole",
     "virtio,entropy": "Miscellaneous.VirtIOMMIOEntropy",
