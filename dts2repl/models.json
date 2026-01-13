@@ -38,7 +38,7 @@
     "arm,armv8": { "type": "CPU.ARMv8A", "cpuType": "cortex-a55" },
     "brcm,brahma-b53": { "type": "CPU.ARMv8A", "cpuType": "cortex-a53" },
     "arm,cortex-a5": { "type": "CPU.ARMv7A", "cpuType": "cortex-a5" },
-    "arm,cortex-a7": { "type": "CPU.ARMv7A", "cpuType": "cortex-a8" },
+    "arm,cortex-a7": { "type": "CPU.ARMv7A", "cpuType": "cortex-a7" },
     "arm,cortex-a8": { "type": "CPU.ARMv7A", "cpuType": "cortex-a8" },
     "arm,cortex-a9": { "type": "CPU.ARMv7A", "cpuType": "cortex-a9" },
     "arm,cortex-a12": { "type": "CPU.ARMv7A", "cpuType": "cortex-a15" },
