@@ -1,0 +1,3 @@
+cpu0:
+    cpuType: "rv32gc_xandes"
+    privilegedArchitecture: PrivilegedArchitecture.Priv1_10
