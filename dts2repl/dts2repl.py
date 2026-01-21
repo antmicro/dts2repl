@@ -1535,7 +1535,7 @@ def generate(filename, override_system_clock_frequency=None, manual_overlays=Non
                     "sensry,sy1xx", "nordic,vpr"
                 }
                 empty_time_provider_overlays = {
-                    "openisa,rv32m1", "telink,tlsr9518adk80d"
+                    "openisa,rv32m1", "telink,tlsr9518adk80d", "egis,et171"
                 }
                 if "_xandes" in isa or (compat in empty_time_provider_compats) or (overlays & empty_time_provider_overlays):
                     indent.append('timeProvider: empty')
