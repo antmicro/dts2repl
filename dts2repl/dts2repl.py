@@ -1528,12 +1528,22 @@ def generate(filename, override_system_clock_frequency=None, manual_overlays=Non
             # Use CPU.VexRiscv for LiteX and Fomu
             if overlays & {'litex,vexriscv', 'kosagi,fomu'}:
                 model = 'CPU.VexRiscv'
-            elif "openisa,rv32m1" in overlays or "telink,tlsr9518adk80d" in overlays or "_xandes" in isa or compat in ["intel,niosv", "nuclei,bumblebee", "neorv32-cpu", "espressif,riscv", "ite,riscv-ite", "litex,vexriscv-standard", "sensry,sy1xx", "nordic,vpr"]:
-                indent.append('timeProvider: empty')
             else:
-                indent.append('timeProvider: clint')
-                dependencies.add('clint')
-                indent.append('allowUnalignedAccesses: true')
+                empty_time_provider_compats = {
+                    "intel,niosv", "nuclei,bumblebee", "neorv32-cpu",
+                    "espressif,riscv", "ite,riscv-ite", "litex,vexriscv-standard",
+                    "sensry,sy1xx", "nordic,vpr"
+                }
+                empty_time_provider_overlays = {
+                    "openisa,rv32m1", "telink,tlsr9518adk80d"
+                }
+                if "_xandes" in isa or (compat in empty_time_provider_compats) or (overlays & empty_time_provider_overlays):
+                    indent.append('timeProvider: empty')
+                else:
+                    indent.append('timeProvider: clint')
+                    dependencies.add('clint')
+                    indent.append('allowUnalignedAccesses: true')
+
             # If no hartId is defined (from models.json), attempt to generate
             # it from CPU node index in DTS file.
             if not any('hartId: ' in s for s in indent):
