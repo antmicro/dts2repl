@@ -1461,6 +1461,11 @@ def generate(filename, override_system_clock_frequency=None, manual_overlays=Non
         if model == 'UART.MAX32650_UART':
             indent.append('gcr: gcr')
             dependencies.add('gcr')
+        if model == 'Miscellaneous.EgisET171_AOSMU':
+            indent.append('mtimer: mtimer')
+            indent.append('pit: pit0')
+            indent.append('wdt: wdt')
+            dependencies.update(('mtimer', 'pit0', 'wdt'))
 
         # additional parameters for python peripherals
         if compat.startswith('fsl,imx6') and compat.endswith('-anatop'):

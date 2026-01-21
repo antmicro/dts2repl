@@ -1,3 +1,5 @@
+smu2: Miscellaneous.EgisET171_SMU2 @ sysbus 0xf0e00000
+
 cpu0:
     cpuType: "rv32gc_xandes"
     privilegedArchitecture: PrivilegedArchitecture.Priv1_10
