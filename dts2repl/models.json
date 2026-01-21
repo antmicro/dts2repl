@@ -405,7 +405,7 @@
     "nordic,vpr": "CPU.RiscV32",
     "neorv32-cpu": "CPU.RiscV32",
     "neorv32-uart": "UART.NEORV32_UART",
-    "neorv32-machine-timer": { "type": "Timers.NEORV32_MachineSystemTimer", "frequency": 100000000 },
+    "riscv,machine-timer": { "type": "Timers.RiscVMachineTimer", "frequency": 100000000 },
     "samsung,exynos4210-uart": "UART.NS16550",
 
     "sifive,dtim0": "Memory.MappedMemory",
