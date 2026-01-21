@@ -729,6 +729,7 @@ class ReplFile:
                             dfs(other_block)
                         break
                 else:
+                    logging.warning(f'Block "{block.name}" removed because dependency "{dep}" is missing')
                     return
             available_blocks.append(block)
 
