@@ -393,7 +393,10 @@
     "riscv": "CPU.RiscV32",
     "andestech,andescore-v5": "CPU.RiscV32",
     "riscv,plic1": { "type": "IRQControllers.PlatformLevelInterruptController", "numberOfContexts": 16, "prioritiesEnabled": true },
-    "sifive,plic-1.0.0": { "type": "IRQControllers.PlatformLevelInterruptController", "numberOfContexts": 16, "prioritiesEnabled": true },
+    "sifive,plic-1.0.0": {
+        "egis,et171": { "type": "IRQControllers.AndesNCEPLIC100", "numberOfContexts": 16, "prioritiesEnabled": true, "numberOfSources": 1023 },
+        "_": { "type": "IRQControllers.PlatformLevelInterruptController", "numberOfContexts": 16, "prioritiesEnabled": true }
+    },
     "sifive,clint0": "IRQControllers.CoreLevelInterruptor",
     "starfive,jh7100-clint": "IRQControllers.CoreLevelInterruptor",
     "thead,c900-clint": "IRQControllers.CoreLevelInterruptor",
