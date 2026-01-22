@@ -417,6 +417,14 @@
     "neorv32-uart": "UART.NEORV32_UART",
     "riscv,machine-timer": {
         "microchip,mpfs": null,
+        "microchip,miv-soc": null,
+        "efinix,sapphire": null,
+        "starfive,jh7110": null,
+        "sifive-soc": null,
+        "openhwgroup,cv32a6_genesys_2|openhwgroup,cv64a6_genesys_2": null,
+        "lowrisc,opentitan-earlgrey": null,
+        "riscv-virtio": null,
+        "renode,riscv32-virtual": null,
         "_": { "type": "Timers.RiscVMachineTimer", "frequency": 100000000, "irq_mappings": [""] }
     },
     "samsung,exynos4210-uart": "UART.NS16550",
