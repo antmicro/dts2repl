@@ -389,7 +389,10 @@ def get_node_prop(node, prop, default=None, inherit=False):
 
 def renode_model_overlay(compat, mcu, overlays):
     def _try_decode(e):
-        if isinstance(e, str):
+        if e is None:
+            # Null mapping -> reject model creation
+            return None, {}, None
+        elif isinstance(e, str):
             # value is just a string - it's a model type in Renode
             return e, {}, None
         elif "type" in e.keys():
