@@ -574,5 +574,8 @@
     "ti,tmp108": "Sensors.TMP108",
     "ti,tmp103": "Sensors.TMP103",
     "st,lis2ds12": "Sensors.LIS2DS12",
-    "st,lsm303dlhc-accel": "Sensors.LSM303DLHC_Accelerometer"
+    "st,lsm303dlhc-accel": "Sensors.LSM303DLHC_Accelerometer",
+
+    "focaltech,ft9001-cpm": "Miscellaneous.FocalTechFT9001_CPM",
+    "focaltech,ft9001-usart": "UART.FT9001_USART"
 }
