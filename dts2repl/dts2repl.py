@@ -360,7 +360,7 @@ def get_node_prop(node, prop, default=None, inherit=False):
         return default
 
     val = node.props[prop]
-    if prop in ('compatible', 'device_type', 'model'):
+    if prop in ('compatible', 'device_type', 'model', 'riscv,isa-extensions'):
         return val.to_strings()
     elif prop in ('interrupts', 'reg', 'ranges', 'alloc-ranges', 'dma-ranges', 'phandle'):
         return val.to_nums()
@@ -1521,7 +1521,21 @@ def generate(filename, override_system_clock_frequency=None, manual_overlays=Non
             overlays.add('cortex-m')
 
         if model == 'CPU.RiscV32' or model == 'CPU.Ri5cy':  # We use CPU.RiscV32 as a generic model for all RV CPUs and fix it up here
-            isa = get_node_prop(node, 'riscv,isa', 'rv32imac')
+            if isa := get_node_prop(node, 'riscv,isa-base', None):
+                extensions = get_node_prop(node, 'riscv,isa-extensions', [])
+
+                for ext in extensions:
+                    # drop "base" extensions
+                    if ext == "i" or ext == "e":
+                        continue
+
+                    if len(ext) == 1:
+                        isa += ext
+                    else:
+                        isa += f"_{ext}"
+            else:
+                isa = get_node_prop(node, 'riscv,isa', 'rv32imac')
+
             # The g extension already contains Zicsr and Zifencei
             if 'rv64g' not in isa and 'rv32g' not in isa:
                 if '_zicsr' not in isa:
