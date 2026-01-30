@@ -509,7 +509,10 @@
     "st,stm32-rng": {"type": "Miscellaneous.STM32_RNG", "series": {"reference": "STM32Series.F4"} },
     "st,stm32-rtc": "Timers.STM32F4_RTC",
     "st,stm32-spi": { "type": "SPI.STM32SPI", "series": {"reference": "STM32Series.F4"} },
-    "st,stm32-timers": { "type": "Timers.STM32_Timer", "frequency": 10000000, "initialLimit": 0xFFFFFFFF },
+    "st,stm32-timers": {
+        "st,stm32f769": { "type": "Timers.STM32_Timer", "frequency": 250000000, "initialLimit": 0xFFFFFFFF },
+        "_": { "type": "Timers.STM32_Timer", "frequency": 10000000, "initialLimit": 0xFFFFFFFF }
+    },
     "st,stm32-timer": { "type": "Timers.STM32_Timer", "frequency": 10000000, "initialLimit": 0xFFFFFFFF },
     "st,stm32-uart": { "st,stm32f3|st,stm32l4|st,stm32u5|st,stm32h7|st,stm32h7rs|st,stm32mp1": { "type": "UART.STM32F7_USART", "frequency": 200000000 }, "_": "UART.STM32_UART" },
     "st,stm32-usart": {
