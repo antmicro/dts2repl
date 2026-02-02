@@ -957,6 +957,39 @@ OVERLAY_NODE = re.compile(
 # Warning: this will match multiple registration points where registration point matches [A-Za-z]+ (so no numbers)
 OVERLAY_MULTIPLE_REG = re.compile(r"(?P<registration_point>[A-Za-z]+)(\s+(?P<address>(0[xX])?[0-9a-fA-F]+))")
 
+SUPPORTED_RV_EXTENSIONS = {
+    "i",
+    "e",
+    "m",
+    "a",
+    "f",
+    "d",
+    "c",
+    "v",
+    "b",
+    "g",
+    "u",
+    "s",
+    "smepmp",
+    "sscofpmf",
+    "xandes",
+    "zba",
+    "zbb",
+    "zbc",
+    "zbs",
+    "zicsr",
+    "zifencei",
+    "zfh",
+    "zvfh",
+    "zve32x",
+    "zve32f",
+    "zve64x",
+    "zve64f",
+    "zve64d",
+    "zacas",
+}
+
+
 def parse_overlay(path):
     with open(path) as f:
         lines = [line.rstrip() for line in f.readlines()]
@@ -1527,6 +1560,11 @@ def generate(filename, override_system_clock_frequency=None, manual_overlays=Non
                 for ext in extensions:
                     # drop "base" extensions
                     if ext == "i" or ext == "e":
+                        continue
+
+                    # drop unsupported extensions
+                    if ext not in SUPPORTED_RV_EXTENSIONS:
+                        logging.warning(f"RISC-V extension: '{ext}' is not supported in Renode!")
                         continue
 
                     if len(ext) == 1:
