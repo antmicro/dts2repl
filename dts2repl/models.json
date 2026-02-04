@@ -86,6 +86,7 @@
     "arm,gic-v3": { "renesas,rzt2m-rsk": { "type":  "IRQControllers.ARM_GenericInterruptController", "supportsTwoSecurityStates": false },  "_" : "IRQControllers.ARM_GenericInterruptController" },
     "arm,gic-v4": "IRQControllers.ARM_GenericInterruptController",
     "arm,pl011": "UART.PL011",
+    "arm,sbsa-uart": { "type": "UART.PL011", "sbsa": true },
     "arm,sp804": "Timers.ARM_SP804_Timer",
     "arm,v6m-nvic": "IRQControllers.NVIC",
     "arm,v7m-nvic": "IRQControllers.NVIC",
