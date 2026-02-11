@@ -2,3 +2,8 @@ dram_controller: Python.PythonPeripheral @ sysbus 0x5A003000
     size: 0x400
     initable: true
     script: "request.Value = 0x11111111"
+
+sysbus:
+    init add:
+        ApplySVD @https://dl.antmicro.com/projects/renode/svd/STM32MP157x.svd.gz
+        Tag <0x4C000080 0x4> "HSEM:HSEM_RLR0:M4_MOCK" 0x80000200
