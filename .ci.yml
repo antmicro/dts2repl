@@ -30,11 +30,13 @@ Test Static release:
   dependencies: [Static release]
   before_get_sources:
     - apt -qqy update > /dev/null
-    - apt -qqy --no-install-recommends install wget ca-certificates > /dev/null
+    - apt -qqy --no-install-recommends install wget curl ca-certificates > /dev/null
   script:
     - ./dts2repl-static --version
-    - ./dts2repl-static https://zephyr-samples-builder.storage.googleapis.com/zephyr/29059ec3d6aaef314dbc598485d5d6de6f35ae5b/96b_aerocore2/hello_world/hello_world.dts --output test.repl
-    - wget -nv https://zephyr-samples-builder.storage.googleapis.com/zephyr/29059ec3d6aaef314dbc598485d5d6de6f35ae5b/96b_aerocore2/hello_world/hello_world.dts
+    - export LATEST_BUILD=$(curl --fail -sS https://zephyr-dashboard.renode.io/zephyr/latest)
+    - export DTS_URL="https://zephyr-samples-builder.storage.googleapis.com/zephyr/${LATEST_BUILD}/96b_aerocore2/hello_world/hello_world.dts"
+    - ./dts2repl-static ${DTS_URL} --output test.repl
+    - wget -nv ${DTS_URL}
     - ./dts2repl-static hello_world.dts --output test2.repl
     - diff test.repl test2.repl || true
     - cat test.repl
