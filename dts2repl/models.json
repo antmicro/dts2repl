@@ -18,6 +18,8 @@
         }
     },
 
+    "adi,max32-rv32": {},
+
     "altr,jtag-uart": "UART.AlteraJTAG_UART",
 
     "ambiq,stimer": "Timers.AmbiqApollo4_SystemTimer",
