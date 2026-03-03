@@ -24,7 +24,7 @@ try_download() {
         echo "Precompiled package for renode commit ${RENODE_VERSION} downloaded."
         tar xf renode*portable.tar.gz -C ..
         cd ..
-        mv renode_*_portable renode-portable
+        mv renode*portable renode-portable
         RENODE_LOCATION=$(realpath renode-portable)
         echo "Renode portable is now in ${RENODE_LOCATION}"
         echo ${RENODE_LOCATION} > ${CI_PROJECT_DIR}/renode-location
