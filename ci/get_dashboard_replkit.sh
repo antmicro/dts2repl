@@ -13,7 +13,7 @@ rename -E 's:replkit/:repls/dashboard/:' -E "s:-${DEMO_NAME}.repl:.repl:" replki
 
 if ls replkit/*-"$DEMO_NAME"-config.json 1> /dev/null 2>&1; then
     rename -E 's:replkit/:repls/dashboard/:' -E "s:-${DEMO_NAME}-config.json:-config.json:" replkit/*-${DEMO_NAME}-config.json
-    rm replkit/*.json 
+    rm -f replkit/*.json
 fi
 
 # Grab the versions
