@@ -26,8 +26,8 @@
     "ambiq,apollo4-pinctrl": "GPIOPort.AmbiqApollo4_GPIO",
     "ambiq,uart": "UART.PL011",
 
-    "arm,arm926ej-s": { "type": "CPU.ARMv7A", "cpuType": "arm926" },
-    "arm,arm1176jzf-s": { "type": "CPU.ARMv7A", "cpuType": "arm1176" },
+    "arm,arm926ej-s": { "type": "CPU.ARMv7A", "cpuType": "arm926ej-s" },
+    "arm,arm1176jzf-s": { "type": "CPU.ARMv7A", "cpuType": "arm1176jzf-s" },
 
     "arm,armv7-timer": {
         "brcm,bcmbca": { "type": "Timers.ARM_GenericTimer", "frequency": 62500000, "defaultCounterFrequencyRegister": 62500000 },
