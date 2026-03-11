@@ -1,0 +1,4 @@
+system: Python.PythonPeripheral @ sysbus 0x4001e000
+    size: 0x1000
+    initable: false
+    script: "flag = not locals().get('flag', False); request.Value = 0xff if flag and request.Offset in [0x3c, 0x55, 0x5e, 0x5f, 0x74, 0x75, 0x76, 0x78, 0x79, 0x4B1] else 0x0"
