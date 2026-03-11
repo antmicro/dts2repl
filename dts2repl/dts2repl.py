@@ -167,7 +167,7 @@ def get_usb_cdc_acm_uart(dts_filename):
     except Exception:
         return None
 
-def get_uart(dts_filename, only_compatible = False):
+def get_uart(dts_filename, only_compatible = False, only_explicit_declarations = False):
     try:
         dt = dtlib.DT(dts_filename)
         repl = generate(dts_filename)
@@ -255,6 +255,9 @@ def get_uart(dts_filename, only_compatible = False):
             cons_index -= 1
     except Exception:
        pass
+
+    if only_explicit_declarations:
+        return None
 
     # Try to return any non-disabled node that looks vaguely like a uart
     try:
