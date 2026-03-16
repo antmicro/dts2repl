@@ -241,6 +241,7 @@
     "microchip,coreuart": { "type": "UART.MiV_CoreUART", "clockFrequency": 66000000 },
     "microchip,mpfs-gpio": "GPIOPort.MPFS_GPIO",
     "microchip,sam9x60-pit64b": { "type": "Python.PythonPeripheral", "size": 0xec, "initable": true, "filename": "scripts/pydev/counter.py" },
+    "microchip,xec-i2c-v2": {"type": "Python.PythonPeripheral", "size": 0x4, "initable": false, "script": "request.Value = 0xffffffff" },
 
     "mediatek,mt8365-uart": "UART.NS16550",
 
