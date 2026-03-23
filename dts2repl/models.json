@@ -18,7 +18,7 @@
         }
     },
 
-    "adi,max32-rv32": {},
+    "adi,max32-rv32": "CPU.RiscV32",
 
     "altr,jtag-uart": "UART.AlteraJTAG_UART",
 

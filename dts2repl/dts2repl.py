@@ -1602,7 +1602,7 @@ def generate(filename, override_system_clock_frequency=None, manual_overlays=Non
                 empty_time_provider_compats = {
                     "intel,niosv", "nuclei,bumblebee", "neorv32-cpu",
                     "espressif,riscv", "ite,riscv-ite", "litex,vexriscv-standard",
-                    "sensry,sy1xx", "nordic,vpr"
+                    "sensry,sy1xx", "nordic,vpr", "adi,max32-rv32"
                 }
                 empty_time_provider_overlays = {
                     "openisa,rv32m1", "telink,tlsr9518adk80d", "egis,et171"
