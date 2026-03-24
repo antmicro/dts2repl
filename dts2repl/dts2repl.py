@@ -1512,6 +1512,9 @@ def generate(filename, override_system_clock_frequency=None, manual_overlays=Non
             indent.append('pit: pit0')
             indent.append('wdt: wdt')
             dependencies.update(('mtimer', 'pit0', 'wdt'))
+        if model == 'GPIOPort.MAX32650_GPIO':
+            ngpios = get_node_prop(node, 'ngpios', 32)
+            indent.append(f'numberOfPins: {ngpios}')
 
         # additional parameters for python peripherals
         if compat.startswith('fsl,imx6') and compat.endswith('-anatop'):

@@ -8,6 +8,11 @@
         "_": "UART.MAX32655_UART"
     },
 
+    "adi,max32-gpio": {
+        "type": "GPIOPort.MAX32650_GPIO",
+        "irq_mappings": ["IRQ", "WakeUpIRQ"]
+    },
+
     "adi,max32-gcr": {
         "adi,max32650evkit|adi,ad_swiot1l_sl|adi,max32650fthr": { "type": "Miscellaneous.MAX32650_GCR" },
         "_": {
