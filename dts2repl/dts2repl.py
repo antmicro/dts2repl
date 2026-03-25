@@ -679,7 +679,7 @@ class ReplFile:
 
     def get_blocks_by_type(self, type: str) -> iterable[ReplBlock] :
         if type == 'cpu':
-            return filter(lambda x: 'cpu' in x.name and not 'timer' in x.name, self.blocks)
+            return filter(lambda x: x.model is not None and x.model.startswith('CPU.'), self.blocks)
 
         raise Exception(f'Unsupported block type {type}')
 
