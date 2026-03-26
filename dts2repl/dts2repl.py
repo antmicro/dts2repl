@@ -1863,7 +1863,7 @@ def generate(filename, override_system_clock_frequency=None, manual_overlays=Non
                 regions = [RegistrationRegion(addr)]
                 indent.append(f'size: {hex(size)}')
             else:
-                logging.warning('Memory node {node.name} has no reg, skipping')
+                logging.warning(f'Memory node "{node.name}" has no reg, skipping')
                 continue
 
         irq_dest_nodes = []
