@@ -391,7 +391,7 @@
     "nxp,lpc-ctimer": "Timers.LPC_CTimer",
     "nxp,lpc-usart": "UART.LPC_USART",
     "nxp,mcux-12b1msps-sar": "Analog.IMXRT_ADC",
-    "nxp,lpc-syscon": { "type": "Python.PythonPeripheral", "size": 0x1000, "script": "request.Value = {0x264: 0x3, 0x284: 0x3, 0x2B0: 0x4, 0x320: 0xFF, 0x3A0: 0xFF, 0xA18: 0xFF}.get(request.Offset, (0x0 if (request.Counter % 2) else 0xFFFFFFFF))" },
+    "nxp,lpc-syscon": { "type": "Python.PythonPeripheral", "size": 0x1000, "script": "request.Value = {0x264: 0x3, 0x284: 0x3, 0x2B0: 0x4, 0x2E8: 0x0, 0x320: 0xFF, 0x3A0: 0xFF, 0x508: 0x0, 0x568: 0x0, 0xA18: 0xFF}.get(request.Offset, (0x0 if (request.Counter % 2) else 0xFFFFFFFF))" },
     "nxp,lpc11u6x-syscon": { "type": "Python.PythonPeripheral", "size": 0x400, "initable": true, "filename": "scripts/pydev/flipflop.py" },
     "nxp,iap-fmc55": { "type": "Python.PythonPeripheral", "size": 0x1000, "initable": true, "filename": "scripts/pydev/flipflop.py" },
     "nxp,lpc11u6x-uart": "UART.NS16550",
