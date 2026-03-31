@@ -426,6 +426,7 @@
     "nordic,vpr": "CPU.RiscV32",
     "neorv32-cpu": "CPU.RiscV32",
     "neorv32-uart": "UART.NEORV32_UART",
+    "neorv32,uart": "UART.NEORV32_UART",
     "riscv,machine-timer": {
         "lowrisc,opentitan-earlgrey": null,
         "_": { "type": "Timers.RiscVMachineTimer", "frequency": 100000000, "irq_mappings": [""] }
