@@ -515,6 +515,49 @@ def get_interrupts_extended(val):
         yield (dest, params)
 
 
+CLINT_COMPATS = {'sifive,clint0', 'starfive,jh7100-clint', 'thead,c900-clint'}
+RISCV_MACHINE_TIMER_IRQ = 7
+
+
+def clint_has_timer_irqs(nodes):
+    # Return True if any CLINT node explicitly routes timer IRQs via
+    # `interrupts-extended`. When the CLINT does this the separate `riscv,machine-timer`
+    # node is fully redundant and should be dropped.
+    for node in nodes:
+        compat_list = get_node_prop(node, 'compatible', [])
+        if not any(c in CLINT_COMPATS for c in compat_list):
+            continue
+        if 'interrupts-extended' not in node.props:
+            continue
+        for _, params in get_interrupts_extended(node.props['interrupts-extended']):
+            if params and params[0] == RISCV_MACHINE_TIMER_IRQ:
+                return True
+    return False
+
+
+def find_clint_absorbed_mtimers(nodes):
+    # Return a dict mapping id(clint_node) -> mtimer_node for every mtimer whose
+    # mtime register address falls inside a CLINT's address range.
+    # In this layout the CLINT model already covers those registers, so the mtimer
+    # must not be registered as a separate peripheral. Instead its timer IRQ
+    # connections are merged into the CLINT block so that the CPU timer interrupt line is still wired up.
+    clint_nodes = [n for n in nodes if any(c in CLINT_COMPATS for c in (get_node_prop(n, 'compatible') or []))]
+    absorbed = {}
+    for mtimer_node in nodes:
+        if 'riscv,machine-timer' not in (get_node_prop(mtimer_node, 'compatible') or []):
+            continue
+        mtime_regs = list(get_reg(mtimer_node))
+        mtime_addr = mtime_regs[0][0] if mtime_regs else None
+        if mtime_addr is None:
+            continue
+        for clint_node in clint_nodes:
+            for base, size in get_reg(clint_node):
+                if size is not None and base <= mtime_addr < base + size:
+                    absorbed[id(clint_node)] = mtimer_node
+                    break
+    return absorbed
+
+
 class NameMapper:
     OVERRIDES = {
         "IRQControllers.ARM_GenericInterruptController": "gic",
@@ -1207,6 +1250,10 @@ def generate(filename, override_system_clock_frequency=None, manual_overlays=Non
         return (not is_cpu, unit_addr, compat)
     nodes = sorted(dt.node_iter(), key=node_sort_key)
 
+    # Detect mtimers to be absorbed by a CLINT due to address overlap.
+    clint_absorbed_mtimer = find_clint_absorbed_mtimers(nodes)
+    skipped_mtimer_ids = {id(m) for m in clint_absorbed_mtimer.values()}
+
     # get mcu compat name
     mcu = next(filter(lambda x: 'cpu' in x.name and get_node_prop(x, 'compatible'), dt.node_iter()), None)
     mcu_compat = None
@@ -1308,6 +1355,11 @@ def generate(filename, override_system_clock_frequency=None, manual_overlays=Non
             continue
         model = str(model)
         logging.info(f'Node {node.name} mapped to {name} was assigned model {model}')
+
+        if model == 'Timers.RiscVMachineTimer' and (clint_has_timer_irqs(nodes) or id(node) in skipped_mtimer_ids):
+            logging.info(f'Skipping {node.name}: CLINT already handles the machine timer')
+            repl_file.try_generate_tag(node)
+            continue
 
         dependencies = set()
         provides = {name}
@@ -1931,6 +1983,25 @@ def generate(filename, override_system_clock_frequency=None, manual_overlays=Non
             # For now we assume that there is only one parameter: the IRQ number, otherwise
             # we skip the interrupt
             irq_dests = [(d, ps) for d, ps in get_node_prop(node, 'interrupts-extended') if len(ps) == 1]
+
+            # When this CLINT absorbed an mtimer due to address overlap the mtimer's
+            # timer IRQ connections would otherwise be lost. Interleave them after
+            # each matching soft-IRQ entry so the output match the Renode model layout.
+            # Skip when the CLINT already carries timer IRQs in its own
+            # interrupts-extended - interleaving would duplicate them
+            # and shift all output indices.
+            if model == 'IRQControllers.CoreLevelInterruptor' and id(node) in clint_absorbed_mtimer \
+                    and not any(ps and ps[0] == RISCV_MACHINE_TIMER_IRQ for _, ps in irq_dests):
+                mtimer_node = clint_absorbed_mtimer[id(node)]
+                if 'interrupts-extended' in mtimer_node.props:
+                    timer_by_hlic = {id(d): ps for d, ps in get_node_prop(mtimer_node, 'interrupts-extended') if len(ps) == 1}
+                    interleaved = []
+                    for d, ps in irq_dests:
+                        interleaved.append((d, ps))
+                        if id(d) in timer_by_hlic:
+                            interleaved.append((d, timer_by_hlic[id(d)]))
+                    irq_dests = interleaved
+
             irq_dest_nodes = [d for d, _ in irq_dests]
             irq_numbers = [ps[0] for _, ps in irq_dests]
         elif 'virtio' in compat:
