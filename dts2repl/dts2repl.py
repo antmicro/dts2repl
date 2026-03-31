@@ -1399,6 +1399,7 @@ def generate(filename, override_system_clock_frequency=None, manual_overlays=Non
         # special handling of flash devices as those should be treated as memory
         flash_nodes = [
             'issi,is25lp128',
+            'jedec,qspi-nor',
             'nxp,imx-flexspi-hyperflash',
             'nxp,imx-flexspi-mx25um51345g',
             'nxp,imx-flexspi-nor',
