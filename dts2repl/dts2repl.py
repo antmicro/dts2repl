@@ -2126,7 +2126,7 @@ def generate(filename, override_system_clock_frequency=None, manual_overlays=Non
             dependencies.add(r.registration_point)
 
         if model.startswith('Memory'):
-            if model == 'Memory.MappedMemory' and size % 0x400 != 0:
+            if model == 'Memory.MappedMemory' and (size % 0x400 != 0 or size < 0x1000):
                 # there is a requirement for mapped memory regions to be of certain size in tlib;
                 # let's fallback to array memory for smaller regions
                 model = 'Memory.ArrayMemory'
