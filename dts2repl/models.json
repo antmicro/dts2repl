@@ -3,6 +3,8 @@
     "serial-flash": "Memory.MappedMemory",
     "nordic,mram": "Memory.MappedMemory",
 
+    "aesc,uart": "UART.AescUART",
+
     "adi,max32-uart": {
         "adi,max32650evkit|adi,ad_swiot1l_sl|adi,max32650fthr": { "type": "UART.MAX32650_UART" },
         "_": "UART.MAX32655_UART"
