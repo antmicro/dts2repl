@@ -1316,6 +1316,22 @@ def generate(filename, override_system_clock_frequency=None, manual_overlays=Non
             repl_file.try_generate_tag(node)
             continue
 
+        # `zephyr,memory-region` is a generic compat that can appear on both actual memory regions and
+        #  peripheral bus containers. Distinguish it by checking other compat strings on the same node:
+        # - if another compat also maps to a memory model, it is a confirmed memory region
+        # - if no other compat confirms memory, check if the 'ranges' property exists: its presence means
+        #   the node is an address-translating bus container whose children are the real peripherals - skip it
+        if compat == 'zephyr,memory-region':
+            def is_memory_compat(c):
+                return c in MODELS and (renode_model_overlay(c, mcu_compat, overlays)[0] or '').startswith('Memory')
+
+            memory_compat = next((c for c in compatible if c != 'zephyr,memory-region' and is_memory_compat(c)), None)
+            if memory_compat:
+                compat = memory_compat
+            elif 'ranges' in node.props:
+                logging.info(f'Node {node.name}: skipping "zephyr,memory-region" bus container (has "ranges")')
+                continue
+
         # not sure why this is needed. We need to investigate the RCC->RTC dependency.
         if is_disabled(node) and not node.name.startswith('rtc') and not "renesas,smartbond-timer" in compat:
             logging.info(f'Node {node.name} disabled. Skipping...')
