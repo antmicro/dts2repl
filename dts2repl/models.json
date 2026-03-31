@@ -436,6 +436,7 @@
         "lowrisc,opentitan-earlgrey": null,
         "riscv-virtio": null,
         "renode,riscv32-virtual": null,
+        "microchip,pic64gx": null,
         "_": { "type": "Timers.RiscVMachineTimer", "frequency": 100000000, "irq_mappings": [""] }
     },
     "samsung,exynos4210-uart": "UART.NS16550",
