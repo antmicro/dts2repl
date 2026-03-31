@@ -1660,7 +1660,7 @@ def generate(filename, override_system_clock_frequency=None, manual_overlays=Non
                    c in [
                         'sifive,e31', 'sifive,u54', 'sifive,u54-mc', 'sifive,u74-mc',
                         'espressif,riscv', 'qemu,riscv-virt', 'openhwgroup,cva6',
-                        'thead,c910', 'thead,c906', 'amd,mbv64'
+                        'thead,c910', 'thead,c906', 'amd,mbv64', 'sifive,e51',
                    ] for c in compatible) \
             or "_xandes" in isa:
                 indent.append('privilegedArchitecture: PrivilegedArchitecture.Priv1_10')
