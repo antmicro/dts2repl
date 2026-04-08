@@ -2,33 +2,26 @@ cpu0:
     privilegedArchitecture: PrivilegedArchitecture.Priv1_10
 
 cpu1:
-    cpuType: "rv64gc_zicsr_zifencei"
     privilegedArchitecture: PrivilegedArchitecture.Priv1_10
 
 cpu2:
-    cpuType: "rv64gc_zicsr_zifencei"
     privilegedArchitecture: PrivilegedArchitecture.Priv1_10
 
 cpu3:
-    cpuType: "rv64gc_zicsr_zifencei"
-    privilegedArchitecture: PrivilegedArchitecture.Priv1_10
-
-cpu4:
-    cpuType: "rv64gc_zicsr_zifencei"
     privilegedArchitecture: PrivilegedArchitecture.Priv1_10
 
 clint:
     numberOfTargets: 5
-    [2, 3] -> cpu1@[3, 7]
-    [4, 5] -> cpu2@[3, 7]
-    [6, 7] -> cpu3@[3, 7]
-    [8, 9] -> cpu4@[3, 7]
+    [2, 3] -> cpu0@[3, 7]
+    [4, 5] -> cpu1@[3, 7]
+    [6, 7] -> cpu2@[3, 7]
+    [8, 9] -> cpu3@[3, 7]
 
 plic:
-    [1,2] -> cpu1@[11,9]
-    [3,4] -> cpu2@[11,9]
-    [5,6] -> cpu3@[11,9]
-    [7,8] -> cpu4@[11,9]
+    [1,2] -> cpu0@[11,9]
+    [3,4] -> cpu1@[11,9]
+    [5,6] -> cpu2@[11,9]
+    [7,8] -> cpu3@[11,9]
     prioritiesEnabled : false
 
 l2Cache: Memory.MappedMemory @ sysbus 0x8000000
