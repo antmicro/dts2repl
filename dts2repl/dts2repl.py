@@ -1270,8 +1270,8 @@ def generate(filename, override_system_clock_frequency=None, manual_overlays=Non
         compatible = get_node_prop(node, 'compatible')
         if compatible:
             if node.name == "/":
-                main_compatible = compatible[0]
-                logging.debug(f'main compat string is = {main_compatible}')
+                main_compatible = compatible
+                logging.debug(f'main compat strings are = {main_compatible}')
                 break
 
     is_acpi_table_generated = False
@@ -1750,9 +1750,8 @@ def generate(filename, override_system_clock_frequency=None, manual_overlays=Non
                 cpuIdx = int(name.replace("cpu", ""))
 
             indent.append(f'cpuId: 0x{cpuIdx:x}')
-
             if not any(compat.startswith(x) for x in ["arm,arm11", "arm,arm9", "arm,cortex-a8"])  \
-            and not main_compatible in ["beagle,beaglebone-ai64", "beagle,beagley-ai", "grinn,am335x-chiliboard", "brcm,bcm2837"]  \
+            and not any(element in ["beagle,beaglebone-ai64", "beagle,beagley-ai", "grinn,am335x-chiliboard", "brcm,bcm2837"] for element in main_compatible) \
             and not compat == "arm,cortex-a5":
                 indent.append('genericInterruptController: gic')
                 dependencies.add('gic')
