@@ -1754,7 +1754,11 @@ def generate(filename, override_system_clock_frequency=None, manual_overlays=Non
 
             indent.append(f'cpuId: 0x{cpuIdx:x}')
             if not any(compat.startswith(x) for x in ["arm,arm11", "arm,arm9", "arm,cortex-a8"])  \
-            and not any(element in ["beagle,beaglebone-ai64", "beagle,beagley-ai", "grinn,am335x-chiliboard", "brcm,bcm2837"] for element in main_compatible) \
+            and (main_compatible is None or not any(element in ["beagle,beaglebone-ai64",
+                                                                "beagle,beagley-ai",
+                                                                "grinn,am335x-chiliboard",
+                                                                "brcm,bcm2837"] for element in
+                                                    main_compatible)) \
             and not compat == "arm,cortex-a5":
                 indent.append('genericInterruptController: gic')
                 dependencies.add('gic')
