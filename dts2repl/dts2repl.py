@@ -1182,6 +1182,9 @@ def convert_attribs_to_str(attribs) -> List[str]:
                 ret.append("%s: true" % (attr))
             else:
                 ret.append("%s: false" % (attr))
+        elif (isinstance(attribs[attr], dict)):
+            # Special object {"reference": "some_ref"} allows some_ref to be a reference value
+            ret.append("%s: %s" % (attr, attribs[attr]['reference']))
         else:
             ret.append("%s: %s" % (attr, str(attribs[attr])))
     return ret
