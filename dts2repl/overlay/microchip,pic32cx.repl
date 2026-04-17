@@ -1,0 +1,42 @@
+sysbus:
+    init:
+        Tag <0x40001010 0x4> "OSCCTRL_STATUS" 0x03 
+        Tag <0x40001030 0x4> "OSCCTRL_DPLL0CTRLA" 0x2
+        Tag <0x40001040 0x4> "OSCCTRL_DPLL0STATUS" 0x3
+        Tag <0x4000140C 0x4> "OSC32KCTRL_STATUS" 0x01
+
+UNKNOWN1: Python.PythonPeripheral @ sysbus 0x40001038
+    size: 0x4
+    initable: true
+    filename: "scripts/pydev/repeater.py"
+
+UNKNOWN2: Python.PythonPeripheral @ sysbus 0x40000814
+    size: 0x4
+    initable: true
+    filename: "scripts/pydev/repeater.py"
+
+UNKNOWN3: Python.PythonPeripheral @ sysbus 0x40000820
+    size: 0x4
+    initable: true
+    filename: "scripts/pydev/repeater.py"
+
+UNKNOWN4: Python.PythonPeripheral @ sysbus 0x40001C90
+    size: 0x4
+    initable: true
+    filename: "scripts/pydev/repeater.py"
+
+// Used by pic32cx_sg61_cult
+GCLK_GENCTRL0: Python.PythonPeripheral @ sysbus 0x40001C20
+    size: 0x4
+    initable: true
+    filename: "scripts/pydev/repeater.py"
+
+GCLK_GENCTRL1: Python.PythonPeripheral @ sysbus 0x40001C24
+    size: 0x4
+    initable: true
+    filename: "scripts/pydev/repeater.py"
+
+GCLK_PCHCTRL12: Python.PythonPeripheral @ sysbus 0x40001D08
+    size: 0x4
+    initable: true
+    filename: "scripts/pydev/repeater.py"
