@@ -204,6 +204,7 @@
 
     "ingenic,jz4780-uart": "UART.NS16550",
     "microchip,xec-uart": "UART.NS16550",
+    "microchip,sercom-g1-uart": {"type": "UART.SAMD5_UART", "irq_mappings": ["IRQ", null, null, null]},
 
     "litex,clk": "Miscellaneous.LiteX_MMCM_CSR32",
     "litex,timer0": { "fomu": { "type" : "Timers.LiteX_Timer", "frequency": 100000000 }, "_": { "type": "Timers.LiteX_Timer_CSR32", "frequency": 100000000 } },
