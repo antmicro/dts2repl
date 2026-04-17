@@ -1,0 +1,58 @@
+sysbus:
+    init add:
+        Tag <0x4402000C 0x4> "SUPC_STATUS" 0xFFFFFFFF
+        Tag <0x4404000C 0x4> "OSCCTRL_INTFLAG" 0x1 
+        Tag <0x44040010 0x4> "OSCCTRL_STATUS" 0xFFFFFFFF
+        Tag <0x4404200C 0x4> "OSC32KCTRL_" 0x3 
+        Tag <0x44050004 0x4> "GCLK_SYNCBUSY" 0x0 
+        Tag <0x44052008 0x4> "MCLK_INTFLAG" 0x1
+
+OSCCTRL_PLL0CTRL: Python.PythonPeripheral @ sysbus 0x44040040
+    size: 0x4
+    initable: true
+    filename: "scripts/pydev/repeater.py"
+
+OSCCTRL_PLL0FBDIV: Python.PythonPeripheral @ sysbus 0x44040044
+    size: 0x4
+    initable: true
+    filename: "scripts/pydev/repeater.py"
+
+OSCCTRL_PLL0POSTDIVA: Python.PythonPeripheral @ sysbus 0x4404004C
+    size: 0x4
+    initable: true
+    filename: "scripts/pydev/repeater.py"
+
+OSCCTRL_PLL1CTRL: Python.PythonPeripheral @ sysbus 0x44040054
+    size: 0x4
+    initable: true
+    filename: "scripts/pydev/repeater.py"
+
+OSCCTRL_PLL1FBDIV: Python.PythonPeripheral @ sysbus 0x44040058
+    size: 0x4
+    initable: true
+    filename: "scripts/pydev/repeater.py"
+
+OSCCTRL_PLL1REFDIV: Python.PythonPeripheral @ sysbus 0x4404005C
+    size: 0x4
+    initable: true
+    filename: "scripts/pydev/repeater.py"
+
+MCLK_CLKDIV0: Python.PythonPeripheral @ sysbus 0x4405200C
+    size: 0x4
+    initable: true
+    filename: "scripts/pydev/repeater.py"
+
+GCLK_GENCTRL0: Python.PythonPeripheral @ sysbus 0x44050020
+    size: 0x4
+    initable: true
+    filename: "scripts/pydev/repeater.py"
+
+GCLK_GENCTRLx: Python.PythonPeripheral @ sysbus 0x440500D8
+    size: 0x4
+    initable: true
+    filename: "scripts/pydev/repeater.py"
+
+MCLK_CLKMSK1: Python.PythonPeripheral @ sysbus 0x44052040
+    size: 0x4
+    initable: true
+    filename: "scripts/pydev/repeater.py"
