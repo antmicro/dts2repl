@@ -1,3 +1,8 @@
+reset_gdma: Python.PythonPeripheral @ sysbus 0x50000010
+    size: 0x4
+    initable: true
+    filename: "scripts/pydev/flipflop.py"
+
 reset_hsgpio3: Python.PythonPeripheral @ sysbus 0x50020014
     size: 0x4
     initable: true
