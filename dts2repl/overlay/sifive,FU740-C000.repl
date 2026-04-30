@@ -11,14 +11,13 @@ cpu3:
     privilegedArchitecture: PrivilegedArchitecture.Priv1_10
 
 clint:
-    numberOfTargets: 5
-    [2, 3] -> cpu0@[3, 7]
+    // cpu0 IRQ connections are already automatically generated
     [4, 5] -> cpu1@[3, 7]
     [6, 7] -> cpu2@[3, 7]
     [8, 9] -> cpu3@[3, 7]
 
 plic:
-    [1,2] -> cpu0@[11,9]
+    // cpu0 IRQ connections are already automatically generated
     [3,4] -> cpu1@[11,9]
     [5,6] -> cpu2@[11,9]
     [7,8] -> cpu3@[11,9]

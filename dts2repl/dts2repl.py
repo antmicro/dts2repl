@@ -953,11 +953,6 @@ class ReplBlock:
     region: Optional[RegistrationRegion] = None
     owner: ReplFile = None # this field will be filled when adding this block to a ReplFile
 
-
-    def get_depending_blocks(self) -> list[ReplBlock]:
-        return [b for b in self.owner.blocks if self.name in b.depends]
-
-
     def __str__(self) -> str:
         return '\n'.join(self.content)
 
@@ -2154,9 +2149,8 @@ def generate(filename, override_system_clock_frequency=None, manual_overlays=Non
         repl_file.filter_64bit_reg_peripherals()
 
     # set number of targets for CLINT if necessary
-    # note that IRQ destinations don't create a dependency; this should pick up just CPUs because they get a dependency on the CLINT when we add timeProvider
     clint_block = repl_file.get_block_by_name('clint')
-    if clint_block and (clint_targets := len(clint_block.get_depending_blocks())):
+    if clint_block and (clint_targets := len(dt.get_node('/cpus').nodes)):
         clint_block.content += [f'    numberOfTargets: {clint_targets}']
 
     repl_file.merge_overlapping_blocks()

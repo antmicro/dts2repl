@@ -1,6 +1,3 @@
-clint:
-    numberOfTargets: 5
-
 plic:
     prioritiesEnabled: false
 
