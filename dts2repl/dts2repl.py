@@ -887,6 +887,20 @@ class ReplFile:
             block.content = filtered_content
 
 
+    def remove_empty_property_overrides(self) -> None:
+        def should_stay(variable):
+            is_not_comment = lambda line : not line.strip().startswith("//")
+            lines_without_comments = list(filter(is_not_comment, variable.content))
+            if len(lines_without_comments) != 1:
+                return True
+            line = lines_without_comments[0].strip()
+            if line.endswith(":"):
+               return False
+            return True
+
+        self.blocks = list(filter(should_stay, self.blocks))
+
+
     def _get_grouped_tags(self) -> iterable[TagBlock]:
         if len(self.tags) < 2:
             return self.tags
@@ -2147,6 +2161,7 @@ def generate(filename, override_system_clock_frequency=None, manual_overlays=Non
 
     repl_file.merge_overlapping_blocks()
     repl_file.remove_dangling_irqs()
+    repl_file.remove_empty_property_overrides()
 
     return str(repl_file)
 
