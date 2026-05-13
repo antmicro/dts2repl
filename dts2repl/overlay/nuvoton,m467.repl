@@ -1,4 +1,8 @@
+CLK_CTRL1: Python.PythonPeripheral @ sysbus 0x40000250
+    size: 0x4
+    initable: true
+    filename: "scripts/pydev/flipflop.py"
+
 sysbus:
     init add:
         Tag <0x40000100 4> "SYS_CTRL1" 0xFFFFFFFF
-        Tag <0x40000250 4> "CLK_CTRL1" 0xFFFFFFFF
