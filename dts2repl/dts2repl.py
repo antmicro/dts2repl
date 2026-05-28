@@ -1894,6 +1894,7 @@ def generate(filename, override_system_clock_frequency=None, manual_overlays=Non
             'Sensors.TMP103',
             'Sensors.TMP108',
             'Sensors.SI7210',
+            'Sensors.VEML7700',
             'I2C.BME280',
             'I2C.SHT45'
         ]

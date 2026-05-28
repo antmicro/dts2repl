@@ -589,5 +589,7 @@
     "st,lsm303dlhc-accel": "Sensors.LSM303DLHC_Accelerometer",
 
     "focaltech,ft9001-cpm": "Miscellaneous.FocalTechFT9001_CPM",
-    "focaltech,ft9001-usart": "UART.FT9001_USART"
+    "focaltech,ft9001-usart": "UART.FT9001_USART",
+
+    "vishay,veml7700": "Sensors.VEML7700"
 }
