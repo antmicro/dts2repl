@@ -1,4 +1,20 @@
+scg_csr_rccr: Python.PythonPeripheral @ { sysbus 0x50182010; sysbus 0x50182014 }
+    size: 0x4
+    initable: true
+    filename: "scripts/pydev/repeater.py"
+
+scg_firccfg: Python.PythonPeripheral @ sysbus 0x50182308
+    size: 0x4
+    initable: true
+    filename: "scripts/pydev/repeater.py"
+
 sysbus:
     init add:
+        Tag <0x50180040 0x4> "SPC_SRAMCTL_ACK" 0x80000000
+        Tag <0x5018A00C 0x4> "CCM32K_STATUS_OSC32K_RDY_ACTIVE" 0x5
+        Tag <0x50182100 0x4> "SCG_SOSCCSR_SOSCVLD" 0x1000000
+        Tag <0x50182200 0x4> "SCG_SIRCCSR_SIRCVLD" 0x1000000
+        Tag <0x50182300 0x4> "SCG_FIRCCSR_FIRCVLD" 0x1000000
+        Tag <0x50182400 0x4> "SCG_ROSCCSR_ROSCVLD" 0x1000000
         Tag <0x501A301C 0x4> "UNKNOWN" 0xFFFFFFFF
 
