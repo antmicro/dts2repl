@@ -1,6 +1,7 @@
 sysbus:
     init:
-        Tag <0x40001010 0x4> "OSCCTRL_STATUS" 0x03 
+        Tag <0x40001010 0x4> "OSCCTRL_STATUS" 0x103
+        Tag <0x4000101C 0x4> "OSCCTRL_DFLLCTRLA" 0x2
         Tag <0x40001030 0x4> "OSCCTRL_DPLL0CTRLA" 0x2
         Tag <0x40001040 0x4> "OSCCTRL_DPLL0STATUS" 0x3
         Tag <0x4000140C 0x4> "OSC32KCTRL_STATUS" 0x01
@@ -29,7 +30,14 @@ UNKNOWN4: Python.PythonPeripheral @ sysbus 0x40001C90
 GCLK_GENCTRL0: Python.PythonPeripheral @ sysbus 0x40001C20
     size: 0x4
     initable: true
-    filename: "scripts/pydev/repeater.py"
+    script: '''
+if request.IsInit:
+    lastVal = 0x100
+elif request.IsRead:
+    request.Value = lastVal | 0x100
+elif request.IsWrite:
+    lastVal = request.Value
+'''
 
 GCLK_GENCTRL1: Python.PythonPeripheral @ sysbus 0x40001C24
     size: 0x4
