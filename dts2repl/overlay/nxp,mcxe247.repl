@@ -1,0 +1,18 @@
+SCG_CSR: Python.PythonPeripheral @ sysbus 0x40064010
+    size: 0x4
+    initable: true
+    script: '''
+if request.IsInit:
+    lastMultiplier = 0
+if request.IsRead:
+    lastMultiplier = (lastMultiplier + 1) % 16
+    request.Value = lastMultiplier << 24
+'''
+
+sysbus:
+    init add:
+        Tag <0x40064100 4> "SCG_SOSCCSR" 0xFFFFFFFF
+        Tag <0x40064200 4> "SCG_SIRCCSR" 0xFFFFFFFF
+        Tag <0x40064300 4> "SCG_FIRCCSR" 0xFFFFFFFF
+        Tag <0x40064500 4> "SCG_SPLLCSR" 0xFFFFFFFF
+        Tag <0x40064600 4> "SCG_APLLCSR" 0xFFFFFFFF
