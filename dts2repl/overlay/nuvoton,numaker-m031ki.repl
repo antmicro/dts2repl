@@ -1,0 +1,8 @@
+CLK_STATUS: Python.PythonPeripheral @ sysbus 0x40000250
+    size: 0x4
+    initable: true
+    filename: "scripts/pydev/flipflop.py"
+
+sysbus:
+    init add:
+        Tag <0x40000100 4> "SYS_REGLCTL" 0xFFFFFFFF
