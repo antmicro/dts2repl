@@ -355,6 +355,7 @@
     "renesas,rz-scif-uart": { "type": "SCI.RenesasRZG_SCIFA", "frequency": 100000000, "irq_mappings": ["0", "1", "2", "3", "4"] },
     "renesas,ra-timer" : "Timers.RenesasRA_GPT",
     "renesas,smartbond-timer" : "Timers.RenesasDA14_GPT",
+    "renesas,ra-mram-controller": { "type": "Python.PythonPeripheral", "size": 0x100, "initable": true, "script": "lastVal = (0 if request.IsInit else ((request.Value & 0xFFFF) if request.IsWrite else lastVal)) ; request.Value = lastVal" },
     "renesas,ra-clock-generation-circuit": { "type": "Python.PythonPeripheral", "size": 0x40, "initable": false, "script": "request.Value = 0xFFFFFFFF" },
     "renesas,r9a07g044-cpg": { "type": "Python.PythonPeripheral", "size": 0x10000, "initable": true, "filename": "scripts/pydev/flipflop.py" },
     "renesas,rz-cpg": { "type": "Python.PythonPeripheral", "size": 0x10000, "initable": true, "filename": "scripts/pydev/flipflop.py" },
