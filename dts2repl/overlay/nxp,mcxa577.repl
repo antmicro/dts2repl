@@ -1,0 +1,32 @@
+SCG0CSR_S: Python.PythonPeripheral @ sysbus 0x500CA010
+    size: 0x8
+    initable: true
+    script: '''
+if request.IsInit: lastVal = 0x3000000
+if request.IsWrite and request.Offset == 0x4: lastVal = request.Value
+if request.IsRead: request.Value = lastVal
+'''
+
+SCG0CSR_NS: Python.PythonPeripheral @ sysbus 0x400CA010
+    size: 0x8
+    initable: true
+    script: '''
+if request.IsInit: lastVal2 = 0x3000000
+if request.IsWrite and request.Offset == 0x4: lastVal2 = request.Value
+if request.IsRead: request.Value = lastVal2
+'''
+
+sysbus:
+    init add:
+        Tag <0x500CA200 0x4> "SIRCCSR_VALID_S" 0x1000000
+        Tag <0x500CA300 0x4> "FIRCCSR_VALID_S" 0x81000000
+        Tag <0x500CA600 0x4> "SPLLCSR_VALID_S" 0x1000000
+        Tag <0x400CA200 0x4> "SIRCCSR_VALID_NS" 0x1000000
+        Tag <0x400CA300 0x4> "FIRCCSR_VALID_NS" 0x81000000
+        Tag <0x400CA600 0x4> "SPLLCSR_VALID_NS" 0x1000000
+        Tag <0x500CB040 0x4> "SPC_SRAMCTL_ACK_S" 0x80000000
+        Tag <0x400CB040 0x4> "SPC_SRAMCTL_ACK_NS" 0x80000000
+        Tag <0x500CA100 0x4> "SOSCCSR_VALID_S" 0x1000000
+        Tag <0x400CA100 0x4> "SOSCCSR_VALID_NS" 0x1000000
+        Tag <0x500CA500 0x4> "APLLCSR_VALID_S" 0x1000000
+        Tag <0x400CA500 0x4> "APLLCSR_VALID_NS" 0x1000000

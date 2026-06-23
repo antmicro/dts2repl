@@ -1,0 +1,17 @@
+SCG0CSR: Python.PythonPeripheral @ sysbus 0x5008F010
+    size: 0x8
+    initable: true
+    script: '''
+if request.IsInit: lastVal = 0x3000000
+if request.IsWrite and request.Offset == 0x4: lastVal = request.Value
+if request.IsRead: request.Value = lastVal
+'''
+
+sysbus:
+    init add:
+        Tag <0x5008F100 0x4> "SOSCCSR_VALID" 0x1000000
+        Tag <0x5008F200 0x4> "SIRCCSR_VALID" 0x1000000
+        Tag <0x5008F300 0x4> "FIRCCSR_VALID" 0x81000000
+        Tag <0x5008F500 0x4> "APLLCSR_VALID" 0x1000000
+        Tag <0x5008F600 0x4> "SPLLCSR_VALID" 0x1000000
+        Tag <0x50090040 0x4> "SRAMCTL_ACK" 0x80000000

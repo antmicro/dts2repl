@@ -362,6 +362,7 @@
     "socionext,uniphier-uart": "UART.NS16550",
 
     "nxp,flexpwm": "Timers.IMXRT_PWM",
+    "nxp,spc": { "type": "Python.PythonPeripheral", "size": 0x1000, "initable": false, "script": "request.Value = 0xF0000000 if request.Offset == 0x40 else 0x0" },
     "nxp,imx-code-bus": "Memory.MappedMemory",
     "nxp,imx-dtcm": "Memory.MappedMemory",
     "nxp,imx-flexspi": "SPI.IMXRT_FlexSPI",
