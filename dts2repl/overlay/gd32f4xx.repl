@@ -1,0 +1,3 @@
+sysbus:
+    init add:
+        Tag <0x40007004 0x4> "PMU_CS" 0xFFFFFFFF
