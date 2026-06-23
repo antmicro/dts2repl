@@ -1,0 +1,4 @@
+pwr: Python.PythonPeripheral @ sysbus 0x56024800
+    size: 0x400
+    initable: true
+    filename: "scripts/pydev/flipflop.py"
