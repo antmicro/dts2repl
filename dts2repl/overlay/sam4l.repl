@@ -1,0 +1,4 @@
+sysbus:
+    init add:
+        Tag <0x400E0814 0x4> "SCIF_PCLKSR" 0xFFFFFFFF
+        Tag <0x400F0424 0x4> "BSCIF_PCLKSR" 0xFFFFFFFF
