@@ -1169,6 +1169,14 @@ def parse_interrupts_property(node, compat, mcu_compat, overlays):
 
         irq_dest_nodes = [interrupt_parent] * len(irq_numbers)
 
+        if compat == 'neorv32,uart':
+            firq = interrupt_parent
+            map_cells = dtlib.to_nums(firq.props['interrupt-map'].value)
+            channel_to_bit = {map_cells[i + 1]: map_cells[i + 4] for i in range(0, len(map_cells), 5)}
+
+            irq_dest_nodes = [firq.parent] * len(irq_numbers)
+            irq_numbers = [channel_to_bit[n] for n in irq_numbers]
+
         # Handle GIC IRQ number remapping
         parent_model = get_model(interrupt_parent, mcu_compat, overlays)
         if parent_model == 'IRQControllers.ARM_GenericInterruptController':
@@ -2081,6 +2089,8 @@ def generate(filename, override_system_clock_frequency=None, manual_overlays=Non
             elif compat in ['arm,cmsdk-uart']:
                 irq_names = ['TxInterrupt', 'RxInterrupt']
             elif compat in ['infineon,xmc4xxx-uart']:
+                irq_names = ['TxInterrupt', 'RxInterrupt']
+            elif compat in ['neorv32,uart']:
                 irq_names = ['TxInterrupt', 'RxInterrupt']
             elif compat in ['ambiq,stimer']:
                 irq_names = ['IRQA', 'IRQB', 'IRQC', 'IRQD', 'IRQE', 'IRQF', 'IRQG', 'IRQH', 'IRQI']
