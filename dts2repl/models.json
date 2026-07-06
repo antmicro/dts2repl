@@ -328,7 +328,7 @@
     "rockchip,rk3399-sdhci-5.1": { "type": "Python.PythonPeripheral", "size": 0x10000, "initable": true, "filename": "scripts/pydev/rolling-bit.py" },
 
     "renesas.smartbond-gpio": "GPIOPort.RenesasDA14_GPIO",
-    "renesas,smartbond-i2c": "I2C.RenesasDA_I2C",
+    "renesas,smartbond-i2c": "I2C.DesignWare_APB_I2C",
     "renesas,smartbond-spi": "SPI.RenesasDA_SPI",
     "renesas,smartbond-uart": "UART.RenesasDA14_UART",
     "renesas,smartbond-watchdog": {"type": "Timers.RenesasDA_Watchdog", "frequency": 32000},
