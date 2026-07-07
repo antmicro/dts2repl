@@ -1235,7 +1235,8 @@ def parse_interrupts_property(node, compat, mcu_compat, overlays):
 
         irq_dest_nodes = [interrupt_parent] * len(irq_numbers)
 
-        if compat == 'neorv32,uart':
+        # Map NEORV32 FIRQ channels to CPU interrupts, matched by interrupt-map as older DTS lack the firq compatible
+        if compat.startswith('neorv32,') and 'interrupt-map' in interrupt_parent.props:
             firq = interrupt_parent
             map_cells = dtlib.to_nums(firq.props['interrupt-map'].value)
             channel_to_bit = {map_cells[i + 1]: map_cells[i + 4] for i in range(0, len(map_cells), 5)}

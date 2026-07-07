@@ -512,6 +512,7 @@
     "neorv32-cpu": "CPU.RiscV32",
     "neorv32-uart": "UART.NEORV32_UART",
     "neorv32,uart": "UART.NEORV32_UART",
+    "neorv32,gpio": "GPIOPort.NEORV32_GPIO",
     "riscv,machine-timer": {
         "lowrisc,opentitan-earlgrey": null,
         "litex,vexiiriscv": null,
