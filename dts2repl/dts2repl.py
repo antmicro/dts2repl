@@ -2097,6 +2097,14 @@ def generate(filename, override_system_clock_frequency=None, manual_overlays=Non
             ]
             indent.append(f"{list(range(len(interruptNumbers)))} -> cpu0@{interruptNumbers}")
 
+        if compat == 'openisa,rv32m1-gpio':
+            _, gpio_size = next(get_reg(node))
+            regions = [RegistrationRegion(addr, gpio_size, "gpio")]
+            port_prop = node.props.get('openisa,rv32m1-port')
+            if port_prop is not None:
+                port_node = port_prop.to_node()
+                port_addr, port_size = next(get_reg(port_node))
+                regions += [RegistrationRegion(port_addr, port_size, "port")]
 
         if compat in ["openisa,rv32m1-lptmr", "openisa,rv32m1-lpuart"]:
             interrupt_parent = get_node_prop(node, "interrupt-parent")

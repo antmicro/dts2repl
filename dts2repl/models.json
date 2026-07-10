@@ -272,6 +272,7 @@
     "openisa,rv32m1-intmux": "IRQControllers.NXP_INTMUX",
     "openisa,ri5cy": "CPU.Ri5cy",
     "openisa,zero-ri5cy": { "type": "CPU.Ri5cy", "hartId": 0 },
+    "openisa,rv32m1-gpio": { "type": "GPIOPort.NXPGPIOPort", "numberOfPins": 32 },
     "openisa,rv32m1-lpuart": { "type": "UART.NXP_LPUART", "fifoSize": 8 },
     "openisa,rv32m1-lptmr": { "type": "UART.LowPower_Timer" },
 
