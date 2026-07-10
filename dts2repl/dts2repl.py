@@ -368,12 +368,14 @@ def get_node_prop(node, prop, default=None, inherit=False):
     elif prop in ('interrupts', 'reg', 'ranges', 'alloc-ranges', 'dma-ranges', 'phandle'):
         return val.to_nums()
     elif prop in ('#address-cells', '#size-cells', '#interrupt-cells', 'cc-num', 'clock-frequency',
-                  'riscv,ndev', 'ngpios', 'port'):
+                  'riscv,ndev', 'ngpios', 'port', '#clock-cells'):
         return val.to_num()
     elif prop in ('interrupt-parent',):
         return val.to_node()
     elif prop in ('interrupts-extended',):
         return get_interrupts_extended(val)
+    elif prop in ('clocks',):
+        return get_clocks(val)
     elif prop in ('gpios',):
         fmt = 'pnn'
         while len(fmt) * 4 < len(val.value):
@@ -389,6 +391,10 @@ def get_node_prop(node, prop, default=None, inherit=False):
         except:
             pass
     return None
+
+REGISTRATION_ALIAS = 'RegistrationPeripheralAlias'
+REGISTRATION_MAPPINGS_ZEPHYR = 'registration_mappings_zephyr'
+REGISTRATION_MAPPINGS_UBOOT = 'registration_mappings_uboot'
 
 def renode_model_overlay(compat, mcu, overlays):
     def _try_decode(e):
@@ -412,6 +418,10 @@ def renode_model_overlay(compat, mcu, overlays):
             if "irq_mappings" in e.keys():
                 im = e["irq_mappings"]
                 del a["irq_mappings"]
+            if REGISTRATION_MAPPINGS_ZEPHYR in e.keys():
+                del a[REGISTRATION_MAPPINGS_ZEPHYR]
+            if REGISTRATION_MAPPINGS_UBOOT in e.keys():
+                del a[REGISTRATION_MAPPINGS_UBOOT]
 
             return m, a, im
         else:
@@ -514,6 +524,20 @@ def get_interrupts_extended(val):
         cells = cells[1 + interrupt_cells:]
         yield (dest, params)
 
+
+def get_clocks(val):
+    node = val.node
+    phandle2node = node.dt.phandle2node
+    cells = dtlib.to_nums(val.value)
+    while cells:
+        dest = phandle2node[cells[0]]
+        clock_cells = get_node_prop(dest, '#clock-cells')
+        if clock_cells is None:
+            logging.warning(f'Failed to parse clocks for {node.path}: {dest.path} has no #clock-cells')
+            return
+        params = cells[1:1 + clock_cells]
+        cells = cells[1 + clock_cells:]
+        yield (dest, params)
 
 CLINT_COMPATS = {'sifive,clint0', 'starfive,jh7100-clint', 'thead,c900-clint'}
 RISCV_MACHINE_TIMER_IRQ = 7
@@ -635,6 +659,7 @@ class RegistrationRegion:
     region_name: Optional[str] = None
     registration_point: str = "sysbus"
     cpu: [Optional[str]] = None
+    registration_alias: str = None
 
     def __post_init__(self):
         if isinstance(self.addresses, list):
@@ -679,6 +704,8 @@ class RegistrationRegion:
     def to_repl(regions):
         def _get_registration_str_simple(region):
             if region.cpu is None:
+                if region.registration_alias is not None:
+                    return f'{region.registration_point} {region.registration_alias}'
                 if region.size is not None:
                     return f'{region.registration_point} <{region.address:#x}, +{region.size:#x}>'
                 elif region.address is not None:
@@ -1560,6 +1587,36 @@ def generate(filename, override_system_clock_frequency=None, manual_overlays=Non
 
         indent.extend(convert_attribs_to_str(attribs))
 
+        if 'clocks' in node.props:
+            selected_clocks_params = None
+            registration_mappings = None
+            done = False
+            for dest, params in get_node_prop(node, 'clocks'):
+                if done:
+                    break
+                rcc_compats = get_node_prop(dest, 'compatible')
+                if not rcc_compats:
+                    continue
+                for rcc_compat in rcc_compats:
+                    if rcc_compat not in MODELS.keys():
+                        continue
+                    if len(params) == 1 and REGISTRATION_MAPPINGS_UBOOT in MODELS[rcc_compat]:
+                        registration_mappings = MODELS[rcc_compat][REGISTRATION_MAPPINGS_UBOOT]
+                        selected_clocks_params = params
+                        done = True
+                        break;
+                    if len(params) == 2 and REGISTRATION_MAPPINGS_ZEPHYR in MODELS[rcc_compat]:
+                        registration_mappings = MODELS[rcc_compat][REGISTRATION_MAPPINGS_ZEPHYR]
+                        selected_clocks_params = params
+                        done = True
+                        break;
+
+            if selected_clocks_params and registration_mappings:
+                peri = next((k for k, v in registration_mappings.items() if [x.value for x in v] == selected_clocks_params), None)
+                if peri:
+                    alias = f'{REGISTRATION_ALIAS}.{peri}'
+                    regions += [RegistrationRegion(registration_point = 'rcc', registration_alias = alias)]
+
         # additional parameters for peripherals
         if model == 'IRQControllers.PlatformLevelInterruptController':
             # 1023 is currently maximum value supported by the PLIC model in Renode
@@ -1571,6 +1628,28 @@ def generate(filename, override_system_clock_frequency=None, manual_overlays=Non
         if model == 'Miscellaneous.STM32L0_RCC':
             indent.append('systick: nvic0')
             dependencies.add('nvic0')
+        if model == 'Miscellaneous.STM32H7_RCC':
+            indent.append('systick: nvic0')
+            dependencies.add('nvic0')
+
+            def find_hse_node(node):
+                if node.name == 'clk-hse' and get_node_prop(node, 'clock-frequency'):
+                    clock_freq_prop = get_node_prop(node, 'clock-frequency')
+                    indent.append(f'hseFrequency: {clock_freq_prop}')
+                    return True
+                return False
+            done = False
+            # RCC related name for node so we don't shadow global node
+            for rcc_node in nodes:
+                if done:
+                    break
+                for sub_node in rcc_node.node_iter():
+                    if find_hse_node(sub_node):
+                        done = True
+                        break
+            if not done:
+                logging.info('clock frequency for HSE not found for RCC. Timings may be wrong')
+
         if model == 'MTD.STM32WBA_FlashController':
             children = node.nodes.values()
             child = next(iter(children), None)
@@ -2134,8 +2213,8 @@ def generate(filename, override_system_clock_frequency=None, manual_overlays=Non
         block_content = [f'{name}: {model} @ {RegistrationRegion.to_repl(regions)}']
         block_content.extend(map(lambda x: f'    {x}', indent))
 
-        region = regions[0] if len(regions) == 1 else None # for now we store at most one for merging
-        if model.startswith('Memory'):
+        region = regions[0] if len([a for a in regions if not getattr(a, 'registration_alias', None) or a.registration_alias == None]) == 1 else None # for now we store at most one for merging
+        if model.startswith('Memory') and region:
             region.size = size
         block = ReplBlock(name, model, dependencies, provides, block_content, region)
         repl_file.add_block(block)
