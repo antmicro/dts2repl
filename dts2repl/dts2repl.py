@@ -390,7 +390,7 @@ def get_node_prop(node, prop, default=None, inherit=False):
             pass
     return None
 
-def renode_model_overlay(compat, mcu, overlays):
+def renode_model_overlay(compat, mcu, overlays, node_compatible=tuple()):
     def _try_decode(e):
         if e is None:
             # Null mapping -> reject model creation
@@ -423,9 +423,15 @@ def renode_model_overlay(compat, mcu, overlays):
 
     if model is None:
         # let's look for a special match notation containing multiple entries separated with '|' or a '_' else entry
+        #
+        # `overlays` only carries the SoC/board root compatible strings (see get_overlays()), so a
+        # nested key never matched a peripheral's OWN "compatible" list. That silently broke devices
+        # whose node reuses another SoC family's compat string for a shared IP block (e.g. an STM32H5
+        # ethernet node also lists "st,stm32h7-ethernet" because it's the same Synopsys DWC EQOS IP as
+        # H7) -- see antmicro/dts2repl#13. Check the node's own compat list too.
         for entry in models_entry:
             for subentry in entry.split("|"):
-                if subentry == "_" or any(subentry in o for o in overlays):
+                if subentry == "_" or any(subentry in o for o in overlays) or any(subentry in c for c in node_compatible):
                     model, attribs, irq_mappings = _try_decode(models_entry[entry])
                     return model, compat, attribs, irq_mappings
 
@@ -1125,9 +1131,10 @@ def can_be_memory(node):
 
 
 def get_model(node, mcu=None, overlays=tuple()):
-    node_compatible = next(filter(lambda x: x in MODELS, get_node_prop(node, 'compatible', [])), None)
+    compatible = get_node_prop(node, 'compatible', [])
+    node_compatible = next(filter(lambda x: x in MODELS, compatible), None)
     if node_compatible:
-        node_model, _, _, _ = renode_model_overlay(node_compatible, mcu, overlays)
+        node_model, _, _, _ = renode_model_overlay(node_compatible, mcu, overlays, compatible)
         return node_model
     return None
 
@@ -1335,7 +1342,7 @@ def generate(filename, override_system_clock_frequency=None, manual_overlays=Non
         #   the node is an address-translating bus container whose children are the real peripherals - skip it
         if compat == 'zephyr,memory-region':
             def is_memory_compat(c):
-                return c in MODELS and (renode_model_overlay(c, mcu_compat, overlays)[0] or '').startswith('Memory')
+                return c in MODELS and (renode_model_overlay(c, mcu_compat, overlays, compatible)[0] or '').startswith('Memory')
 
             memory_compat = next((c for c in compatible if c != 'zephyr,memory-region' and is_memory_compat(c)), None)
             if memory_compat:
@@ -1375,7 +1382,7 @@ def generate(filename, override_system_clock_frequency=None, manual_overlays=Non
         logging.info(f'Node {node.name} mapped to {name}...')
 
         # decide which Renode model to use
-        model, _, attribs, irq_mappings = renode_model_overlay(compat, mcu_compat, overlays)
+        model, _, attribs, irq_mappings = renode_model_overlay(compat, mcu_compat, overlays, compatible)
         if model is None:
             # There is no model for the given "specialized" SoC compat string, but they might exist for other SoC variants
             logging.info(f'Node {node.name}, compat {compat} has no matching specific model - does the JSON have "_" clause? Skipping...')
@@ -1798,7 +1805,8 @@ def generate(filename, override_system_clock_frequency=None, manual_overlays=Non
                     found = True
 
             if found:
-                _, _, timer_attribs, timer_irq_mappings = renode_model_overlay(get_node_prop(timer_node, 'compatible', [''])[0], mcu_compat, overlays)
+                timer_node_compatible = get_node_prop(timer_node, 'compatible', [''])
+                _, _, timer_attribs, timer_irq_mappings = renode_model_overlay(timer_node_compatible[0], mcu_compat, overlays, timer_node_compatible)
                 if timer_irq_mappings:
                     generic_timer_irq_names = timer_irq_mappings
 
@@ -2227,7 +2235,7 @@ def process_node(node, node_type, mcu, overlays, get_snippets, skip_disabled):
         label = node.labels[0]
 
     if compat in MODELS:
-        model, _, _, _ = renode_model_overlay(compat, mcu, overlays)
+        model, _, _, _ = renode_model_overlay(compat, mcu, overlays, compats)
 
     if node_type == "cpu":
         if id := node.unit_addr:
@@ -2362,7 +2370,7 @@ def generate_bus_sensors(filename, overlays):
             compat = compats[0]
             if compat in MODELS:
                 mcu = get_mcu_compat(filename)
-                model, compat, _, _ = renode_model_overlay(compat, mcu, overlays)
+                model, compat, _, _ = renode_model_overlay(compat, mcu, overlays, compats)
             else:
                 model = ''
 
