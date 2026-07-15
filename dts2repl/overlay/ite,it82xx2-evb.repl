@@ -1,0 +1,21 @@
+uart1:
+    IRQ -> intc@38
+
+uart2:
+    IRQ -> intc@39
+
+intc: IRQControllers.ITE_IT_INTC @ sysbus 0x00f03f00
+    version: Version.IT8XXX2_V2
+    cpu: cpu0
+    IRQ -> cpu0@11
+
+etwd: Timers.ITE_IT_ETWD @ sysbus 0x00f01f00
+    version2: true
+    0 -> intc@30
+    1 -> intc@58
+    2 -> intc@155
+    3 -> intc@156
+    4 -> intc@157
+    5 -> intc@158
+    6 -> intc@159
+    7 -> intc@80

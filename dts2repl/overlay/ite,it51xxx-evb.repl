@@ -1,0 +1,22 @@
+uart1:
+    IRQ -> intc@38
+
+intc: IRQControllers.ITE_IT_INTC @ sysbus 0x00f04300
+    version: Version.IT51XXX
+    cpu: cpu0
+    IRQ -> cpu0@11
+
+etwd: Timers.ITE_IT_ETWD @ sysbus 0x00f04700
+    version2: true
+    0 -> intc@207
+    1 -> intc@208
+    2 -> intc@209
+    3 -> intc@210
+    4 -> intc@211
+    5 -> intc@212
+    6 -> intc@213
+    7 -> intc@214
+
+sysbus:
+    init:
+        Tag <0xf01e06 0x1> "ECPM_PLLFREQR" 0x9
