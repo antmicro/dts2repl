@@ -437,6 +437,7 @@
     "neorv32,uart": "UART.NEORV32_UART",
     "riscv,machine-timer": {
         "lowrisc,opentitan-earlgrey": null,
+        "andestech,ae350": { "type": "Timers.RiscVMachineTimer", "frequency": 60000000, "irq_mappings": [""] },
         "_": { "type": "Timers.RiscVMachineTimer", "frequency": 100000000, "irq_mappings": [""] }
     },
     "samsung,exynos4210-uart": "UART.NS16550",
