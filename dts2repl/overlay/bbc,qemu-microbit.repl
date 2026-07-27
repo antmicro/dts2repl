@@ -1,0 +1,3 @@
+timer0: Timers.NRF52840_Timer @ sysbus 0x40008000
+    numberOfEvents: 4
+    ->nvic0@8
