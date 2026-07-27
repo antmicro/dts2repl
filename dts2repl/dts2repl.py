@@ -1687,8 +1687,8 @@ def generate(filename, override_system_clock_frequency=None, manual_overlays=Non
             overlays.add('cortex-m')
 
         if model == 'CPU.RiscV32' or model == 'CPU.Ri5cy':  # We use CPU.RiscV32 as a generic model for all RV CPUs and fix it up here
-            if isa := get_node_prop(node, 'riscv,isa-base', None):
-                extensions = get_node_prop(node, 'riscv,isa-extensions', [])
+            if isa := get_node_prop(node, 'riscv,isa-base', None, inherit=True):
+                extensions = get_node_prop(node, 'riscv,isa-extensions', [], inherit=True)
 
                 for ext in extensions:
                     # drop "base" extensions
@@ -1705,7 +1705,7 @@ def generate(filename, override_system_clock_frequency=None, manual_overlays=Non
                     else:
                         isa += f"_{ext}"
             else:
-                isa = get_node_prop(node, 'riscv,isa', 'rv32imac')
+                isa = get_node_prop(node, 'riscv,isa', 'rv32imac', inherit=True)
 
             # The g extension already contains Zicsr and Zifencei
             if 'rv64g' not in isa and 'rv32g' not in isa:
