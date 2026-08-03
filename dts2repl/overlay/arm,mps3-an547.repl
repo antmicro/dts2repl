@@ -1,2 +1,5 @@
 reserved_ram: Memory.MappedMemory @ sysbus 0x21000000
     size: 0x200000
+
+cpu0:
+    enableTrustZone: true
