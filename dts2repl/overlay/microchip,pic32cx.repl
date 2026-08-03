@@ -6,10 +6,8 @@ sysbus:
         Tag <0x40001040 0x4> "OSCCTRL_DPLL0STATUS" 0x3
         Tag <0x4000140C 0x4> "OSC32KCTRL_STATUS" 0x01
 
-UNKNOWN1: Python.PythonPeripheral @ sysbus 0x40001038
-    size: 0x4
-    initable: true
-    filename: "scripts/pydev/repeater.py"
+OSCCTRL_DPLL0: Memory.ArrayMemory @ sysbus 0x40001034
+    size: 0x8
 
 UNKNOWN2: Python.PythonPeripheral @ sysbus 0x40000814
     size: 0x4

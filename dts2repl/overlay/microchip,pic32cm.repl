@@ -15,25 +15,16 @@ GCLK_GENCTRL: Python.PythonPeripheral @ sysbus 0x40001C20
     initable: true
     filename: "scripts/pydev/repeater.py"
 
-GCLK_PCHCTRL3: Python.PythonPeripheral @ sysbus 0x40001CA0
-    size: 0x4
-    initable: true
-    filename: "scripts/pydev/repeater.py"
-
-GCLK_PCHCTRLx: Python.PythonPeripheral @ sysbus 0x40001CD8
-    size: 0x4
-    initable: true
-    filename: "scripts/pydev/repeater.py"
+GCLK_PCHCTRL: Memory.ArrayMemory @ sysbus 0x40001C80
+    size: 0xA0
 
 UNK3: Python.PythonPeripheral @ sysbus 0x4000101C
     size: 0x4
     initable: true
     filename: "scripts/pydev/repeater.py"
 
-UNK5: Python.PythonPeripheral @ sysbus 0x4000081C
-    size: 0x4
-    initable: true
-    filename: "scripts/pydev/repeater.py"
+MCLK_MASKS: Memory.ArrayMemory @ sysbus 0x40000810
+    size: 0x10
 
 UNK6: Python.PythonPeripheral @ sysbus 0x40001024
     size: 0x4
