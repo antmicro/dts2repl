@@ -41,7 +41,7 @@
         "st,stm32mp157": { "type": "Timers.ARM_GenericTimer", "frequency": 62500000, "defaultCounterFrequencyRegister": 62500000 },
         "st,stm32mp135": { "type": "Timers.ARM_GenericTimer", "frequency": 62500000, "defaultCounterFrequencyRegister": 62500000 },
         "_": { "type": "Timers.ARM_GenericTimer", "frequency": 62500000 } },
-    "arm,armv8-timer": { "renesas,rzt2m_starter_kit": { "type": "Timers.ARM_GenericTimer", "frequency": 20000000 }, "_": { "type": "Timers.ARM_GenericTimer", "frequency": 62500000 } },
+    "arm,armv8-timer": { "renesas,rzt2m_starter_kit": { "type": "Timers.ARM_GenericTimer", "frequency": 20000000 }, "brcm,bcm2711": { "type": "Timers.ARM_GenericTimer", "frequency": 1500000000 }, "_": { "type": "Timers.ARM_GenericTimer", "frequency": 62500000 } },
     "arm,armv8_timer": { "type": "Timers.ARM_GenericTimer", "frequency": 62500000 },
 
     "arm,armv8": { "type": "CPU.ARMv8A", "cpuType": "cortex-a55" },
