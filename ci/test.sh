@@ -67,5 +67,7 @@ if [ "$(ls -A repls/diffs | wc -l)" != 0 ]; then
     RENODE_LOCATION=$(cat ${CI_PROJECT_DIR}/renode-location)
     echo "Renode should be at ${RENODE_LOCATION}"
     export PATH=$(find ${RENODE_LOCATION} -type f -name renode-test | xargs realpath | xargs dirname):$PATH
+    mkdir -p "$PWD/tmp"
+    export TMPDIR="$PWD/tmp"
     renode-test --results-dir robot-results "$PWD/../ci/load_repls_with_diffs.robot"
 fi
