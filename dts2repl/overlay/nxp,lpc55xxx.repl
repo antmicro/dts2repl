@@ -5,8 +5,13 @@ puf_sram_ctrl_int_status: Python.PythonPeripheral @ sysbus 0x4003B3E0
 
 sysbus:
     init add:
-        Tag <0x50034FE0 0x4> "FLASH_STAT" 0xFFFFFFFF
-        Tag <0x40034FE0 0x4> "FLASH_INTSTAT" 0xFFFFFFFF
+        Tag <0x40034FE0 0x4> "FLASH_STAT" 0xFFFFFFFF
+        Tag <0x40013010 0x4> "ANACTRL_FRO192M_CTRL" 0xFFFFFFFF
+        Tag <0x40013020 0x4> "ANACTRL_XO32M_CTRL" 0xFFFFFFFF
         Tag <0x40013024 0x4> "ANACTRL_24" 0xFFFFFFFF
-        Tag <0x50013024 0x4> "UNKNOWN1" 0xFFFFFFFF
+        // Same as above, but in secure world
+        Tag <0x50034FE0 0x4> "FLASH_STAT" 0xFFFFFFFF
+        Tag <0x50013010 0x4> "ANACTRL_FRO192M_CTRL" 0xFFFFFFFF
+        Tag <0x50013020 0x4> "ANACTRL_XO32M_CTRL" 0xFFFFFFFF
+        Tag <0x50013024 0x4> "ANACTRL_24" 0xFFFFFFFF
 

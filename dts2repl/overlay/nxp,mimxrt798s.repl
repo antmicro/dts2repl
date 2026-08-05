@@ -8,5 +8,15 @@ xspi1:
 sysbus:
     init add:
         Tag <0x4018412c 0x4> "XSPI0_DLLSR_NON_SECURE" 0xffffffff 
+        Tag <0x50001010 0x18> "SYSCON_PSCCTLx" 0xffffffff overridePeripheralAccesses=true
+        Tag <0x50041010 0x18> "SYSCON_PSCCTLx" 0xffffffff overridePeripheralAccesses=true
+        Tag <0x50061010 0x18> "SYSCON_PSCCTLx" 0xffffffff overridePeripheralAccesses=true
+        Tag <0x50061290 0x18> "SYSCON_FRO2CLKSTATUS" 0xffffffff overridePeripheralAccesses=true
+        Tag <0x50061360 0x4> "SYSCON_FRO2AUTOTRIM" 0x10002 overridePeripheralAccesses=true
+        Tag <0x50061810 0x4> "CLKCTL_PSCCTL0_SENS" 0xffffffff overridePeripheralAccesses=true
+        Tag <0x50061300 0x4> "SYSCON_CSR" 0xffffffff overridePeripheralAccesses=true
+        Tag <0x50065010 0x18> "SYSCON_PSCCTLx" 0xffffffff overridePeripheralAccesses=true
+        Tag <0x500a1010 0x18> "SYSCON_PSCCTLx" 0xffffffff overridePeripheralAccesses=true
+        Tag <0x50001118 0x4> "SYSCON_FRO01CLKSTATUS" 0x2 overridePeripheralAccesses=true
         Tag <0x5018412c 0x4> "XSPI0_DLLSR_SECURE" 0xffffffff
         Tag <0x5018512c 0x4> "XSPI1_DLLSR_SLVA" 0xffffffff

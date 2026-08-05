@@ -8,6 +8,7 @@ if request.IsRead: request.Value = 0x3000000 if tick else 0x2000000; tick = not 
 
 sysbus:
     init add:
+        Tag <0x40013010 0x4> "ANACTRL_FRO192M_CTRL" 0xFFFFFFFF
         Tag <0x40090040 0x4> "SRAMCTL_ACK" 0x80000000
         Tag <0x4008F300 0x4> "FIRCCSR_VALID" 0x81000000
         Tag <0x4008F200 0x4> "SIRCCSR_VALID" 0x1000000
