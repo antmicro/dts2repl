@@ -1,0 +1,8 @@
+rom: Memory.MappedMemory @ sysbus 0x0F000000
+    size: 0x400
+
+sysbus:
+    init add:
+        WriteDoubleWord 0x0F000000 0x47704770
+        WriteDoubleWord 0x0F000094 0x0F000001
+        Tag <0x40001048 4> "CKMD_RIS" 0xFFFFFFFF
