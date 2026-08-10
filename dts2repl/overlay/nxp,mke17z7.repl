@@ -14,6 +14,7 @@ if request.IsRead:
 sysbus:
     init add:
         ApplySVD @https://dl.antmicro.com/projects/renode/svd/MKE17Z7.svd.gz
+        Tag <0x40064100 4> "SCG_SOSCCSR" 0x01000000
         Tag <0x40064200 4> "SCG_SIRCCSR" 0xFFFFFFFF
         Tag <0x40064300 4> "SCG_FIRCCSR" 0xFFFFFFFF
         Tag <0x40064500 4> "UNKNOWN3" 0xFFFFFFFF
