@@ -1,0 +1,3 @@
+sysbus:
+    init add:
+        Tag <0x42441044 0x4> "CRYPTO_INSTR_FF_STATUS" 0x10000
