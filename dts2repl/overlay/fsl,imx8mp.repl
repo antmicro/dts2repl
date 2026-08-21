@@ -1,1 +1,6 @@
-fsl,imx8mm.repl
+ddr_memory: Memory.MappedMemory @ sysbus 0x40000000
+    size: 0x200000000
+
+sysbus:
+    init add:
+        Tag <0x007E0000 0x20000> "TCML" 0x1000
