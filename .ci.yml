@@ -4,7 +4,9 @@ stages:
 
 Static release:
   stage: Release
-  image: debian:bullseye
+  image: debian:bookworm
+  variables:
+    PIP_BREAK_SYSTEM_PACKAGES: "1"
   before_get_sources:
     - apt -qqy update &> /dev/null
     - apt -qqy install patchelf build-essential python3-pip zlib1g-dev &> /dev/null
