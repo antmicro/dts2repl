@@ -1328,13 +1328,14 @@ def generate(filename, override_system_clock_frequency=None, manual_overlays=Non
         # filter out nodes without compat strings
         compatible = get_node_prop(node, 'compatible')
 
-        if compatible and 'gpio-leds' in compatible:
-            logging.debug(f'Skipping LED parent node {node.name}')
+        if compatible and any(c in compatible for c in ('gpio-leds', 'gpio-keys')):
+            logging.debug(f'Skipping GPIO group parent node {node.name}')
             continue
         else:
             parent_compat = get_node_prop(node.parent, 'compatible', []) if node.parent else []
-            # if the paren't compat string is the one for LEDs, move it down to each individual LED
-            if 'gpio-leds' in parent_compat:
+            # if the parent's compat string is the one for LEDs or buttons, move
+            # it down to each individual LED or button
+            if any(c in parent_compat for c in ('gpio-leds', 'gpio-keys')):
                 compatible = parent_compat
 
         if compatible is None:
@@ -1998,10 +1999,10 @@ def generate(filename, override_system_clock_frequency=None, manual_overlays=Non
             i2c_addr = int(node.unit_addr, 16)
             regions = [RegistrationRegion(addresses=[i2c_addr], registration_point=i2c_name)]
 
-        if model == 'Miscellaneous.LED':
+        if model in ('Miscellaneous.LED', 'Miscellaneous.Button'):
             gpios = list(get_node_prop(node, 'gpios'))
             if not gpios:
-                logging.info(f'LED {node.name} has no gpios property, skipping...')
+                logging.info(f'{node.name} has no gpios property, skipping...')
                 continue
             gpio, num, gpio_flags = gpios[0][:3]
             gpio_compat = get_node_prop(gpio, 'compatible', [])
@@ -2024,9 +2025,15 @@ def generate(filename, override_system_clock_frequency=None, manual_overlays=Non
             gpio_name = name_mapper.get_name(gpio)
             regions = [RegistrationRegion(num, registration_point=gpio_name)]
 
-            gpio_connection = ReplBlock(gpio_name, None, {gpio_name, name}, set(),
-                                        [f'{gpio_name}:', f'    {num} -> {name}@0'])
-            repl_file.add_block(gpio_connection)
+            if model == 'Miscellaneous.Button':
+                # A button drives the pin, so the connection belongs to the
+                # button itself; an LED is driven by the port, so there it
+                # belongs to the port.
+                indent.append(f'-> {gpio_name}@{num}')
+            else:
+                gpio_connection = ReplBlock(gpio_name, None, {gpio_name, name}, set(),
+                                            [f'{gpio_name}:', f'    {num} -> {name}@0'])
+                repl_file.add_block(gpio_connection)
 
         if model.startswith('Timers'):
             if 'cc-num' in node.props:
