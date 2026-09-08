@@ -2001,10 +2001,11 @@ def generate(filename, override_system_clock_frequency=None, manual_overlays=Non
             regions = [RegistrationRegion(addresses=[i2c_addr], registration_point=i2c_name)]
 
         if model in ('Miscellaneous.LED', 'Miscellaneous.Button'):
-            gpios = list(get_node_prop(node, 'gpios'))
-            if not gpios:
+            gpios_prop = get_node_prop(node, 'gpios')
+            if not gpios_prop:
                 logging.info(f'{node.name} has no gpios property, skipping...')
                 continue
+            gpios = list(gpios_prop)
             gpio, num, gpio_flags = gpios[0][:3]
             gpio_compat = get_node_prop(gpio, 'compatible', [])
             if 'nxp,s32-gpio' in gpio_compat:
