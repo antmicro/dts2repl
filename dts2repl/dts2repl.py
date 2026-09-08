@@ -1470,7 +1470,13 @@ def generate(filename, override_system_clock_frequency=None, manual_overlays=Non
         elif addr and not model.startswith('CPU.'):
             addr = int(addr.split(',')[0], 16)
             addr = translate_address(addr, node)
-            if addr % 4 != 0:
+            # The alignment rule is about memory-mapped registrations. A device
+            # on a bus is addressed by position on that bus instead, and neither
+            # a 7-bit I2C address nor an SPI chip select is constrained that way:
+            # a BME280 at 0x76 is perfectly normal.
+            on_bus = node.parent is not None and \
+                name_mapper.get_name(node.parent).startswith(('i2c', 'spi'))
+            if addr % 4 != 0 and not on_bus:
                 logging.info(f'Node {node.name} has misaligned address {addr}. Skipping...')
                 repl_file.try_generate_tag(node)
                 continue
@@ -1978,24 +1984,19 @@ def generate(filename, override_system_clock_frequency=None, manual_overlays=Non
                 indent.append(f"IRQ -> cpu0@{interrupt_number}")
 
 
-        i2c_sensors = [
-            'Sensors.TMP103',
-            'Sensors.TMP108',
-            'Sensors.SI7210',
-            'Sensors.VEML7700',
-            'I2C.BME280',
-            'I2C.SHT45'
-        ]
-
-        if model in i2c_sensors:
-            if len(node.parent.labels) == 0:
-                logging.warning(f"Node {node} has no labels! Dropping {model}")
-                continue
-
-            i2c_name = name_mapper.get_name(node.parent)
-            if not i2c_name.startswith("i2c"):
-                logging.warning(f"Parent of {node} is not an I2C controller! Dropping {model}")
-                continue
+        # A device sitting on an I2C bus registers on its controller rather than
+        # on the sysbus. What decides this is position in the tree, not the
+        # model name: the `I2C.` namespace holds controllers as well as the
+        # devices hanging off them.
+        #
+        # Flash chips are the exception: they map to Memory.MappedMemory, which
+        # is memory-mapped and belongs on the sysbus.
+        #
+        # SPI is left out because its controllers disagree about the
+        # registration point, some taking a chip select and others none.
+        i2c_name = (name_mapper.get_name(node.parent)
+                    if node.parent is not None and node.parent.labels else '')
+        if i2c_name.startswith('i2c') and node.unit_addr and not model.startswith('Memory.'):
             i2c_addr = int(node.unit_addr, 16)
             regions = [RegistrationRegion(addresses=[i2c_addr], registration_point=i2c_name)]
 
