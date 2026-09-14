@@ -1429,6 +1429,8 @@ def generate(filename, override_system_clock_frequency=None, manual_overlays=Non
         provides = {name}
         regions = []
         indent = []
+        # bus children (I2C address, SPI chip select) have no size cells
+        on_bus = node.parent is not None and get_node_prop(node.parent, '#size-cells') == 0
 
         if model in ("CPU.ARMv7A",):
             address_space_32bit = True
@@ -1474,8 +1476,6 @@ def generate(filename, override_system_clock_frequency=None, manual_overlays=Non
             # on a bus is addressed by position on that bus instead, and neither
             # a 7-bit I2C address nor an SPI chip select is constrained that way:
             # a BME280 at 0x76 is perfectly normal.
-            on_bus = node.parent is not None and \
-                name_mapper.get_name(node.parent).startswith(('i2c', 'spi'))
             if addr % 4 != 0 and not on_bus:
                 logging.info(f'Node {node.name} has misaligned address {addr}. Skipping...')
                 repl_file.try_generate_tag(node)
@@ -1994,9 +1994,11 @@ def generate(filename, override_system_clock_frequency=None, manual_overlays=Non
         #
         # SPI is left out because its controllers disagree about the
         # registration point, some taking a chip select and others none.
-        i2c_name = (name_mapper.get_name(node.parent)
-                    if node.parent is not None and node.parent.labels else '')
-        if i2c_name.startswith('i2c') and node.unit_addr and not model.startswith('Memory.'):
+        if on_bus and not model.startswith(('Memory.', 'CPU.')):
+            if not (get_model(node.parent, mcu_compat, overlays) or '').startswith('I2C.') or not node.unit_addr:
+                logging.warning(f'Node {node.name} is not on a modeled I2C controller. Dropping {model}')
+                continue
+            i2c_name = name_mapper.get_name(node.parent)
             i2c_addr = int(node.unit_addr, 16)
             regions = [RegistrationRegion(addresses=[i2c_addr], registration_point=i2c_name)]
 
