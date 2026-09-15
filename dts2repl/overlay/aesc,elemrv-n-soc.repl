@@ -1,0 +1,3 @@
+sysbus:
+    init add:
+        Tag <0xF0010000 4> "PINCTRL_INFO" 0x80
