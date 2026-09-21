@@ -368,7 +368,7 @@ def get_node_prop(node, prop, default=None, inherit=False):
     elif prop in ('interrupts', 'reg', 'ranges', 'alloc-ranges', 'dma-ranges', 'phandle'):
         return val.to_nums()
     elif prop in ('#address-cells', '#size-cells', '#interrupt-cells', 'cc-num', 'clock-frequency',
-                  'riscv,ndev', 'ngpios', 'port', '#clock-cells'):
+                  'riscv,ndev', 'ngpios', 'port', '#clock-cells', 'fifo-depth'):
         return val.to_num()
     elif prop in ('interrupt-parent',):
         return val.to_node()
@@ -1503,7 +1503,8 @@ def generate(filename, override_system_clock_frequency=None, manual_overlays=Non
                     ['stm32-gpio', 'stm32-timers', 'silabs,gecko', 'silabs,usart-uart', 'gaisler,irqmp',
                      'gaisler,gptimer', 'gaisler,apbuart', 'xlnx,xuartps']))
                 or any(map(lambda x: x in model,
-                    ['UART.STM32_UART', 'I2C.TegraI2CController', 'IRQControllers.PlatformLevelInterruptController', 'IRQControllers.AndesNCEPLIC100']))
+                    ['UART.STM32_UART', 'I2C.TegraI2CController', 'IRQControllers.PlatformLevelInterruptController', 'IRQControllers.AndesNCEPLIC100',
+                     'SPI.DesignWare_SPI']))
             ):
                 # sized sysbus registration for peripherals that require an explicit size
                 _, size = next(get_reg(node))
@@ -1694,6 +1695,14 @@ def generate(filename, override_system_clock_frequency=None, manual_overlays=Non
         if model == 'GPIOPort.MAX32650_GPIO':
             ngpios = get_node_prop(node, 'ngpios', 32)
             indent.append(f'numberOfPins: {ngpios}')
+
+        if model == 'SPI.DesignWare_SPI':
+            # The model has no defaults for the FIFO depths, and the devicetree
+            # carries the value as SSI_TX_FIFO_DEPTH. 32 is the IP's own default
+            # for the parameter, used when the node does not declare one.
+            fifo_depth = get_node_prop(node, 'fifo-depth', 32)
+            indent.append(f'transmitDepth: {fifo_depth}')
+            indent.append(f'receiveDepth: {fifo_depth}')
 
         if model == 'GPIOPort.RenesasRA_GPIOMisc':
             if any("ra8" in o.lower() for o in overlays):
