@@ -1,0 +1,10 @@
+romapi: Python.PythonPeripheral @ sysbus 0x300000
+    size: 0x400
+    script: "request.Value = 0x300401 if request.Offset >= 0x200 else 0x300200"
+
+romstub: Memory.MappedMemory @ sysbus 0x300400
+    size: 0x400
+
+sysbus:
+    init add:
+        WriteDoubleWord 0x300400 0x47702000
