@@ -445,6 +445,7 @@
         "egis,et171": { "type": "IRQControllers.AndesNCEPLIC100", "numberOfContexts": 16, "prioritiesEnabled": true, "numberOfSources": 1023 },
         "_": { "type": "IRQControllers.PlatformLevelInterruptController", "numberOfContexts": 16, "prioritiesEnabled": true }
     },
+    "riscv,clint0": "IRQControllers.CoreLevelInterruptor",
     "sifive,clint0": "IRQControllers.CoreLevelInterruptor",
     "starfive,jh7100-clint": "IRQControllers.CoreLevelInterruptor",
     "thead,c900-clint": "IRQControllers.CoreLevelInterruptor",
@@ -456,6 +457,7 @@
     "neorv32,uart": "UART.NEORV32_UART",
     "riscv,machine-timer": {
         "lowrisc,opentitan-earlgrey": null,
+        "litex,vexiiriscv": null,
         "andestech,ae350": { "type": "Timers.RiscVMachineTimer", "frequency": 60000000, "irq_mappings": [""] },
         "_": { "type": "Timers.RiscVMachineTimer", "frequency": 100000000, "irq_mappings": [""] }
     },
