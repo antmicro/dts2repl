@@ -1220,6 +1220,8 @@
     "invensense,icp101xx": "Sensors.ICP_101xx",
     "himax,hm01b0": "Sensors.HiMaxHM01B0",
     "sensirion,sht21": "I2C.SHT21",
+    "st,lsm6dso": "Sensors.LSM6DSO_IMU",
+    "microchip,enc28j60": "Network.ENC28J60",
     "focaltech,ft5336": "Input.FT5336",
 
     "focaltech,ft9001-cpm": "Miscellaneous.FocalTechFT9001_CPM",
