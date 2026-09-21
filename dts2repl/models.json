@@ -498,6 +498,9 @@
                      "silabs,efr32bg22|silabs,efr32mg22|silabs,efr32bg27|silabs,efr32mg27|silabs,bgm22": { "type": "Miscellaneous.SiLabs.EFR32xG2_HFXO_2", "startupDelayTicks": 3 },
                      "_" : { "type": "Miscellaneous.SiLabs.EFR32xG2_HFXO_3", "startupDelayTicks": 3 }},
     "silabs,series2-dcdc": { "type": "Miscellaneous.SiLabs.EFR32xG2_DCDC_2", "irq_mappings": [null] },
+    "silabs,siwx91x-cmu-hp": { "type": "Python.PythonPeripheral", "size": 0x100, "initable": true, "script": "regs = {} if request.IsInit else regs; request.Value = (regs.get(request.Offset, 0) | {0x58: 0xFFFFFFFF}.get(request.Offset, 0)) if request.IsRead else request.Value; regs.update({request.Offset: request.Value} if request.IsWrite else {})" },
+    "silabs,siwx91x-cmu-ulp": { "type": "Python.PythonPeripheral", "size": 0x100, "initable": true, "script": "regs = {} if request.IsInit else regs; request.Value = (regs.get(request.Offset, 0) | {0x28: 0xFFFFFFFF}.get(request.Offset, 0)) if request.IsRead else request.Value; regs.update({request.Offset: request.Value} if request.IsWrite else {})" },
+    "silabs,siwx91x-cmu-aon": { "type": "Python.PythonPeripheral", "size": 0x200, "initable": true, "script": "regs = {} if request.IsInit else regs; request.Value = (regs.get(request.Offset, 0) | {0x20: 0x2108, 0x118: 0x8000}.get(request.Offset, 0)) if request.IsRead else request.Value; regs.update({request.Offset: request.Value} if request.IsWrite else {})" },
 
     "sifli,sf32lb-usart": { "type": "UART.STM32F7_USART", "frequency": 48000000 },
     "sifli,sf32lb-rcc": { "type": "Python.PythonPeripheral", "size": 0x1000, "initable": true, "filename": "scripts/pydev/rolling-bit.py" },
