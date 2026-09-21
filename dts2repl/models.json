@@ -112,6 +112,7 @@
     "sensirion,sht4x": "I2C.SHT45",
 
     "raspberrypi,pico-uart": "UART.PL011",
+    "raspberrypi,pico-i2c": "I2C.DesignWare_APB_I2C",
 
     "allwinner,sun50i-h5-mbus": "Memory.MappedMemory",
     "allwinner,sun50i-a64-mbus": "Memory.MappedMemory",
@@ -123,6 +124,7 @@
     "atmel,sam-usart": "UART.SAM_USART",
     "atmel,sam-uart": { "type": "UART.SAM_USART", "uartOnlyMode": true },
     "atmel,sam0-uart": { "atmel,samd20": "UART.SAMD20_UART", "_": "UART.SAMD5_UART" },
+    "atmel,sam0-i2c": { "type": "I2C.SAMD21_I2C", "irq_mappings": ["", null, null, null] },
     "atmel,sama5d2-tcb": { "type": "Python.PythonPeripheral", "size": 0x4000, "initable": true, "filename": "scripts/pydev/flipflop.py" },
     "atmel,sama5d2-i2c": { "type": "Python.PythonPeripheral", "size": 0x160, "initable": true, "filename": "scripts/pydev/flipflop.py" },
     "atmel,sam-flash-controller": { "type": "Python.PythonPeripheral", "size": 0x200, "initable": true, "filename": "scripts/pydev/flipflop.py" },
@@ -264,6 +266,8 @@
     "microchip,miv": "CPU.RiscV32",
     "microchip,coreuart": { "type": "UART.MiV_CoreUART", "clockFrequency": 66000000 },
     "microchip,mpfs-gpio": "GPIOPort.MPFS_GPIO",
+    "microchip,mpfs-i2c": "I2C.MPFS_I2C",
+    "microchip,mpfs-spi": "SPI.MPFS_SPI",
     "microchip,sam9x60-pit64b": { "type": "Python.PythonPeripheral", "size": 0xec, "initable": true, "filename": "scripts/pydev/counter.py" },
     "microchip,xec-i2c-v2": {"type": "Python.PythonPeripheral", "size": 0x4, "initable": false, "script": "request.Value = 0xffffffff" },
 
@@ -363,6 +367,11 @@
     },
     "renesas,ra-pinctrl-pfs": "GPIOPort.RenesasRA_GPIOMisc",
     "renesas,ra-i2c" : "I2C.RenesasRA_IIC",
+    "renesas,ra-iic": { "type": "I2C.RenesasRA_IIC", "irq_mappings": ["ReceiveIRQ", "TransmitIRQ", "TransmitEndIRQ", "ErrorOrEventIRQ"] },
+    "renesas,rz-riic": {
+        "renesas,rzv2h|renesas,rzv2n": { "type": "I2C.RenesasRZG_IIC", "irq_mappings": ["TransmitEndIRQ", "NackIRQ", "StopIRQ", "StartIRQ", null, null, "TransmitIRQ", "ReceiveIRQ"] },
+        "_": { "type": "I2C.RenesasRZG_IIC", "irq_mappings": ["ReceiveIRQ", "TransmitIRQ", "TransmitEndIRQ", "NackIRQ", "StopIRQ", "StartIRQ", null, null] }
+    },
     "renesas,rcar-gen3-i2c": { "type": "Python.PythonPeripheral", "size": 0x40, "initable": true, "script": "request.Value = 0x59" },
     "renesas,rcar-gen3-iic": { "type": "Python.PythonPeripheral", "size": 0x425, "initable": true, "script": "request.Value = 0x1" },
     "renesas,ra-interrupt-controller-unit" : "IRQControllers.RenesasRA_ICU",
@@ -472,6 +481,7 @@
     "sifive,otp0": "Memory.MappedMemory",
     "sifive,rocket0": "CPU.RiscV32",
     "sifive,uart0": "UART.SiFive_UART",
+    "sifive,spi0": "SPI.HiFive_SPI",
 
     "sensry,sy1xx" : "CPU.RiscV32",
 
@@ -511,6 +521,7 @@
     "snps,dwc3": {"type": "Python.PythonPeripheral", "size": 0x10000, "initable": true, "script": "request.Value = 0" },
     "snps,ddrc-3.80a": {"type": "Python.PythonPeripheral", "size": 0x400000, "initable": true, "script": "request.Value = 0x1" },
     "snps,designware-gpio": "GPIOPort.DesignWare_APB_GPIO",
+    "snps,designware-i2c": "I2C.DesignWare_APB_I2C",
 
     "nuvoton,numaker-uart": "UART.NS16550",
     "nuvoton,npcm845-uart": "UART.NS16550",
@@ -1205,6 +1216,7 @@
     "silabs,gecko-i2c": "I2C.EFR32xG2_I2CController",
 
     "silabs,si7210": "Sensors.SI7210",
+    "silabs,si7006": { "type": "Sensors.SI70xx", "model": { "reference": "Model.SI7006" } },
     "ti,tmp108": "Sensors.TMP108",
     "ti,tmp103": "Sensors.TMP103",
     "st,lis2ds12": "Sensors.LIS2DS12",
