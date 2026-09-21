@@ -138,6 +138,7 @@
     "brcm,bcm2711-aux-uart": "UART.BCM2711_AUX_UART",
     "brcm,bcm6345-uart": "UART.BCM2711_AUX_UART",
 
+    "cdac,vega-et1031": "CPU.RiscV32",
     "cdns,tensilica-xtensa-lx3": { "type": "CPU.Xtensa", "cpuType": "dc233c", "frequency": 100000000 },
     "cdns,ttc": "Timers.Cadence_TTC",
     "xlnx,ttcps": "Timers.Cadence_TTC",
