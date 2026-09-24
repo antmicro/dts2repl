@@ -1972,6 +1972,22 @@ def generate(filename, override_system_clock_frequency=None, manual_overlays=Non
             indent.append('rtcPeripheral: rtc')
             dependencies.add('rtc')
 
+        # The NRF52x GPIOTE connects to all GPIOs on the board, even if it's not
+        # specified in the devicetree
+        # NOTE: GPIOTEs for other NRF boards may only connect to some GPIOs
+        if model == 'GPIOPort.NRF52840_GPIOTasksEvents':
+            for gpio in nodes:
+                if 'nordic,nrf-gpio' not in (get_node_prop(gpio, 'compatible') or []):
+                    continue
+                if is_disabled(gpio):
+                    continue
+                port = get_node_prop(gpio, 'port')
+                if port is None:
+                    continue
+                port_name = name_mapper.get_name(gpio)
+                indent.append(f'port{port}: {port_name}')
+                dependencies.add(port_name)
+
         if compat == "openisa,rv32m1-intmux":
             interruptNumbers = [
                 get_node_prop(entry, "interrupts", 0)[0]

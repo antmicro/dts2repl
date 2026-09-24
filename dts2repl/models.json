@@ -298,6 +298,7 @@
     "nordic,nrf-clock": { "nrf54l|nrf54h": "Miscellaneous.NRF54L_CLOCK", "_": { "type": "Miscellaneous.NRF_CLOCK" } },
     "nordic,nrf-ecb": "Miscellaneous.NRF52840_ECB",
     "nordic,nrf-gpio": "GPIOPort.NRF52840_GPIO",
+    "nordic,nrf-gpiote": { "nrf52": "GPIOPort.NRF52840_GPIOTasksEvents" },
     "nordic,nrf-rng": "Miscellaneous.NRF52840_RNG",
     "nordic,nrf-rtc": "Timers.NRF52840_RTC",
     "nordic,nrf-grtc": { "type": "Timers.NRF54H20_GRTC", "irq_mappings": ["IRQ"] },
