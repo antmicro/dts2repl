@@ -10,4 +10,4 @@ authors= [
 dts2repl = "dts2repl.dts2repl:main"
 
 [tool.setuptools.package-data]
-"*" = ["overlay/*.repl", "models.json"]
+"*" = ["overlay/*.repl", "overlay/include/*.repl", "models.json"]

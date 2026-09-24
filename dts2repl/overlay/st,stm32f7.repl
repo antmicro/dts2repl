@@ -2,3 +2,5 @@ pwr: Python.PythonPeripheral @ sysbus 0x40007000
     size: 0x400
     initable: true
     filename: "scripts/pydev/flipflop.py"
+
+using "include/stm32-syscfg-exti.repl"

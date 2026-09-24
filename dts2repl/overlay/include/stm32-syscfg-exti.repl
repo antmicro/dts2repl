@@ -1,0 +1,43 @@
+// SYSCFG selects which GPIO port drives each EXTI line. Zephyr reaches it
+// through the HAL, so the devicetree has no node for it and it is declared here.
+//
+// Shared by the families whose SYSCFG sits at 0x40013800 and routes ports to
+// EXTI this way: F2, F4 and F7. F1 does the same job with AFIO instead.
+syscfg: Miscellaneous.STM32_SYSCFG @ sysbus 0x40013800
+    [0-15] -> exti@[0-15]
+
+// Every port a part in these families can have. A connection naming a port
+// this part lacks is dropped along with the port, so the list does not have to
+// match the package.
+gpioa:
+    [0-15] -> syscfg#0@[0-15]
+
+gpiob:
+    [0-15] -> syscfg#1@[0-15]
+
+gpioc:
+    [0-15] -> syscfg#2@[0-15]
+
+gpiod:
+    [0-15] -> syscfg#3@[0-15]
+
+gpioe:
+    [0-15] -> syscfg#4@[0-15]
+
+gpiof:
+    [0-15] -> syscfg#5@[0-15]
+
+gpiog:
+    [0-15] -> syscfg#6@[0-15]
+
+gpioh:
+    [0-15] -> syscfg#7@[0-15]
+
+gpioi:
+    [0-15] -> syscfg#8@[0-15]
+
+gpioj:
+    [0-15] -> syscfg#9@[0-15]
+
+gpiok:
+    [0-15] -> syscfg#10@[0-15]

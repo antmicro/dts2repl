@@ -6,3 +6,5 @@ pwr: Python.PythonPeripheral @ sysbus 0x40007000
 sysbus:
     init add:
         ApplySVD @https://dl.antmicro.com/projects/renode/svd/STM32F40x.svd.gz
+
+using "include/stm32-syscfg-exti.repl"

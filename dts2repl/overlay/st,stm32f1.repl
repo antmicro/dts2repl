@@ -1,3 +1,28 @@
 sysbus:
     init add:
         ApplySVD @https://dl.antmicro.com/projects/renode/svd/STM32F103.svd.gz
+
+// AFIO selects which GPIO port drives each EXTI line. Zephyr reaches it through
+// the HAL, so the devicetree has no node for it and it is declared here.
+//
+// Renode's model takes exactly seven ports, A to G, whatever the package bonds
+// out -- a 64-pin F103 has only A to E -- so all seven are declared, as in
+// Renode's own stm32f103.repl. A port the devicetree already has is skipped as
+// a duplicate; the others are inert.
+gpioa: GPIOPort.STM32F1GPIOPort @ sysbus <0x40010800, +0x400>
+
+gpiob: GPIOPort.STM32F1GPIOPort @ sysbus <0x40010c00, +0x400>
+
+gpioc: GPIOPort.STM32F1GPIOPort @ sysbus <0x40011000, +0x400>
+
+gpiod: GPIOPort.STM32F1GPIOPort @ sysbus <0x40011400, +0x400>
+
+gpioe: GPIOPort.STM32F1GPIOPort @ sysbus <0x40011800, +0x400>
+
+gpiof: GPIOPort.STM32F1GPIOPort @ sysbus <0x40011c00, +0x400>
+
+gpiog: GPIOPort.STM32F1GPIOPort @ sysbus <0x40012000, +0x400>
+
+afio: GPIOPort.STM32F1AFIO @ sysbus 0x40010000
+    gpioPorts: [gpioa, gpiob, gpioc, gpiod, gpioe, gpiof, gpiog]
+    [0-15] -> exti@[0-15]
