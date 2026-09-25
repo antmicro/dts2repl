@@ -1255,7 +1255,6 @@ def convert_attribs_to_str(attribs) -> List[str]:
     return ret
 
 def generate_irq_connections(irq_names, irq_dest_nodes, irq_numbers, irq_local_indices, name_mapper, dest_local_as_hex=False) -> List[str]:
-    visited_irqs = set()
     irqs = []
     def _format_as_irq(irq_src_name: str, irq_dest_name: str, irq: str, irq_dest_local: str = None, dest_local_as_hex: bool = False):
         irq_dest = irq_dest_name
@@ -1265,10 +1264,6 @@ def generate_irq_connections(irq_names, irq_dest_nodes, irq_numbers, irq_local_i
 
     for i, (irq_name, irq_dest, irq) in enumerate(zip(irq_names, irq_dest_nodes, irq_numbers)):
         if irq_name is None:
-            continue
-        if irq in visited_irqs:
-            # some u-boot peripherals contain duplicated irqs in device trees e.g.
-            # https://github.com/u-boot/u-boot/blob/69bd83568c57813cd23bc2d100c066a17e7e349d/dts/upstream/src/riscv/microchip/mpfs-icicle-kit.dts#L86
             continue
         # assume very large IRQ numbers which have all bits set (i.e. 2^n - 1) are invalid
         if irq >= 0xfff and (irq & (irq + 1)) == 0:
@@ -1281,7 +1276,6 @@ def generate_irq_connections(irq_names, irq_dest_nodes, irq_numbers, irq_local_i
             irqs += [_format_as_irq(irq_name, irq_dest_name, irq, irq_local_indices[i], dest_local_as_hex=dest_local_as_hex)]
         else:
             irqs += [_format_as_irq(irq_name, irq_dest_name, irq)]
-        visited_irqs.add(irq)
         # IRQ destinations are not treated as dependencies, we filter
         # out IRQ connections to missing peripherals at the end because
         # it is better to have a peripheral missing an interrupt connection
