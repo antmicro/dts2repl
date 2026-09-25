@@ -2230,6 +2230,12 @@ def generate(filename, override_system_clock_frequency=None, manual_overlays=Non
                 # let's fallback to array memory for smaller regions
                 model = 'Memory.ArrayMemory'
 
+        # ESP32 / ESP32-S2 UART: the console HAL writes TX through the AHB FIFO alias, so register it there too.
+        # Only the UARTs boards use as console: ESP32 uart0, ESP32-S2 uart0 and uart1.
+        uart_ahb_alias = {0x3ff40000: 0x60000000, 0x3f400000: 0x60000000, 0x3f410000: 0x60010000}
+        if model == 'UART.ESP32_UART' and len(regions) == 1 and regions[0].address in uart_ahb_alias:
+            regions.append(RegistrationRegion(uart_ahb_alias[regions[0].address]))
+
         block_content = [f'{name}: {model} @ {RegistrationRegion.to_repl(regions)}']
         block_content.extend(map(lambda x: f'    {x}', indent))
 

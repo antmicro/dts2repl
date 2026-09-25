@@ -1,0 +1,32 @@
+dcache0:
+    size: 0x2400000
+
+irom: Memory.MappedMemory @ sysbus 0x40000000
+    size: 0x60000
+
+drom: Memory.MappedMemory @ sysbus 0x3FF00000
+    size: 0x20000
+
+system: Memory.MappedMemory @ sysbus 0x600C0000
+    size: 0x1000
+
+extmem: Miscellaneous.ESP32S3_EXTMEM @ sysbus 0x600C4000
+
+rtc_cntl: Miscellaneous.ESP32_RTC_CNTL @ sysbus 0x60008000
+
+timg0: Timers.ESP32_TIMG @ sysbus 0x6001F000
+
+spi1: SPI.ESP32_SPIController @ sysbus 0x60002000
+    generation: ESP32Generation.ESP32S3
+
+spiflash: SPI.GenericSpiFlash @ spi1
+    underlyingMemory: flash0
+    manufacturerId: 0xC8
+    memoryType: 0x40
+
+sysbus:
+    init:
+        // GPIO46 low keeps the ROM's boot messages on, GPIO0 high skips the download bootloader.
+        Tag <0x60004038 0x4> "GPIO_STRAP" 0x8
+        // BBPLL_CAL_DONE, polled by the ROM after it starts the PLL calibration.
+        Tag <0x6000e040 0x4> "I2C_MST_ANA_CONF0" 0x01000000

@@ -142,6 +142,8 @@
 
     "cdac,vega-et1031": "CPU.RiscV32",
     "cdns,tensilica-xtensa-lx3": { "type": "CPU.Xtensa", "cpuType": "dc233c", "frequency": 100000000 },
+    "espressif,xtensa-lx7": { "type": "CPU.Xtensa", "cpuType": "esp32s3", "frequency": 0xe4e1c00 },
+    "espressif,xtensa-lx6": { "type": "CPU.Xtensa", "cpuType": "esp32", "frequency": 0xe4e1c00 },
     "cdns,ttc": "Timers.Cadence_TTC",
     "xlnx,ttcps": "Timers.Cadence_TTC",
     "cdns,uart-r1p8": "UART.Cadence_UART",
@@ -276,6 +278,7 @@
     "nuclei,bumblebee": "CPU.RiscV32",
     "espressif,riscv": "CPU.RiscV32",
     "espressif,esp32-uart": "UART.ESP32_UART",
+    "espressif,esp32-usb-serial": "UART.ESP32_USBSerialJTAG",
     "intel,niosv": "CPU.RiscV32",
     "intel,x86": { "type": "CPU.X86", "cpuType": "n270" },
     "intel,x86_64": { "type": "CPU.X86_64", "cpuType": "x86_64" },

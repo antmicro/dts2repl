@@ -1,0 +1,57 @@
+irom: Memory.MappedMemory @ sysbus 0x40000000
+    size: 0x70000
+
+drom: Memory.MappedMemory @ sysbus 0x3ff90000
+    size: 0x10000
+
+efuse: Python.PythonPeripheral @ sysbus 0x3ff5a000
+    size: 0x200
+    initable: true
+    script: '''
+if request.IsInit:
+    words = {}
+elif request.IsRead:
+    request.Value = words.get(request.Offset, 0)
+    # The ROM writes a command to EFUSE_CMD and then polls it: it has to read the command back
+    # once before the controller may report the operation as finished.
+    if request.Offset == 0x104:
+        words[0x104] = 0
+else:
+    words[request.Offset] = request.Value
+'''
+
+rtc_cntl: Memory.MappedMemory @ sysbus 0x3ff48000
+    size: 0x1000
+
+dport_cache: Memory.ArrayMemory @ sysbus 0x3ff00000
+    size: 0x100
+
+spi1: SPI.ESP32_SPIController @ sysbus 0x3ff42000
+    generation: ESP32Generation.ESP32
+
+spiflash: SPI.GenericSpiFlash @ spi1
+    underlyingMemory: flash0
+    manufacturerId: 0xC8
+    memoryType: 0x40
+
+timg0: Timers.ESP32_TIMG @ sysbus 0x3ff5f000
+    generation: ESP32Generation.ESP32
+
+timg1: Timers.ESP32_TIMG @ sysbus 0x3ff60000
+    generation: ESP32Generation.ESP32
+
+sysbus:
+    init:
+        Tag <0x3ff44038 0x4> "GPIO_STRAP" 0x13
+        Tag <0x3ff58040 0x4> "SLC_0TX_LINK" 0x80000000
+        Tag <0x3ff6607c 0x4> "SYSCON_WAFER_MSB" 0x80000000
+        Tag <0x3ff003f0 0x4> "DCACHE_STATE" 0x00000080
+        // reset reason = POWERON (else ets_main.c:404 asserts); STORE5 = 240 MHz cpu freq
+        WriteDoubleWord 0x3ff48034 0x1
+        WriteDoubleWord 0x3ff480b4 0x00F000F0
+        // DPORT PRO/APP cache-control flush-done bits
+        WriteDoubleWord 0x3ff00040 0x20
+        WriteDoubleWord 0x3ff00058 0x20
+        // eFuse wafer-version bits so the ROM sees chip revision >= v3.0
+        WriteDoubleWord 0x3ff5a00c 0x8000
+        WriteDoubleWord 0x3ff5a014 0x100000

@@ -1,0 +1,44 @@
+cpu0:
+    cpuType: "esp32s2"
+
+irom: Memory.MappedMemory @ sysbus 0x40000000
+    size: 0x20000
+
+romdata: Memory.MappedMemory @ sysbus 0x3ffe0000
+    size: 0x20000
+
+iram: Memory.MappedMemory @ sysbus 0x40020000
+    size: 0x50000
+
+rtcfast_i: Memory.MappedMemory @ sysbus 0x40070000
+    size: 0x2000
+
+drom: Memory.MappedMemory @ sysbus 0x3ffa0000
+    size: 0x10000
+
+rtc_cntl: Miscellaneous.ESP32_RTC_CNTL @ sysbus 0x3f408000
+    generation: ESP32Generation.ESP32S2
+
+system: Memory.MappedMemory @ sysbus 0x3f4c0000
+    size: 0x1000
+
+timg0: Timers.ESP32_TIMG @ sysbus 0x3f41f000
+    generation: ESP32Generation.ESP32S2
+
+timg1: Timers.ESP32_TIMG @ sysbus 0x3f420000
+    generation: ESP32Generation.ESP32S2
+
+spi1: SPI.ESP32_SPIController @ sysbus 0x3f402000
+    generation: ESP32Generation.ESP32S2
+
+spiflash: SPI.GenericSpiFlash @ spi1
+    underlyingMemory: flash0
+    manufacturerId: 0xC8
+    memoryType: 0x40
+
+sysbus:
+    init:
+        Tag <0x3f404038 0x4> "GPIO_STRAP" 0x00000004
+        Tag <0x61800000 0x4> "DCACHE_STATE_DONE" 0x00282600
+        Tag <0x61800040 0x4> "ICACHE_STATE_DONE" 0x00282600
+        Tag <0x6180011c 0x4> "CACHE_STATE_IDLE" 0x00001001
