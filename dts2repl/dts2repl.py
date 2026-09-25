@@ -1288,6 +1288,39 @@ def generate_irq_connections(irq_names, irq_dest_nodes, irq_numbers, irq_local_i
         # than no peripheral at all
     return irqs
 
+# Some devicetree entries lack `line-ranges`, but we can infer them from IRQ names, which are named lineN, lineN-M, or lineN-M-IRRELEVANT
+LINE_IRQ_NAME = re.compile(r'line(?P<first>\d+)(?:-(?P<last>\d+))?(?:-\w*)?')
+
+def line_ranges_from_interrupt_names(names: list[str]) -> Optional[list[tuple[int, int]]]:
+    matches = [LINE_IRQ_NAME.fullmatch(irq_name) for irq_name in names]
+    return [
+        (
+            int(match['first']),
+            int(match['last']) - int(match['first']) + 1 if match['last'] else 1
+        ) for match in matches
+    ] if all(matches) else None
+
+def pairs(iterable):
+    i = iter(iterable)
+    return zip(i, i)
+
+def get_exti_irq_names(node, base_dests):
+    line_ranges = pairs(node.props['line-ranges'].to_nums()) if 'line-ranges' in node.props \
+        else line_ranges_from_interrupt_names(node.props['interrupt-names'].to_strings()) if 'interrupt-names' in node.props \
+        else None
+
+    if line_ranges is None:
+        logging.warning("EXTI does not specify interrupt lines")
+        return [], base_dests
+
+    names, dests = zip(
+        *itertools.chain.from_iterable(
+            zip(range(start, start + count), itertools.repeat(dest)) \
+                for dest, (start, count) in zip(base_dests, line_ranges)
+        )
+    )
+    return names, dests
+
 def generate(filename, override_system_clock_frequency=None, manual_overlays=None):
     name_mapper = NameMapper()
     dt = get_dt(filename)
@@ -2234,6 +2267,9 @@ def generate(filename, override_system_clock_frequency=None, manual_overlays=Non
                 irq_names = ['0']
             elif compat in ['renesas,rzt2m-uart']:
                 irq_names = ['// RxErrIRQ', 'RxIRQ', 'TxIRQ', 'TxEndIRQ']
+            elif compat in ['wch,exti', 'st,stm32-exti']:
+                irq_names, irq_destinations = get_exti_irq_names(node, zip(irq_dest_nodes, irq_numbers))
+                irq_dest_nodes, irq_numbers = zip(*irq_destinations)
             else:
                 irq_names = [str(n) for n in range(len(irq_dest_nodes))]
 
