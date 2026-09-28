@@ -1073,9 +1073,30 @@ SUPPORTED_RV_EXTENSIONS = {
 }
 
 
-def parse_overlay(path):
+REPL_USING = re.compile(r'using\s+"(?P<path>[^"]+)"')
+
+# Expand `using`s in-place so that the overlays are portable when used as part of an emitted repl
+def read_overlay_lines(path, including=()):
+    path = Path(path).resolve()
+    if path in including:
+        raise ValueError(f'overlay include cycle: {" -> ".join((*including, path))}')
+    lines = []
     with open(path) as f:
-        lines = [line.rstrip() for line in f.readlines()]
+        for line in f:
+            line = line.rstrip()
+            match = REPL_USING.fullmatch(line)
+            if match:
+                target = path.parent / match.group('path')
+                # Pad empty lines around so that if the file starts or ends with
+                # an indented block, it doesn't get merged with anything in the
+                # parent file
+                lines += ['', *read_overlay_lines(target, (*including, path)), '']
+            else:
+                lines.append(line)
+    return lines
+
+def parse_overlay(path):
+    lines = read_overlay_lines(path)
 
     blocks = []
     parts = [list(g) for k, g in itertools.groupby(lines, lambda x: x == "") if not k]
