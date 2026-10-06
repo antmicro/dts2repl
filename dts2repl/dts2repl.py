@@ -1315,6 +1315,31 @@ def get_exti_irq_names(node, base_dests):
     )
     return names, dests
 
+def _get_gpio(node, mcu_compat, overlays, property_name='gpios'):
+    gpios_prop = get_node_prop(node, property_name)
+    if not gpios_prop:
+        logging.info('%s has no property "%s", skipping...', node.name, property_name)
+        return None, None, None
+
+    gpios = list(gpios_prop)
+    gpio, num, gpio_flags = gpios[0][:3]
+    gpio_compat = get_node_prop(gpio, 'compatible', [])
+    if 'nxp,s32-gpio' in gpio_compat:
+        # We have to translate gpio pin to pad
+        gpio_addr = int(gpio.unit_addr, 16)
+        gpio_base_addr = gpio_addr & ~0xFFFF
+        port_index = int((gpio_addr - gpio_base_addr - 0x1700) / 0x4)
+        num = port_index * 32 + num
+        gpio = gpio.parent
+
+    gpio_model = get_model(gpio, mcu_compat, overlays)
+    if not gpio_model or not gpio_model.startswith("GPIO"):
+        # don't add invalid GPIO connections
+        logging.info('No GPIO model, skipping...')
+        return None, None, None
+
+    return gpio, num, gpio_flags
+
 def generate(filename, override_system_clock_frequency=None, manual_overlays=None):
     name_mapper = NameMapper()
     dt = get_dt(filename)
@@ -2076,24 +2101,8 @@ def generate(filename, override_system_clock_frequency=None, manual_overlays=Non
             regions = [RegistrationRegion(addresses=[i2c_addr], registration_point=i2c_name)]
 
         if model in ('Miscellaneous.LED', 'Miscellaneous.Button'):
-            gpios_prop = get_node_prop(node, 'gpios')
-            if not gpios_prop:
-                logging.info(f'{node.name} has no gpios property, skipping...')
-                continue
-            gpios = list(gpios_prop)
-            gpio, num, gpio_flags = gpios[0][:3]
-            gpio_compat = get_node_prop(gpio, 'compatible', [])
-            if 'nxp,s32-gpio' in gpio_compat:
-                # We have to translate gpio pin to pad
-                gpio_addr = int(gpio.unit_addr, 16)
-                gpio_base_addr = gpio_addr & ~0xFFFF
-                port_index = int((gpio_addr - gpio_base_addr - 0x1700) / 0x4)
-                num = port_index * 32 + num
-                gpio = gpio.parent
-
-            gpio_model = get_model(gpio, mcu_compat, overlays)
-            if not gpio_model or not gpio_model.startswith("GPIO"):
-                # don't add invalid GPIO connections
+            gpio, num, gpio_flags = _get_gpio(node, mcu_compat, overlays)
+            if not gpio:
                 continue
 
             active_low = (gpio_flags & 1) == 1
