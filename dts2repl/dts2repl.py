@@ -368,7 +368,7 @@ def get_node_prop(node, prop, default=None, inherit=False):
     elif prop in ('interrupts', 'reg', 'ranges', 'alloc-ranges', 'dma-ranges', 'phandle'):
         return val.to_nums()
     elif prop in ('#address-cells', '#size-cells', '#interrupt-cells', 'cc-num', 'clock-frequency',
-                  'riscv,ndev', 'ngpios', 'port', '#clock-cells', 'fifo-depth'):
+                  'riscv,ndev', 'ngpios', 'port', '#clock-cells', 'fifo-depth', 'height'):
         return val.to_num()
     elif prop in ('interrupt-parent', 'spi-dev',):
         return val.to_node()
@@ -2103,6 +2103,9 @@ def generate(filename, override_system_clock_frequency=None, manual_overlays=Non
             elif (compatibles := get_node_prop(node.parent, 'compatible')) and 'zephyr,mipi-dbi-spi' in compatibles:
                 spi_name = name_mapper.get_name(get_node_prop(node.parent, 'spi-dev'))
                 regions = [RegistrationRegion(registration_point=spi_name)]
+                height = get_node_prop(node, 'height')
+                if height:
+                    indent.append(f'height: {height}')
                 gpio, num, _ = _get_gpio(node.parent, mcu_compat, overlays, 'dc-gpios')
                 if gpio:
                     gpio_name = name_mapper.get_name(gpio)
