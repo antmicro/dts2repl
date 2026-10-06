@@ -23,16 +23,16 @@ from dts2repl.improved_json_decoder import ImprovedJsonDecoder
 from dts2repl import name, version
 
 try:
-   from dts2repl import version_commit
-   version = version + "-" + version_commit
+    from dts2repl import version_commit
+    version = version + "-" + version_commit
 except:
-   pass
+    pass
 
 try:
-   from dts2repl import version_additional
-   version = version + "-" + version_additional
+    from dts2repl import version_additional
+    version = version + "-" + version_additional
 except:
-   pass
+    pass
 
 def get_models_path() -> Path:
     return pathlib.Path(__file__).parent.resolve() / "models.json"
@@ -254,7 +254,7 @@ def get_uart(dts_filename, only_compatible = False, only_explicit_declarations =
                 return verify_and_return_node(node)
             cons_index -= 1
     except Exception:
-       pass
+        pass
 
     if only_explicit_declarations:
         return None
@@ -269,7 +269,7 @@ def get_uart(dts_filename, only_compatible = False, only_explicit_declarations =
                 if not is_disabled(node) and 'reg' in node.props:
                     return verify_and_return_node(node)
     except Exception:
-       pass
+        pass
 
     # Last check, search the generated repl itself for something UART look-alike
     UART_BACKUP_REGEX=re.compile(r"(?P<name>[0-9A-Za-z]+):\s+UART.")
@@ -326,16 +326,16 @@ def get_dt(filename):
     filename = str(filename)
 
     if filename == '-':
-       filename = '/dev/stdin'
+        filename = '/dev/stdin'
     if filename.startswith("https://") or filename.startswith("http://"):
-       try:
-          import requests
-       except:
-          print("error: requests module is required to support remote files")
-          sys.exit(1)
-       dts_file = requests.get(filename).text
+        try:
+            import requests
+        except:
+            print("error: requests module is required to support remote files")
+            sys.exit(1)
+        dts_file = requests.get(filename).text
     else:
-       dts_file = open(filename).readlines()
+        dts_file = open(filename).readlines()
     dts_file = filter(lambda x: 'pinctrl-0;' not in x, dts_file)
     dts_file = ''.join(dts_file)
 
@@ -922,7 +922,7 @@ class ReplFile:
                 return True
             line = lines_without_comments[0].strip()
             if line.endswith(":"):
-               return False
+                return False
             return True
 
         self.blocks = list(filter(should_stay, self.blocks))
@@ -2710,7 +2710,7 @@ def main():
             f.writelines(f'{x}\n' for x in includes)
 
     if args.output == "-":
-       args.output = "/dev/stdout"
+        args.output = "/dev/stdout"
     with open(args.output, 'w') as f:
         f.write(
             generate(
