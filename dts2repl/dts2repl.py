@@ -370,13 +370,13 @@ def get_node_prop(node, prop, default=None, inherit=False):
     elif prop in ('#address-cells', '#size-cells', '#interrupt-cells', 'cc-num', 'clock-frequency',
                   'riscv,ndev', 'ngpios', 'port', '#clock-cells', 'fifo-depth'):
         return val.to_num()
-    elif prop in ('interrupt-parent',):
+    elif prop in ('interrupt-parent', 'spi-dev',):
         return val.to_node()
     elif prop in ('interrupts-extended',):
         return get_interrupts_extended(val)
     elif prop in ('clocks',):
         return get_clocks(val)
-    elif prop in ('gpios',):
+    elif prop in ('gpios', 'dc-gpios',):
         fmt = 'pnn'
         while len(fmt) * 4 < len(val.value):
             fmt += 'n'
@@ -2082,23 +2082,36 @@ def generate(filename, override_system_clock_frequency=None, manual_overlays=Non
                 indent.append(f"IRQ -> cpu0@{interrupt_number}")
 
 
-        # A device sitting on an I2C bus registers on its controller rather than
-        # on the sysbus. What decides this is position in the tree, not the
-        # model name: the `I2C.` namespace holds controllers as well as the
-        # devices hanging off them.
-        #
+        # A device sitting on a bus registers on its controller rather than on the sysbus.
         # Flash chips are the exception: they map to Memory.MappedMemory, which
         # is memory-mapped and belongs on the sysbus.
         #
-        # SPI is left out because its controllers disagree about the
+        # I2C devices are connected to their controller. What decides this is position in the tree,
+        # not the model name: the `I2C.` namespace holds controllers as well as the
+        # devices hanging off them.
+        #
+        # MIPI DBI is a bus not modeled in Renode but when the underlying bus is SPI, the display
+        # peripheral can be connected to the SPI controller and the DC GPIO.
+        #
+        # Other SPI peripherals are left out because their controllers disagree about the
         # registration point, some taking a chip select and others none.
         if on_bus and not model.startswith(('Memory.', 'CPU.')):
-            if not (get_model(node.parent, mcu_compat, overlays) or '').startswith('I2C.') or not node.unit_addr:
-                logging.warning(f'Node {node.name} is not on a modeled I2C controller. Dropping {model}')
+            if (get_model(node.parent, mcu_compat, overlays) or '').startswith('I2C.') and node.unit_addr:
+                i2c_name = name_mapper.get_name(node.parent)
+                i2c_addr = int(node.unit_addr, 16)
+                regions = [RegistrationRegion(addresses=[i2c_addr], registration_point=i2c_name)]
+            elif (compatibles := get_node_prop(node.parent, 'compatible')) and 'zephyr,mipi-dbi-spi' in compatibles:
+                spi_name = name_mapper.get_name(get_node_prop(node.parent, 'spi-dev'))
+                regions = [RegistrationRegion(registration_point=spi_name)]
+                gpio, num, _ = _get_gpio(node.parent, mcu_compat, overlays, 'dc-gpios')
+                if gpio:
+                    gpio_name = name_mapper.get_name(gpio)
+                    gpio_connection = ReplBlock(gpio_name, None, {gpio_name, name}, set(),
+                                                [f'{gpio_name}:', f'    {num} -> {name}@0'])
+                    repl_file.add_block(gpio_connection)
+            else:
+                logging.warning('Node %s is not on a modelled bus controller. Dropping %s', node.name, model)
                 continue
-            i2c_name = name_mapper.get_name(node.parent)
-            i2c_addr = int(node.unit_addr, 16)
-            regions = [RegistrationRegion(addresses=[i2c_addr], registration_point=i2c_name)]
 
         if model in ('Miscellaneous.LED', 'Miscellaneous.Button'):
             gpio, num, gpio_flags = _get_gpio(node, mcu_compat, overlays)
