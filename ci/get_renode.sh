@@ -53,7 +53,7 @@ try_build() {
 
     git fetch --all 1>/dev/null 2>/dev/null
 
-    ./build.sh --net 1>../renode-build.log 2>&1 || return $?
+    ./build.sh 1>../renode-build.log 2>&1 || return $?
     pip install -r tests/requirements.txt > /dev/null
 
     cd ..
