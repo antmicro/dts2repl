@@ -29,6 +29,9 @@ class ImprovedJsonDecoder(json.JSONDecoder):
             return self.parse_object((string, idx + 1), self.strict,
                 self._scan_once, self.object_hook, self.object_pairs_hook, self.memo)
         elif nextchar == '[':
+            # Python 3.15 added the required `array_hook` argument.
+            if hasattr(self, 'array_hook'):
+                return self.parse_array((string, idx + 1), self._scan_once, self.array_hook)
             return self.parse_array((string, idx + 1), self._scan_once)
         elif nextchar == 'n' and string[idx:idx + 4] == 'null':
             return None, idx + 4
