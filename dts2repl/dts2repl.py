@@ -184,6 +184,10 @@ def get_uart(dts_filename, only_compatible = False, only_explicit_declarations =
     def verify_and_return_node(node):
         name = name_mapper.get_name(node)
         if only_compatible:
+            # Overlays may provide the console as a virtual one
+            virtual_console_pattern = fr'CreateVirtualConsole\s+"{re.escape(name)}"'
+            if re.search(virtual_console_pattern, repl) is not None:
+                return name
             # Try to match the node name to a peripheral in repl
             # it should mean that the UART is supported and can be used
             UART_REGEX = re.compile(fr"\s*{name}:\s*.+")
