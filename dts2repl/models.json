@@ -278,6 +278,7 @@
     "nuclei,bumblebee": "CPU.RiscV32",
     "espressif,riscv": "CPU.RiscV32",
     "espressif,esp32-uart": "UART.ESP32_UART",
+    "espressif,esp32-lpuart": "UART.ESP32_UART",
     "espressif,esp32-usb-serial": "UART.ESP32_USBSerialJTAG",
     "intel,niosv": "CPU.RiscV32",
     "intel,x86": { "type": "CPU.X86", "cpuType": "n270" },
