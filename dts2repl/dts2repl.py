@@ -140,6 +140,8 @@ def get_cpu_dep_chain(arch, dts_filename, zephyr_path, chain):
                 return get_cpu_dep_chain(arch, dtsi_filename, zephyr_path, chain+[name])
     return chain
 
+CHOSEN_CONSOLE_PROPS = ('zephyr,console', 'zephyr,shell-uart')
+
 def get_usb_cdc_acm_uart(dts_filename):
     # This function will check if CDC ACM UART is supported
     # and will return its USB device name if it is supported
@@ -155,11 +157,12 @@ def get_usb_cdc_acm_uart(dts_filename):
 
     name_mapper = NameMapper()
     # Check if cdc-acm-uart is in dts file
-    # Then get chosen shell-uart, then by that get parent of CDC ACM UART.
+    # Then get the node selected by CHOSEN_CONSOLE_PROPS, then by that get parent of CDC ACM UART.
     # The CDC ACM UART is supposed to be a child of USB device.
     try:
         chosen = dt.get_node('/chosen')
-        cdc_acm_uart_node = chosen.props['zephyr,shell-uart'].to_path()
+        console_prop = next(p for p in CHOSEN_CONSOLE_PROPS if p in chosen.props)
+        cdc_acm_uart_node = chosen.props[console_prop].to_path()
         if cdc_acm_uart_node.props['compatible'].to_string() != 'zephyr,cdc-acm-uart':
             logging.info(f'cdc acm uart is not supported: "{dts_filename}"')
             return None
@@ -192,13 +195,14 @@ def get_uart(dts_filename, only_compatible = False, only_explicit_declarations =
     # name while generating the repl, all bets are off
     name_mapper = NameMapper()
 
-    # First, try to use the chosen zephyr,shell-uart
-    try:
-        chosen = dt.get_node('/chosen')
-        node = chosen.props['zephyr,shell-uart'].to_path()
-        return verify_and_return_node(node)
-    except Exception:
-        pass
+    # First, try to use the nodes selected by CHOSEN_CONSOLE_PROPS
+    for console_prop in CHOSEN_CONSOLE_PROPS:
+        try:
+            chosen = dt.get_node('/chosen')
+            node = chosen.props[console_prop].to_path()
+            return verify_and_return_node(node)
+        except Exception:
+            pass
 
     # Then, chosen stdout-path = &uart;
     try:
