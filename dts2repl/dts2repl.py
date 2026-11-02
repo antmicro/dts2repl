@@ -593,8 +593,8 @@ class NameMapper:
         "IRQControllers.GaislerMIC": "irqmp",
         "IRQControllers.NVIC": "nvic0",
         "IRQControllers.PlatformLevelInterruptController": "plic",
-        "Miscellaneous.SiLabs.EFR32xG2_HFXO_2": "hfxo",
-        "Miscellaneous.SiLabs.EFR32xG2_HFXO_3": "hfxo",
+        "Miscellaneous.SiLabs.SiLabs_HFXO_2": "hfxo",
+        "Miscellaneous.SiLabs.SiLabs_HFXO_3": "hfxo",
         "Miscellaneous.MAX32650_GCR": "gcr",
         "GPIOPort.RenesasRA_GPIOMisc": "portMisc"
     }
@@ -1755,7 +1755,7 @@ def generate(filename, override_system_clock_frequency=None, manual_overlays=Non
         if model == 'Timers.RenesasDA_Watchdog':
             indent.append('nvic: nvic0')
             dependencies.add('nvic0')
-        if model == 'Miscellaneous.SiLabs.EFR32xG2_CMU_3':
+        if model == 'Miscellaneous.SiLabs.SiLabs_CMU_3':
             indent.append('hfxo: hfxo')
             dependencies.add('hfxo')
         if model == 'Miscellaneous.MAX32650_GCR':
