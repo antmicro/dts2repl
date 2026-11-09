@@ -1756,8 +1756,9 @@ def generate(filename, override_system_clock_frequency=None, manual_overlays=Non
             indent.append('nvic: nvic0')
             dependencies.add('nvic0')
         if model == 'Miscellaneous.SiLabs.SiLabs_CMU_3':
-            indent.append('hfxo: hfxo')
-            dependencies.add('hfxo')
+            hfxo = next(filter(lambda n: 'silabs,hfxo' in get_node_prop(n, 'compatible', []), dt.node_iter()), None)
+            if hfxo is not None and get_node_prop(hfxo, 'clock-frequency'):
+                indent.append(f"hfxoFrequency: {get_node_prop(hfxo, 'clock-frequency')}")
         if model == 'Miscellaneous.MAX32650_GCR':
             indent.append('nvic: nvic0')
             dependencies.add('nvic0')
