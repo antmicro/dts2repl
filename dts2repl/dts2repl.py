@@ -1714,7 +1714,7 @@ def generate(filename, override_system_clock_frequency=None, manual_overlays=Non
             indent.append('systick: nvic0')
             dependencies.add('nvic0')
         if model == 'Miscellaneous.STM32H7_RCC':
-            indent.append('systick: nvic0')
+            indent.append('nvic: nvic0')
             dependencies.add('nvic0')
 
             def find_hse_node(node):
