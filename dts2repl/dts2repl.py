@@ -543,7 +543,7 @@ def get_clocks(val):
         cells = cells[1 + clock_cells:]
         yield (dest, params)
 
-CLINT_COMPATS = {'sifive,clint0', 'starfive,jh7100-clint', 'thead,c900-clint'}
+CLINT_COMPATS = {'riscv,clint0', 'sifive,clint0', 'starfive,jh7100-clint', 'thead,c900-clint'}
 RISCV_MACHINE_TIMER_IRQ = 7
 
 
