@@ -1,0 +1,5 @@
+sram_a1: Memory.MappedMemory @ sysbus 0x20000
+    size: 0x8000
+
+dram: Memory.MappedMemory @ sysbus 0x40000000
+    size: 0x80000000
