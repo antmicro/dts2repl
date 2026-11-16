@@ -276,6 +276,8 @@
     "microchip,xec-i2c-v2": {"type": "Python.PythonPeripheral", "size": 0x4, "initable": false, "script": "request.Value = 0xffffffff" },
 
     "mediatek,mt8365-uart": "UART.NS16550",
+    "mediatek,mt6577-uart": "UART.NS16550",
+    "mediatek,hsuart": "UART.NS16550",
 
     "nuclei,bumblebee": "CPU.RiscV32",
     "espressif,riscv": "CPU.RiscV32",
