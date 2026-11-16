@@ -1,0 +1,9 @@
+ddr: Memory.MappedMemory @ sysbus 0x70000000
+    size: 0x40000000
+
+sysbus:
+    init add:
+        Tag <0x63F80000 0x4> "DPLL1_DP_CTL" 0x1
+        Tag <0x63F84000 0x4> "DPLL2_DP_CTL" 0x1
+        Tag <0x63F88000 0x4> "DPLL3_DP_CTL" 0x1
+        Tag <0x63F8C000 0x4> "DPLL4_DP_CTL" 0x1
