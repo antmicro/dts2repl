@@ -1,0 +1,26 @@
+sram: Memory.MappedMemory @ sysbus 0x40200000
+    size: 0x10000
+
+cm_idlest_ckgen: Python.PythonPeripheral @ sysbus 0x48004D20
+    size: 0x4
+    initable: true
+    filename: "scripts/pydev/flipflop.py"
+
+cm_idlest2_ckgen: Python.PythonPeripheral @ sysbus 0x48004D24
+    size: 0x4
+    initable: true
+    filename: "scripts/pydev/flipflop.py"
+
+cm_idlest_pll_mpu: Python.PythonPeripheral @ sysbus 0x48004924
+    size: 0x4
+    initable: true
+    filename: "scripts/pydev/flipflop.py"
+
+cm_idlest_pll_iva2: Python.PythonPeripheral @ sysbus 0x48004024
+    size: 0x4
+    initable: true
+    filename: "scripts/pydev/flipflop.py"
+
+sysbus:
+    init add:
+        Tag <0x6D000080 0x4> "SDRC_MCFG_0" 0x8000

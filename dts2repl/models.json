@@ -1220,6 +1220,8 @@
     "quicklogic,usbserialport-s3b": "UART.USBSerialPort_S3B",
 
     "ti,am4372-i2c": { "type": "Python.PythonPeripheral", "size": 0x1000, "initable": false, "script": "request.Value = 0x1" },
+    "ti,omap3430-timer": { "type": "Python.PythonPeripheral", "size": 0x400, "initable": true, "filename": "scripts/pydev/counter.py" },
+    "ti,omap-counter32k": { "type": "Python.PythonPeripheral", "size": 0x20, "initable": true, "filename": "scripts/pydev/counter.py" },
     "ti,am654-uart": "UART.NS16550",
     "ti,am654-secure-proxy":  { "type": "Python.PythonPeripheral", "size": 0x100000, "initable": true, "filename": "scripts/pydev/flipflop.py" },
     "ti,am4372-uart": "UART.NS16550",
