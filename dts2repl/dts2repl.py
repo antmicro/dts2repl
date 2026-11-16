@@ -2176,6 +2176,9 @@ def generate(filename, override_system_clock_frequency=None, manual_overlays=Non
                     continue
             elif 'alloc-ranges' in node.props:
                 addr, size = next(get_reg(node, 'alloc-ranges'))
+                # a range like <0x0 0xffffffff> is an allocation constraint, not a memory region
+                if size % 0x1000:
+                    continue
                 regions = [RegistrationRegion(addr)]
                 indent.append(f'size: {hex(size)}')
             else:
