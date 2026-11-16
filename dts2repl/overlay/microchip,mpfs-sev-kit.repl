@@ -1,0 +1,2 @@
+ddr_cached_low: Memory.MappedMemory @ sysbus 0x80000000
+    size: 0x40000000
