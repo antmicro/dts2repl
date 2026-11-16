@@ -263,6 +263,14 @@ def get_uart(dts_filename, only_compatible = False, only_explicit_declarations =
     if only_explicit_declarations:
         return None
 
+    # Without stdout-path U-Boot uses the device with sequence number 0, i.e. the serial0 alias
+    try:
+        node = dt.get_node('/aliases').props['serial0'].to_path()
+        if not is_disabled(node):
+            return verify_and_return_node(node)
+    except Exception:
+        pass
+
     # Try to return any non-disabled node that looks vaguely like a uart
     try:
         for node in dt.node_iter():
