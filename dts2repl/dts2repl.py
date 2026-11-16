@@ -616,6 +616,8 @@ class NameMapper:
 
         # make name a valid repl GeneralIdentifier
         name = re.sub('[^A-Za-z0-9_]', '_', name)
+        if name[:1].isdigit():
+            name = 'n' + name
 
         model = get_model(node) or ''
         if model.startswith('CPU.'):
