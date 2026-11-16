@@ -181,6 +181,9 @@
     "fsl,imx6q-uart": "UART.MxcUart",
     "fsl,imx21-uart": "UART.MxcUart",
     "fsl,imx7ulp-lpuart" : "UART.MxcUart",
+    "fsl,imx21-i2c": {
+        "tq,imx": { "type": "Python.PythonPeripheral", "size": 0x4000, "initable": true, "script": "cr = 0 if request.IsInit else (request.Value if (request.IsWrite and request.Offset == 0x8) else cr); request.Value = ((0x82 | (cr & 0x20)) if request.Offset == 0xc else 0) if request.IsRead else request.Value" }
+    },
     "fsl,imxrt-lpuart": "UART.MxcUart",
     "fsl,vf610-lpuart": "UART.ImxUart",
     "fsl,vf610-i2c": { "type": "Python.PythonPeripheral", "size": 0x10000, "initable": true, "filename": "scripts/pydev/flipflop.py" },
