@@ -38,7 +38,7 @@
 
     "arm,armv7-timer": {
         "brcm,bcmbca": { "type": "Timers.ARM_GenericTimer", "frequency": 62500000, "defaultCounterFrequencyRegister": 62500000 },
-        "st,stm32mp157": { "type": "Timers.ARM_GenericTimer", "frequency": 62500000, "defaultCounterFrequencyRegister": 62500000 },
+        "st,stm32mp15": { "type": "Timers.ARM_GenericTimer", "frequency": 62500000, "defaultCounterFrequencyRegister": 62500000 },
         "st,stm32mp135": { "type": "Timers.ARM_GenericTimer", "frequency": 62500000, "defaultCounterFrequencyRegister": 62500000 },
         "_": { "type": "Timers.ARM_GenericTimer", "frequency": 62500000 } },
     "arm,armv8-timer": {
