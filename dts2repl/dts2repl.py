@@ -1828,8 +1828,17 @@ def generate(filename, override_system_clock_frequency=None, manual_overlays=Non
             indent.append('initable: false')
             indent.append('// 0x0: ctl')
             indent.append('// 0x18: misc')
-            indent.append('// these settings mean 256 MB of DRAM')
-            indent.append('script: "request.Value = {0x0: 0x4000000, 0x18: 0x0}.get(request.Offset, 0)"')
+            # ctl row bits encode the DRAM size: 256 MB by default, more if /memory says so
+            ram_size = 0
+            if dt.has_node('/memory'):
+                ram_size = next(get_reg(dt.get_node('/memory')), (0, 0))[1] or 0
+            else:
+                for n in dt.root.nodes.values():
+                    if n.name.startswith('memory@') and 'reg' in n.props:
+                        ram_size = next(get_reg(n), (0, 0))[1] or 0
+                        break
+            row = {0x20000000: 5, 0x40000000: 6}.get(ram_size, 4)
+            indent.append(f'script: "request.Value = {{0x0: {hex(row << 24)}, 0x18: 0x0}}.get(request.Offset, 0)"')
         elif compat.startswith('fsl,imx') and compat.endswith('-ccm'):
             indent.append('size: 0x4000')
             indent.append('initable: false')
