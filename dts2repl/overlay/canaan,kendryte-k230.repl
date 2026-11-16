@@ -1,0 +1,2 @@
+sram: Memory.MappedMemory @ sysbus 0x80200000
+    size: 0x200000
