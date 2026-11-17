@@ -36,6 +36,19 @@ spiflash: SPI.GenericSpiFlash @ spi1
     manufacturerId: 0xC8
     memoryType: 0x40
 
+// Zephyr's simple boot reads flash with esp_rom_flash_read(), which maps one 64 KiB flash page at a
+// time into the 0x3F370000 cache window through MMU entry 183. Without an MMU model this entry copies the
+// requested flash0 page into that window. Drop it once an ESP32 cache MMU model is upstreamed.
+flash_read_mmu: Python.PythonPeripheral @ sysbus 0x618012DC
+    size: 0x4
+    initable: false
+    script: '''
+if request.IsWrite and request.Value & 0xC000 == 0x8000:
+    from Antmicro.Renode.Peripherals import IPeripheralExtensions
+    bus = IPeripheralExtensions.GetMachine(self).SystemBus
+    bus.WriteBytes(bus.ReadBytes((request.Value & 0x3FFF) << 16, 0x10000), 0x3F370000)
+'''
+
 sysbus:
     init:
         Tag <0x3f404038 0x4> "GPIO_STRAP" 0x00000004

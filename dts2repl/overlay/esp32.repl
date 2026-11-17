@@ -40,6 +40,19 @@ timg0: Timers.ESP32_TIMG @ sysbus 0x3ff5f000
 timg1: Timers.ESP32_TIMG @ sysbus 0x3ff60000
     generation: ESP32Generation.ESP32
 
+// Zephyr's simple boot reads flash with esp_rom_flash_read(), which maps one 64 KiB flash page at a
+// time into the 0x3F720000 cache window through MMU entry 50. Without an MMU model this entry copies the
+// requested flash0 page into that window. Drop it once an ESP32 cache MMU model is upstreamed.
+flash_read_mmu: Python.PythonPeripheral @ sysbus 0x3FF100C8
+    size: 0x4
+    initable: false
+    script: '''
+if request.IsWrite and not request.Value & 0x100:
+    from Antmicro.Renode.Peripherals import IPeripheralExtensions
+    bus = IPeripheralExtensions.GetMachine(self).SystemBus
+    bus.WriteBytes(bus.ReadBytes((request.Value & 0xFF) << 16, 0x10000), 0x3F720000)
+'''
+
 sysbus:
     init:
         Tag <0x3ff44038 0x4> "GPIO_STRAP" 0x13
