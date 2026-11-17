@@ -1,0 +1,16 @@
+sysbus:
+    init add:
+        Tag <0x4400800C 0x4> "SUPC_STATUS" 0x100
+
+clock: Python.PythonPeripheral @ sysbus 0x4400C000
+    size: 0x8000
+    initable: true
+    script: '''
+if request.IsInit:
+    status = {0x10: 0x01000101, 0x200C: 0x1, 0x6008: 0x1}
+    regs = {}
+elif request.IsWrite:
+    regs[request.Offset] = request.Value
+elif request.IsRead:
+    request.Value = status.get(request.Offset, regs.get(request.Offset, 0))
+'''
