@@ -1210,7 +1210,10 @@
     "st,stm32mp15-i2c": { "type": "Python.PythonPeripheral", "size": 0x400, "initable": true, "filename": "scripts/pydev/flipflop.py" },
     "st,stm32mp157-syscfg": { "type": "Python.PythonPeripheral", "size": 0x400, "initable": true, "filename": "scripts/pydev/flipflop.py" },
     "st,stm32-hsem-mailbox": "Miscellaneous.STM32H7_HardwareSemaphore",
-    "st,stm32-pwr": { "type": "Python.PythonPeripheral", "size": 0x400 , "initable": true, "filename": "scripts/pydev/flipflop.py" },
+    "st,stm32-pwr": {
+        "st,stm32u3": { "type": "Python.PythonPeripheral", "size": 0x400, "initable": false, "script": "v = request.Value if request.IsWrite and request.Offset == 0xC else globals().get('v', 0); f = 1 - globals().get('f', 0); request.Value = v | ((v & 0x103) << 16) if request.Offset == 0xC else f * 0xFFFFFFFF" },
+        "_": { "type": "Python.PythonPeripheral", "size": 0x400 , "initable": true, "filename": "scripts/pydev/flipflop.py" }
+    },
     "st,stm32wb0-pwr": { "type": "Python.PythonPeripheral", "size": 0x400 , "initable": true, "filename": "scripts/pydev/flipflop.py" },
 
     "starfive,itim0": "Memory.MappedMemory",
