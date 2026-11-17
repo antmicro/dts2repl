@@ -1,0 +1,3 @@
+cpu0:
+    init:
+        RegisterCustomCSR "MMISC_CTL" 0x7D0 Machine
