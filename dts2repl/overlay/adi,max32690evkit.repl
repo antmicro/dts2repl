@@ -1,3 +1,4 @@
 sysbus:
     init add:
         Tag <0x4002A100 0x4> "ICC_ctrl" 0xffffffff
+        Tag <0x4002A900 0x4> "RV32_ICACHE_CONTROLLER_ICC1_CTRL" 0x10000
