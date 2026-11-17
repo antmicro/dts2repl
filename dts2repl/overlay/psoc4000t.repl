@@ -1,0 +1,3 @@
+sysbus:
+    init add:
+        Tag <0x40030030 0x4> "SRSSLT_CLK_IMO_CONFIG" 0x80000000
