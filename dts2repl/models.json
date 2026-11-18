@@ -424,12 +424,14 @@
                           "_": { "type" : "SCI.RenesasRA6M5_SCI", "frequency": 48000000, "enableManchesterMode" : false, "enableFIFO" : true, "irq_mappings": ["ReceiveIRQ", "TransmitIRQ", "TransmitEndIRQ", null ] } },
     "renesas,scif-r9a07g044" : { "type": "SCI.RenesasRZG_SCIFA", "frequency": 100000000, "irq_mappings": ["0", "2", "3", "1", "4"] },
     "renesas,rz-scif-uart": { "type": "SCI.RenesasRZG_SCIFA", "frequency": 100000000, "irq_mappings": ["0", "1", "2", "3", "4"] },
+    "renesas,rza2m-scif-uart": { "type": "SCI.RenesasRZG_SCIFA", "frequency": 66000000, "irq_mappings": ["0", "2", "3", "4"] },
     "renesas,ra-timer" : "Timers.RenesasRA_GPT",
     "renesas,smartbond-timer" : "Timers.RenesasDA14_GPT",
     "renesas,ra-mram-controller": { "type": "Python.PythonPeripheral", "size": 0x100, "initable": true, "script": "lastVal = (0 if request.IsInit else ((request.Value & 0xFFFF) if request.IsWrite else lastVal)) ; request.Value = lastVal" },
     "renesas,ra-clock-generation-circuit": { "type": "Python.PythonPeripheral", "size": 0x40, "initable": false, "script": "request.Value = 0xFFFFFFFF" },
     "renesas,r9a07g044-cpg": { "type": "Python.PythonPeripheral", "size": 0x10000, "initable": true, "filename": "scripts/pydev/flipflop.py" },
     "renesas,rz-cpg": { "type": "Python.PythonPeripheral", "size": 0x10000, "initable": true, "filename": "scripts/pydev/flipflop.py" },
+    "renesas,rza2m-cpg": { "type": "Python.PythonPeripheral", "size": 0x460, "initable": false, "script": "r = globals().setdefault('r', {0x0: 0x1012}); o = request.Offset; r.update({o: request.Value}) if request.IsWrite else None; request.Value = r.get(o, 0)" },
 
     "socionext,uniphier-uart": "UART.NS16550",
 
