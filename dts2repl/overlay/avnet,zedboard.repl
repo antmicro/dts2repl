@@ -1,0 +1,2 @@
+ocm_low_page0: Memory.MappedMemory @ sysbus 0x0
+    size: 0x1000
