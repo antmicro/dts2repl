@@ -1,0 +1,3 @@
+sysbus:
+    init add:
+        Tag <0x40261524 4> "SRSS_CLK_ECO_STATUS" 0x3
