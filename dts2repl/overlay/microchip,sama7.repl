@@ -1,8 +1,22 @@
+pmc_pcr: Python.PythonPeripheral @ sysbus 0xE0018088
+    size: 0x4
+    initable: true
+    script: '''
+if request.IsInit:
+    cfg = {}
+    sel = 0
+elif request.IsWrite:
+    sel = request.Value & 0x7F
+    if request.Value & 0x80000000:
+        cfg[sel] = request.Value & 0x7FFFFFFF
+else:
+    request.Value = cfg.get(sel, sel)
+'''
+
 sysbus:
     init add:
         Tag <0xE0018024 0x4> "CKGR_MCFR" 0x1FFFF
         Tag <0xE0018028 0x4> "PMC_CPU_CKR" 0x1
         Tag <0xE0018030 0x4> "PMC_MCR" 0x10020000
         Tag <0xe0018068 0x4> "PMC_SR" 0xF03FFFF
-        Tag <0xe0018088 0x4> "PMC_PCR" 0xe0000400
         Tag <0xe00180EC 0x4> "PMC_PLL_ISR0" 0xFFFFFFFF
