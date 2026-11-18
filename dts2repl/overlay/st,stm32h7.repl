@@ -5,5 +5,6 @@ sysbus:
     init add:
         Tag <0x58024800 4> "PWR_CR1_DBP_SET" 0x100
         Tag <0x58024808 4> "PWR_CR2_BREN_SET" 0x1
+        Tag <0x5802480C 4> "PWR_CR3.USB33RDY" 0x4000000
         Tag <0x58024818 4> "D3CR.VOSRDY" 0x2000
         Tag <0x58026410 4> "HSEM_UNLOCK" 0x80000000 overridePeripheralAccesses=True
