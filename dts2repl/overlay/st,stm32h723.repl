@@ -1,0 +1,3 @@
+sysbus:
+    init add:
+        Tag <0x52002074 0x4> "FLASH_OPTSR2_PRG_CPUFREQ_BOOST" 0x4
