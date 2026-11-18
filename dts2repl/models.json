@@ -611,6 +611,7 @@
     "st,stm32wb-rcc": { "type": "Python.PythonPeripheral", "size": 0x400, "initable": true, "filename": "scripts/pydev/rolling-bit.py" },
     "st,stm32wba-rcc": "Miscellaneous.STM32WBA_RCC",
     "st,stm32wb0-rcc": { "type": "Python.PythonPeripheral", "size": 0x400, "initable": true, "filename": "scripts/pydev/rolling-bit.py" },
+    "st,stm32wl3-rcc": { "type": "Python.PythonPeripheral", "size": 0x400, "initable": true, "filename": "scripts/pydev/rolling-bit.py" },
     "st,stm32u5-rcc": { "type": "Python.PythonPeripheral", "size": 0x400, "initable": true, "filename": "scripts/pydev/flipflop.py" },
     "st,stm32c5-rcc": { "type": "Python.PythonPeripheral", "size": 0x400, "initable": true, "filename": "scripts/pydev/flipflop.py" },
     "st,stm32u3-rcc": { "type": "Python.PythonPeripheral", "size": 0x400, "initable": true, "filename": "scripts/pydev/flipflop.py" },
