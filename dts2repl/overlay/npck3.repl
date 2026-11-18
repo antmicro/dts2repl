@@ -1,0 +1,7 @@
+itim32: Timers.NPCX_ITIM @ sysbus 0x400B0000
+    apb2Frequency: 15000000
+    -> nvic0@29
+
+itim64: Timers.NPCX_ITIM @ sysbus 0x400BC000
+    is64Bit: true
+    apb2Frequency: 15000000
