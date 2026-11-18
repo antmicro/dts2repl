@@ -1,0 +1,20 @@
+bitband: Miscellaneous.BitBanding @ sysbus <0x42000000, +0x2000000>
+    peripheralBase: 0x40000000
+
+sysctl: Python.PythonPeripheral @ sysbus 0x400FE000
+    size: 0x1000
+    initable: true
+    script: '''
+if request.IsInit:
+    regs = {}
+elif request.IsWrite:
+    regs[request.Offset] = request.Value
+elif 0xA00 <= request.Offset < 0xB00:
+    request.Value = 0xFFFFFFFF
+elif request.Offset == 0x50:
+    request.Value = 0x140
+elif request.Offset == 0x168:
+    request.Value = 0x1
+else:
+    request.Value = regs.get(request.Offset, 0)
+'''

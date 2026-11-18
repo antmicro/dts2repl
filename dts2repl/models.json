@@ -1246,6 +1246,7 @@
     "ti,omap4-i2c": { "type": "Python.PythonPeripheral", "size": 0x1000, "initable": false, "script": "request.Value = 0x1" },
     "ti,omap5-dmm": { "type": "Python.PythonPeripheral", "size": 0x800, "initable": false, "script": "request.Value = {0x40: 0x80640000}.get(request.Offset, 0)" },
     "ti,stellaris-uart": "UART.PL011",
+    "ti,tiva-c-uart": "UART.PL011",
 
     "xlnx,xuartps": "UART.Cadence_UART",
     "xlnx,zynq-slcr": { "type": "Python.PythonPeripheral", "size": 0x200, "initable": false, "script": "request.Value = {0x100: 0x0001A008, 0x120: 0x1F000400, 0x124: 0x18400003}.get(request.Offset, 0)" },
