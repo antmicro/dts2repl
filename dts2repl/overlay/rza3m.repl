@@ -1,0 +1,16 @@
+cpg: Python.PythonPeripheral @ sysbus 0x11010000
+    size: 0x10000
+    initable: true
+    script: '''
+if request.IsInit:
+    lastVal = 0
+    pll5 = 0
+elif request.Offset == 0x140:
+    if request.IsWrite and request.Value & 0x10000:
+        pll5 = request.Value & 0x1
+elif request.Offset == 0x15C:
+    request.Value = 0x11 if pll5 else 0x0
+else:
+    lastVal = 1 - lastVal
+    request.Value = lastVal * 0xFFFFFFFF
+'''
