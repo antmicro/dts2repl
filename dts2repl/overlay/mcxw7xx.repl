@@ -8,12 +8,12 @@ scg_firccfg: Python.PythonPeripheral @ sysbus 0x50182308
     initable: true
     filename: "scripts/pydev/repeater.py"
 
-scg_csr_rccr: Python.PythonPeripheral @ { sysbus 0x5001E010; sysbus 0x5001E014 }
+scg_csr_rccr_mcxw71: Python.PythonPeripheral @ { sysbus 0x5001E010; sysbus 0x5001E014 }
     size: 0x4
     initable: true
     filename: "scripts/pydev/repeater.py"
 
-scg_firccfg: Python.PythonPeripheral @ sysbus 0x5001E308
+scg_firccfg_mcxw71: Python.PythonPeripheral @ sysbus 0x5001E308
     size: 0x4
     initable: true
     filename: "scripts/pydev/repeater.py"
