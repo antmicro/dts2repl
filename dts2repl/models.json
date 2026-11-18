@@ -6,7 +6,7 @@
     "aesc,uart": "UART.AescUART",
 
     "adi,max32-uart": {
-        "adi,max32650evkit|adi,ad_swiot1l_sl|adi,max32650fthr|adi,max32666evkit|adi,max32666fthr": { "type": "UART.MAX32650_UART" },
+        "adi,max32650evkit|adi,ad_swiot1l_sl|adi,max32650fthr|adi,max32666evkit|adi,max32666fthr|adi,max32651evkit|adi,max32660evsys": { "type": "UART.MAX32650_UART" },
         "_": "UART.MAX32655_UART"
     },
 
@@ -16,7 +16,7 @@
     },
 
     "adi,max32-gcr": {
-        "adi,max32650evkit|adi,ad_swiot1l_sl|adi,max32650fthr|adi,max32666evkit|adi,max32666fthr": { "type": "Miscellaneous.MAX32650_GCR" },
+        "adi,max32650evkit|adi,ad_swiot1l_sl|adi,max32650fthr|adi,max32666evkit|adi,max32666fthr|adi,max32651evkit|adi,max32660evsys": { "type": "Miscellaneous.MAX32650_GCR" },
         "_": {
             "type": "Python.PythonPeripheral",
             "size": 0x400,

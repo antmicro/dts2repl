@@ -1,0 +1,4 @@
+sysbus:
+    init add:
+        Tag <0x5002A100 4> "ICC0_CTRL" 0x10000
+        Tag <0x4002A100 4> "ICC0_CTRL_NS" 0x10000
