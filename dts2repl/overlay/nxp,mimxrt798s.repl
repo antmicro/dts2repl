@@ -7,7 +7,7 @@ xspi1:
 
 sysbus:
     init add:
-        Tag <0x4018412c 0x4> "XSPI0_DLLSR_NON_SECURE" 0xffffffff 
+        Tag <0x4018412c 0x4> "XSPI0_DLLSR_NON_SECURE" 0xffffffff
         Tag <0x50001010 0x18> "SYSCON_PSCCTLx" 0xffffffff overridePeripheralAccesses=true
         Tag <0x50041010 0x18> "SYSCON_PSCCTLx" 0xffffffff overridePeripheralAccesses=true
         Tag <0x50061010 0x18> "SYSCON_PSCCTLx" 0xffffffff overridePeripheralAccesses=true

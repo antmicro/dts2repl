@@ -1,11 +1,11 @@
 sysbus:
-    init add:        
+    init add:
         Tag <0x445b1004 0x4> "busybit" 1
         Tag <0x445B101C 0x4> "status" 0
         Tag <0x445B1020 0x4> "content" 0xFF
 
 mu2msg: Python.PythonPeripheral @ sysbus 0x445B1014
-    size: 0x8 
+    size: 0x8
     initable: true
     script: '''
 len = [12, 16, 8, 8, 8, 8, 8, 8, 8, 8]

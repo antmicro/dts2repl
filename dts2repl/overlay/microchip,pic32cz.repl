@@ -1,10 +1,10 @@
 sysbus:
     init add:
         Tag <0x4402000C 0x4> "SUPC_STATUS" 0xFFFFFFFF
-        Tag <0x4404000C 0x4> "OSCCTRL_INTFLAG" 0x1 
+        Tag <0x4404000C 0x4> "OSCCTRL_INTFLAG" 0x1
         Tag <0x44040010 0x4> "OSCCTRL_STATUS" 0xFFFFFFFF
-        Tag <0x4404200C 0x4> "OSC32KCTRL_" 0x3 
-        Tag <0x44050004 0x4> "GCLK_SYNCBUSY" 0x0 
+        Tag <0x4404200C 0x4> "OSC32KCTRL_" 0x3
+        Tag <0x44050004 0x4> "GCLK_SYNCBUSY" 0x0
         Tag <0x44052008 0x4> "MCLK_INTFLAG" 0x1
 
 OSCCTRL_PLL0CTRL: Python.PythonPeripheral @ sysbus 0x44040040

@@ -2,6 +2,6 @@ sysbus:
     init add:
         Unregister "sysbus.mcg"
         Tag <0x40064003 1> "MCG_CONTROL4" 0x20
-        
+
 lpuart0:
     hasGlobalRegisters: false

@@ -24,11 +24,11 @@ if request.IsRead: request.Value = regs[request.Offset >> 2]
 if request.IsWrite: regs[request.Offset >> 2] = request.Value
 '''
 
-sysbus: 
+sysbus:
     init add:
         ApplySVD @https://dl.antmicro.com/projects/renode/svd/RV32M1_RI5CY.svd.gz
-        Tag <0x4002C200 4> "SIRCCSR" 0xFFFFFFFF          
-        Tag <0x4002C300 4> "FIRCCSR" 0xFFFFFFFF          
+        Tag <0x4002C200 4> "SIRCCSR" 0xFFFFFFFF
+        Tag <0x4002C300 4> "FIRCCSR" 0xFFFFFFFF
         Tag <0x4002C304 4> "FIRCDIV" 0x00010101
         Tag <0x4002C500 4> "LPFFLCSR" 0xFFFFFFFF
         Tag <0x4002C208 4> "SIRCFFG" 0x1
