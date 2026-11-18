@@ -216,8 +216,11 @@
     "gaisler,irqmp": "IRQControllers.GaislerMIC",
     "gaisler,leon3": { "type": "CPU.Sparc", "cpuType": "leon3" },
 
-    "gd,gd32-rcu": { "type": "Python.PythonPeripheral", "size": 0x400, "initable": false, "script": "request.Value = 0xFFFFFFFF" },
-    "gd,gd32-usart": { "gd,gd32a503v-eval|gd,gd32f350r-eval|gd,gd32l233r-eval": { "type": "UART.GD32_UART", "extendedMode": true },
+    "gd,gd32-rcu": {
+        "gd32c2x1": { "type": "Python.PythonPeripheral", "size": 0x400, "initable": false, "script": "request.Value = 0xFFFFFFF3 if request.Offset == 0x8 else 0xFFFFFFFF" },
+        "_": { "type": "Python.PythonPeripheral", "size": 0x400, "initable": false, "script": "request.Value = 0xFFFFFFFF" }
+    },
+    "gd,gd32-usart": { "gd,gd32a503v-eval|gd,gd32f350r-eval|gd,gd32l233r-eval|gd,gd32c231c-eval": { "type": "UART.GD32_UART", "extendedMode": true },
                        "_": "UART.GD32_UART" },
 
     "gpio-leds": "Miscellaneous.LED",
