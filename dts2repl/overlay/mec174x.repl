@@ -8,6 +8,19 @@ MCHP_TMR32_1: Python.PythonPeripheral @ sysbus 0x40000CA0
     initable: true
     filename: "scripts/pydev/counter.py"
 
+GIRQ23_SRC: Python.PythonPeripheral @ sysbus 0x4000E12C
+    size: 0x4
+    initable: true
+    script: '''
+if request.IsInit:
+    armed = False
+elif request.IsWrite:
+    armed = True
+elif request.IsRead:
+    request.Value = 0 if armed else 0xFFFFFFFF
+    armed = False
+'''
+
 sysbus:
     init add:
         Tag <0x4008010C 4> "OSC_ID" 0xFFFFFFFF
