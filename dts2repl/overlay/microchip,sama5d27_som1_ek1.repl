@@ -1,0 +1,5 @@
+// The Zephyr UART driver never programs UART_BRGR and relies on at91bootstrap having set it,
+// so write the baud divisor the bootloader would leave behind.
+sysbus:
+    init add:
+        WriteDoubleWord 0xF8020020 0x2D
