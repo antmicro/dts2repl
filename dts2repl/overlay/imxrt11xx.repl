@@ -23,6 +23,20 @@ ANADIG_MISC_VDDSOC2PLL_AI_CTRL_VIDEO: Python.PythonPeripheral @ sysbus 0x40C848B
     initable: true
     filename: "scripts/pydev/flipflop.py"
 
+ccm_lpcg: Python.PythonPeripheral @ sysbus 0x40CC6000
+    size: 0x2000
+    initable: true
+    script: '''
+if request.IsInit:
+    regs = {}
+elif request.IsWrite:
+    regs[request.Offset] = request.Value
+elif request.Offset & 0x1F == 0x10:
+    request.Value = regs.get(request.Offset - 0x10, 0) & 0x1
+else:
+    request.Value = regs.get(request.Offset, 0)
+'''
+
 sysbus:
     init add:
         ApplySVD @https://dl.antmicro.com/projects/renode/svd/MIMXRT1176_CM4.svd.gz
