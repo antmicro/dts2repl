@@ -1,0 +1,6 @@
+sysbus:
+    init add:
+        Tag <0xF0010000 4> "PINCTRL_INFO" 0x80
+        Tag <0xF0022000 4> "CLKCTRL_DOMAINS" 0x1
+        Tag <0xF002200C 4> "CLKCTRL_DOMAIN0_RATIO" 0x10001
+        Tag <0xF0023014 4> "SYSCON_REF_CLOCK" 0x5F5E100

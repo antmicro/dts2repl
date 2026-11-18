@@ -1920,7 +1920,7 @@ def generate(filename, override_system_clock_frequency=None, manual_overlays=Non
             else:
                 empty_time_provider_compats = {
                     "intel,niosv", "nuclei,bumblebee", "neorv32-cpu",
-                    "espressif,riscv", "ite,riscv-ite", "litex,vexriscv-standard",
+                    "espressif,riscv", "ite,riscv-ite", "litex,vexriscv-standard", "spinalhdl,vexiiriscv",
                     "sensry,sy1xx", "nordic,vpr", "adi,max32-rv32", "cdac,vega-et1031"
                 }
                 empty_time_provider_overlays = {

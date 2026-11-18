@@ -239,6 +239,7 @@
     "litex,uart0": "UART.LiteX_UART",
     "litex,uart": "UART.LiteX_UART",
     "litex,vexriscv-standard": "CPU.RiscV32",
+    "spinalhdl,vexiiriscv": "CPU.RiscV32",
 
     "memory": "Memory.MappedMemory",
     "mmio-sram": "Memory.MappedMemory",
