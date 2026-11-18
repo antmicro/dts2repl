@@ -586,6 +586,7 @@
         "st,stm32g0|st,stm32g4|st,stm32l1|st,stm32l4|st,stm32l5" : {"type": "Python.PythonPeripheral", "size": 0x400, "initable": true, "filename": "scripts/pydev/flipflop.py" },
         "st,stm32f1|st,stm32f3": { "type": "Python.PythonPeripheral", "size": 0x400, "initable": true, "filename": "scripts/pydev/rolling-bit.py" },
         "st,stm32l0": "Miscellaneous.STM32L0_RCC",
+        "st,stm32mp13": { "type": "Python.PythonPeripheral", "size": 0x1000, "initable": false, "script": "r = globals().setdefault('r', {}); o = request.Offset; r.update({o: request.Value}) if request.IsWrite else None; v = r.get(o, 0); request.Value = v | (0x105 if o == 0x428 else 0) | (0x80000000 if o in (0x540, 0x544, 0x548) else 0) | ((v & 1) << 1 if o in (0x4A0, 0x4D0, 0x500, 0x520) else 0)" },
         "_" : "Miscellaneous.STM32F4_RCC"
     },
     "st,stm32-rng": {"type": "Miscellaneous.STM32_RNG", "series": {"reference": "STM32Series.F4"} },
