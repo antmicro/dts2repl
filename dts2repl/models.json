@@ -589,6 +589,15 @@
     },
     "st,stm32-rng": {"type": "Miscellaneous.STM32_RNG", "series": {"reference": "STM32Series.F4"} },
     "st,stm32-rtc": "Timers.STM32F4_RTC",
+    "st,stm32-otgfs": {
+        "st,stm32h745|st,stm32h747|st,stm32h755|st,stm32h757": { "type": "USB.DesignWare_USB_OTG", "irq_mappings": [null, null, null, "IRQ"] },
+        "_": { "type": "USB.DesignWare_USB_OTG", "irq_mappings": ["IRQ"] }
+    },
+    "st,stm32-otghs": {
+        "st,stm32h7rs|st,stm32h7s": { "type": "USB.DesignWare_USB_OTG", "irq_mappings": ["IRQ"] },
+        "st,stm32h7": { "type": "USB.DesignWare_USB_OTG", "irq_mappings": [null, null, null, "IRQ"] },
+        "_": { "type": "USB.DesignWare_USB_OTG", "irq_mappings": ["IRQ"] }
+    },
     "st,stm32h7-spi": {"type": "SPI.STM32H7_SPI", "irq_mappings": ["IRQ"] },
     "st,stm32-spi": { "type": "SPI.STM32SPI", "series": {"reference": "STM32Series.F4"} },
     "st,stm32-timers": { "type": "Timers.STM32_Timer", "frequency": 10000000, "initialLimit": 0xFFFFFFFF },
